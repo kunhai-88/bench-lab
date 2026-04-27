@@ -1,11 +1,30 @@
 {
   "name": "openrouter-bench-lab",
   "version": "0.1.0",
+  "description": "A static OpenRouter model benchmark dashboard with local hidden browser tests and RMB cost tracking.",
   "private": false,
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/defto-ai/openrouter-bench-lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/defto-ai/openrouter-bench-lab/issues"
+  },
+  "homepage": "https://github.com/defto-ai/openrouter-bench-lab#readme",
+  "keywords": [
+    "openrouter",
+    "llm",
+    "benchmark",
+    "token",
+    "cost",
+    "browser-test",
+    "static-dashboard"
+  ],
   "scripts": {
     "bench:openrouter": "node scripts/run-openrouter-benchmark.mjs",
+    "check": "node --check script.js && node --check scripts/run-openrouter-benchmark.mjs",
     "serve": "python3 -m http.server 4173"
   },
   "devDependencies": {

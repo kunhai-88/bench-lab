@@ -1,35 +1,53 @@
 # OpenRouter Bench Lab
 
-Static dashboard plus a local OpenRouter runner for comparing model token usage, RMB cost, generated demo quality, and browser-test results.
+一个用于评估 OpenRouter 模型「真实调用成本 + 生成效果」的静态网页项目。
 
-The checked-in site is static and Cloudflare Pages compatible. Real API calls run only from your local machine through `.env.local`.
+它会在本地调用 OpenRouter，让不同模型完成同一个自然语言任务，例如「写一个可以正常使用的网页计算器」或「写一个可以正常使用的网页日历」。脚本会记录 token 用量、人民币成本、耗时、修复次数，并用隐藏浏览器测试评估生成结果。网页端负责展示排行榜、测试结果、调用轨迹和可下载 demo。
 
-## Run real model generation
+> English: A static dashboard and local runner for comparing OpenRouter model cost, token usage, generated web app quality, and hidden browser-test results.
 
-Create a local key file first:
+## 项目特点
+
+- 静态网页：可直接部署到 Cloudflare Pages、GitHub Pages 或任意静态托管服务。
+- 本地调用：OpenRouter API Key 只放在 `.env.local`，不会提交到仓库。
+- 自然 prompt：模型只看到真实用户需求，不会看到隐藏测试选择器和断言。
+- 隐藏评测：Playwright 会在浏览器里点击、输入、观察 UI 行为。
+- 成本统计：记录 input/output/cache/reasoning tokens，并按 USD/CNY 汇率折算人民币。
+- Demo 下载：每个模型生成的 HTML demo 都可以在页面里打开和下载。
+- 开源安全：默认忽略 `.env.local`、`.bench-runs/`、`generated/` 和真实结果数据。
+
+## 当前任务
+
+默认内置两个任务：
+
+| 任务 | 给模型的自然语言 prompt |
+| --- | --- |
+| 计算器 | `写一个可以正常使用的网页计算器。页面要完整、好看，直接打开就能用。` |
+| 日历 | `写一个可以正常使用的网页日历。页面要完整、好看，直接打开就能用。` |
+
+隐藏测试不会提前暴露给模型。测试会尽量通过行为发现控件，而不是强制模型写固定 `data-testid`。
+
+## 快速开始
+
+安装依赖：
+
+```bash
+npm install
+```
+
+创建本地环境文件：
 
 ```bash
 cp .env.example .env.local
 ```
 
-Then edit `.env.local` and replace `sk-or-your-key-here` with your OpenRouter key.
-Do not commit `.env.local`; it is ignored by git.
-
-The runner fetches the latest USD/CNY rate from Frankfurter automatically. Set `USD_CNY=...` in `.env.local` only when you want to override it manually.
-The runner also refreshes model unit prices from OpenRouter `/api/v1/models`; the checked-in prices are only fallbacks.
-
-The generation prompt is intentionally short and natural:
-
-- Calculator: `写一个可以正常使用的网页计算器。页面要完整、好看，直接打开就能用。`
-- Calendar: `写一个可以正常使用的网页日历。页面要完整、好看，直接打开就能用。`
-
-The browser tests are hidden from the model. They evaluate behavior after generation instead of telling the model which selectors or exact edge cases to satisfy.
+编辑 `.env.local`，填入你的 OpenRouter Key：
 
 ```bash
-npm run bench:openrouter
+OPENROUTER_API_KEY=sk-or-your-key-here
 ```
 
-Limit spend while testing:
+运行一次真实 benchmark：
 
 ```bash
 npm run bench:openrouter -- \
@@ -38,55 +56,125 @@ npm run bench:openrouter -- \
   --retries=1
 ```
 
-`--retries=1` runs one repair attempt when browser tests fail. The dashboard shows the total tokens and total RMB cost across all attempts.
-
-The script writes:
-
-- `data/bench-results.json`
-- `generated/<task>/<model>/index.html`
-- `.bench-runs/<task>/<model>.json` for local debugging. This folder is gitignored and not needed for deployment.
-
-The dashboard automatically loads `data/bench-results.json` when it exists. If it does not exist, it falls back to fixture data.
-Each generated demo can be opened in the dashboard and downloaded as a standalone HTML file.
-
-## Optional browser tests
-
-Without Playwright, the runner uses structural checks. For real browser interaction tests:
-
-```bash
-npm install -D playwright
-npx playwright install chromium
-npm run bench:openrouter
-```
-
-## Preview locally
+本地预览网页：
 
 ```bash
 npm run serve
 ```
 
-Open `http://127.0.0.1:4173`.
+打开：
 
-## Deploy to Cloudflare Pages
-
-Use the project root as the static output directory. No build command is required.
-
-## Safe open-source checklist
-
-Before pushing to GitHub:
-
-```bash
-git status --short
-git check-ignore -v .env.local .bench-runs
-rg "sk-or-v1-|OPENROUTER_API_KEY=" . --glob '!node_modules/**' --glob '!.env.local' --glob '!.bench-runs/**'
+```text
+http://127.0.0.1:4173
 ```
 
-Expected:
+## 环境变量
 
-- `.env.local` is ignored by `.gitignore`.
-- `.bench-runs/` is ignored by `.gitignore`.
-- Only `.env.example`, `README.md`, and script usage text mention placeholder keys.
-- Do not commit real OpenRouter keys or local raw API debug payloads.
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `OPENROUTER_API_KEY` | 无 | 必填。只放在 `.env.local`。 |
+| `MAX_TOKENS` | `16000` | 单次生成最大 token。 |
+| `MAX_RETRIES` | `1` | 浏览器测试失败后的修复尝试次数。 |
+| `OPENROUTER_TIMEOUT_MS` | `480000` | 单次 OpenRouter 请求超时。 |
+| `OPENROUTER_REASONING_EFFORT` | `none` | 默认降低 reasoning 消耗；如 provider 不支持，脚本会自动降级重试。 |
+| `ARTIFACT_OUTPUT_MODE` | `html` | 生成 demo 的输出模式。 |
+| `USD_CNY` | 自动获取 | 可手动指定美元兑人民币汇率。 |
+
+脚本会自动：
+
+- 从 Frankfurter 获取最新 USD/CNY 汇率。
+- 从 OpenRouter `/api/v1/models` 刷新模型单价。
+- 将真实结果写入 `data/bench-results.json`。
+- 将生成 demo 写入 `generated/<task>/<model>/index.html`。
+- 将本地调试响应写入 `.bench-runs/`。
+
+## 常用命令
+
+```bash
+# 检查 JS 语法
+npm run check
+
+# 运行全部默认模型和任务
+npm run bench:openrouter
+
+# 只跑一个模型和一个任务，控制成本
+npm run bench:openrouter -- \
+  --models=deepseek/deepseek-v3.2 \
+  --tasks=calculator \
+  --retries=1
+
+# 启动静态服务器
+npm run serve
+```
+
+## 结果文件
+
+这些文件是本地生成产物，默认不提交：
+
+- `data/bench-results.json`
+- `generated/`
+- `.bench-runs/`
+
+原因：
+
+- `data/bench-results.json` 代表某次本地实验结果，可能过期。
+- `generated/` 可能包含大量模型生成 HTML。
+- `.bench-runs/` 是本地调试用 raw response，不适合开源提交。
+
+如果你想发布一份固定 benchmark 报告，可以在自己的 fork 里取消忽略这些文件，或另建 release artifact。
+
+## 部署
+
+部署到 Cloudflare Pages：
+
+- Build command: 留空
+- Output directory: 项目根目录
+- Environment variables: 不需要。静态页面不应该带 OpenRouter Key。
+
+部署后页面只展示仓库里的静态数据。真实 API 调用仍应在本地运行。
+
+## 开源安全检查
+
+提交前建议运行：
+
+```bash
+git status --short --ignored
+git check-ignore -v .env.local .bench-runs data/bench-results.json generated node_modules
+rg --pcre2 "sk-or-v1-[A-Za-z0-9]+|OPENROUTER_API_KEY=.*sk-or" . \
+  --glob '!node_modules/**' \
+  --glob '!.env.local' \
+  --glob '!.bench-runs/**' \
+  --glob '!data/bench-results.json' \
+  --glob '!generated/**'
+```
+
+预期结果：
+
+- `.env.local` 被忽略。
+- `.bench-runs/` 被忽略。
+- `data/bench-results.json` 被忽略。
+- `generated/` 被忽略。
+- 仓库里只出现占位 key，例如 `sk-or-your-key-here` 或文档里的 `sk-or-...`。
+
+如果你的 OpenRouter Key 曾经被提交或贴到公开位置，请立刻去 OpenRouter 后台轮换 key。
+
+## 贡献
+
+欢迎贡献：
+
+- 新任务模板
+- 更稳健的隐藏浏览器测试
+- 新模型 catalog
+- 成本展示和可视化改进
+- Cloudflare Pages 部署示例
+
+请先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+
+## English Summary
+
+OpenRouter Bench Lab is a static dashboard plus a local runner. It calls OpenRouter models with natural user prompts, generates standalone HTML demos, runs hidden browser tests, and records token usage, latency, repair attempts, and CNY cost.
+
+API keys stay local in `.env.local`. Generated artifacts and raw responses are ignored by default.
 
 ## License
 
