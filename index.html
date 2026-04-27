@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>页面生成模型对比</title>
+    <meta
+      name="description"
+      content="对比不同模型生成同一网页任务时的可用性、成本、耗时和实际页面效果。"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080906'/%3E%3Cpath d='M9 9h46v46H9z' fill='%23c6ff3d'/%3E%3Cpath d='M18 22h28v6H18zm0 14h18v6H18z' fill='%23080906'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css?v=copy-1" />
+  </head>
+  <body>
+    <canvas id="signal-canvas" aria-hidden="true"></canvas>
+    <main class="shell">
+      <header class="masthead">
+        <nav class="topline" aria-label="页面状态">
+          <a class="brand" href="#top" aria-label="页面生成模型对比">
+            <span class="brand-mark">OR</span>
+            <span>模型对比</span>
+          </a>
+          <div class="status-strip" aria-label="数据状态">
+            <span>实测结果</span>
+            <span>页面可试用</span>
+            <span>汇率 <strong id="fx-pill">6.8336</strong></span>
+          </div>
+        </nav>
+
+        <section class="hero-grid" id="top">
+          <div class="hero-copy">
+            <p class="eyebrow">页面生成模型对比</p>
+            <h1>哪个模型更适合生成可用页面？</h1>
+            <p class="hero-sub">
+              先选一个模型，再切换计算器或日历任务。这里直接展示它生成的页面、通过了哪些检查、一次生成大约花多少钱。
+            </p>
+          </div>
+
+          <div class="run-console" aria-label="结果摘要">
+            <div class="console-head">
+              <span class="pulse"></span>
+              <span>结果摘要</span>
+            </div>
+            <div id="usage-json" class="usage-summary"></div>
+          </div>
+        </section>
+      </header>
+
+      <section class="experiment-flow" aria-label="选择和查看结果">
+        <div class="flow-heading">
+          <div>
+            <p class="eyebrow">先选模型</p>
+            <h2>选择一个模型版本</h2>
+            <p>
+              每张卡片都显示当前任务下的完成情况、成本和耗时。选中模型后，下面的页面效果、检查结果和对比排行会一起更新。
+            </p>
+          </div>
+          <div class="flow-steps" aria-label="查看步骤">
+            <span class="flow-step is-active">1 模型</span>
+            <span class="flow-step">2 任务</span>
+            <span class="flow-step">3 页面效果</span>
+          </div>
+        </div>
+
+        <div id="model-selector" class="model-selector" aria-label="模型版本选择"></div>
+
+        <div class="control-band" aria-label="任务和设置">
+          <div class="task-tabs" role="tablist" aria-label="任务选择">
+            <button class="task-tab is-active" data-task="calculator" type="button" role="tab" aria-selected="true">
+              计算器
+            </button>
+            <button class="task-tab" data-task="calendar" type="button" role="tab" aria-selected="false">
+              日历
+            </button>
+          </div>
+
+          <div class="flow-readout" aria-label="正在查看">
+            <span>正在查看</span>
+            <strong id="flow-current">-</strong>
+            <small id="flow-current-detail">-</small>
+          </div>
+
+          <label class="fx-control">
+            <span>美元兑人民币</span>
+            <input id="fx-rate" type="number" min="0" step="0.0001" value="6.8336" />
+          </label>
+
+          <button class="replay-button" id="replay-run" type="button">重新播放</button>
+        </div>
+      </section>
+
+      <section class="prompt-panel primary-prompt" aria-label="任务要求">
+        <div class="panel-title compact">
+          <div>
+            <p class="eyebrow">任务要求</p>
+            <h2 id="prompt-title">发给模型的要求</h2>
+          </div>
+          <span id="prompt-chip" class="prompt-chip">计算器</span>
+        </div>
+        <div class="prompt-body">
+          <p id="prompt-summary" class="prompt-summary">-</p>
+          <pre id="task-prompt" class="prompt-text"></pre>
+        </div>
+      </section>
+
+      <section class="demo-grid">
+        <article class="preview-panel" aria-label="实际生成页面">
+          <div class="panel-title preview-title">
+            <div>
+              <p class="eyebrow">实际页面</p>
+              <h2 id="preview-title">计算器页面</h2>
+            </div>
+            <span id="artifact-chip" class="artifact-chip">可试用</span>
+          </div>
+          <div id="artifact-preview" class="artifact-preview"></div>
+        </article>
+      </section>
+
+      <section class="summary-grid" aria-label="Summary metrics">
+        <article class="metric-tile">
+          <span class="metric-label">最低成本通过</span>
+          <strong id="metric-cheapest">-</strong>
+          <small id="metric-cheapest-detail">-</small>
+        </article>
+        <article class="metric-tile">
+          <span class="metric-label">完成度最高</span>
+          <strong id="metric-best">-</strong>
+          <small id="metric-best-detail">-</small>
+        </article>
+        <article class="metric-tile">
+          <span class="metric-label">最快通过</span>
+          <strong id="metric-fastest">-</strong>
+          <small id="metric-fastest-detail">-</small>
+        </article>
+        <article class="metric-tile">
+          <span class="metric-label">成本区间</span>
+          <strong id="metric-spread">-</strong>
+          <small id="metric-spread-detail">-</small>
+        </article>
+      </section>
+
+      <section class="main-grid">
+        <div class="leaderboard-panel" aria-label="模型横向对比">
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">横向对比</p>
+              <h2 id="task-title">计算器对比</h2>
+            </div>
+            <span id="task-badge" class="task-badge">7 项检查</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="model-table">
+              <thead>
+                <tr>
+                  <th>模型</th>
+                  <th>检查结果</th>
+                  <th>用量</th>
+                  <th>成本</th>
+                  <th>价格</th>
+                  <th>耗时</th>
+                  <th>综合表现</th>
+                </tr>
+              </thead>
+              <tbody id="model-rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="detail-panel" aria-label="当前模型详情">
+          <div class="selected-model">
+            <span id="selected-provider">当前选择</span>
+            <h2 id="selected-name">模型</h2>
+            <p id="selected-verdict">-</p>
+          </div>
+
+          <div class="token-stack" aria-label="用量构成">
+            <div class="stack-bar">
+              <span class="stack-input" id="stack-input"></span>
+              <span class="stack-output" id="stack-output"></span>
+              <span class="stack-cache" id="stack-cache"></span>
+            </div>
+            <div class="stack-legend">
+              <span><i class="legend-input"></i>输入</span>
+              <span><i class="legend-output"></i>输出</span>
+              <span><i class="legend-cache"></i>缓存</span>
+            </div>
+          </div>
+
+          <div class="detail-stats">
+            <div>
+              <span>总用量</span>
+              <strong id="detail-tokens">-</strong>
+            </div>
+            <div>
+              <span>单项检查成本</span>
+              <strong id="detail-cost-pass">-</strong>
+            </div>
+            <div>
+              <span>修复次数</span>
+              <strong id="detail-retries">-</strong>
+            </div>
+            <div>
+              <span>检查轮次</span>
+              <strong id="detail-tools">-</strong>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="evidence-grid">
+        <article class="tests-panel" aria-label="功能检查结果">
+          <div class="panel-title compact">
+            <div>
+              <p class="eyebrow">功能检查</p>
+              <h2>哪些能力通过了</h2>
+            </div>
+            <span id="pass-rate-chip" class="pass-chip">-</span>
+          </div>
+          <div id="test-list" class="test-list"></div>
+        </article>
+
+        <article class="scatter-panel" aria-label="成本和完成度位置">
+          <div class="panel-title compact">
+            <div>
+              <p class="eyebrow">成本 × 完成度</p>
+              <h2>性价比位置</h2>
+            </div>
+          </div>
+          <div id="scatter" class="scatter"></div>
+        </article>
+      </section>
+
+      <details class="trace-panel" aria-label="运行记录">
+        <summary>
+          <div class="panel-title compact">
+            <div>
+              <p class="eyebrow">运行记录</p>
+              <h2>本轮是怎么跑完的</h2>
+            </div>
+            <span class="trace-toggle">查看</span>
+          </div>
+        </summary>
+        <ol id="trace-list" class="trace-list"></ol>
+      </details>
+
+      <footer class="footer-band">
+        <span>本地静态页面</span>
+        <span>可部署到 Cloudflare Pages</span>
+        <span>数据来自 OpenRouter 调用记录</span>
+      </footer>
+    </main>
+
+    <script src="./script.js?v=copy-2"></script>
+  </body>
+</html>

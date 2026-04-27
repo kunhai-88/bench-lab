@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+.bench-runs/
+data/bench-results.json
+generated/
+.DS_Store
+.playwright-mcp/
+bench-lab-*.png
