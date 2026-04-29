@@ -1,5 +1,5 @@
 {
-  "name": "openrouter-bench-lab",
+  "name": "bench-lab",
   "version": "0.1.0",
   "description": "A static OpenRouter model benchmark dashboard with local hidden browser tests and RMB cost tracking.",
   "private": false,
@@ -7,12 +7,12 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/defto-ai/openrouter-bench-lab.git"
+    "url": "https://github.com/kunhai-88/bench-lab.git"
   },
   "bugs": {
-    "url": "https://github.com/defto-ai/openrouter-bench-lab/issues"
+    "url": "https://github.com/kunhai-88/bench-lab/issues"
   },
-  "homepage": "https://github.com/defto-ai/openrouter-bench-lab#readme",
+  "homepage": "https://github.com/kunhai-88/bench-lab#readme",
   "keywords": [
     "openrouter",
     "llm",
