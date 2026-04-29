@@ -1,8 +1,8 @@
 # OpenRouter Bench Lab
 
-一个用于评估 OpenRouter 模型「真实调用成本 + 生成效果」的静态网页项目。
+一个用于评估 OpenRouter 模型网页生成能力的静态报告项目。
 
-它会在本地调用 OpenRouter，让不同模型完成同一个自然语言任务，例如「写一个可以正常使用的网页计算器」或「写一个可以正常使用的网页日历」。脚本会记录 token 用量、人民币成本、耗时、修复次数，并用隐藏浏览器测试评估生成结果。网页端负责展示排行榜、测试结果、调用轨迹和可下载 demo。
+它会在本地调用 OpenRouter，让不同模型完成同一组网页生成任务，例如计算器或日历。脚本会记录 token 用量、人民币成本、耗时、修复次数，并通过隐藏浏览器测试评估生成页面的真实可用性。前端报告负责展示模型排行、功能检查、调用轨迹和可体验页面。
 
 > English: A static dashboard and local runner for comparing OpenRouter model cost, token usage, generated web app quality, and hidden browser-test results.
 
@@ -13,7 +13,7 @@
 - 自然 prompt：模型只看到真实用户需求，不会看到隐藏测试选择器和断言。
 - 隐藏评测：Playwright 会在浏览器里点击、输入、观察 UI 行为。
 - 成本统计：记录 input/output/cache/reasoning tokens，并按 USD/CNY 汇率折算人民币。
-- Demo 下载：每个模型生成的 HTML demo 都可以在页面里打开和下载。
+- 页面预览：每个模型生成的 HTML 页面都可以直接打开、体验和下载。
 - 开源安全：默认忽略 `.env.local`、`.bench-runs/`、`generated/` 和真实结果数据。
 
 ## 当前任务
@@ -22,10 +22,10 @@
 
 | 任务 | 给模型的自然语言 prompt |
 | --- | --- |
-| 计算器 | `写一个可以正常使用的网页计算器。页面要完整、好看，直接打开就能用。` |
-| 日历 | `写一个可以正常使用的网页日历。页面要完整、好看，直接打开就能用。` |
+| 计算器 | `请生成一个可直接打开使用的网页计算器。要求界面完整、交互清晰、无需外部依赖。` |
+| 日历 | `请生成一个可直接打开使用的网页日历。要求界面完整、交互清晰、无需外部依赖。` |
 
-隐藏测试不会提前暴露给模型。测试会尽量通过行为发现控件，而不是强制模型写固定 `data-testid`。
+隐藏测试不会提前暴露给模型。测试会尽量通过用户可见行为发现控件，而不是要求模型写固定 `data-testid`。
 
 ## 快速开始
 
@@ -77,7 +77,7 @@ http://127.0.0.1:4173
 | `MAX_RETRIES` | `1` | 浏览器测试失败后的修复尝试次数。 |
 | `OPENROUTER_TIMEOUT_MS` | `480000` | 单次 OpenRouter 请求超时。 |
 | `OPENROUTER_REASONING_EFFORT` | `none` | 默认降低 reasoning 消耗；如 provider 不支持，脚本会自动降级重试。 |
-| `ARTIFACT_OUTPUT_MODE` | `html` | 生成 demo 的输出模式。 |
+| `ARTIFACT_OUTPUT_MODE` | `html` | 生成页面的输出模式。 |
 | `USD_CNY` | 自动获取 | 可手动指定美元兑人民币汇率。 |
 
 脚本会自动：
@@ -85,7 +85,7 @@ http://127.0.0.1:4173
 - 从 Frankfurter 获取最新 USD/CNY 汇率。
 - 从 OpenRouter `/api/v1/models` 刷新模型单价。
 - 将真实结果写入 `data/bench-results.json`。
-- 将生成 demo 写入 `generated/<task>/<model>/index.html`。
+- 将生成页面写入 `generated/<task>/<model>/index.html`。
 - 将本地调试响应写入 `.bench-runs/`。
 
 ## 常用命令
@@ -172,7 +172,7 @@ rg --pcre2 "sk-or-v1-[A-Za-z0-9]+|OPENROUTER_API_KEY=.*sk-or" . \
 
 ## English Summary
 
-OpenRouter Bench Lab is a static dashboard plus a local runner. It calls OpenRouter models with natural user prompts, generates standalone HTML demos, runs hidden browser tests, and records token usage, latency, repair attempts, and CNY cost.
+OpenRouter Bench Lab is a static dashboard plus a local runner. It calls OpenRouter models with natural user prompts, generates standalone HTML pages, runs hidden browser tests, and records token usage, latency, repair attempts, and CNY cost.
 
 API keys stay local in `.env.local`. Generated artifacts and raw responses are ignored by default.
 

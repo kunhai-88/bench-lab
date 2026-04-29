@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>网页计算器</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 20px;
+}
+.calculator {
+  background: #1e1e2e;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  width: 360px;
+  max-width: 100%;
+}
+.display {
+  background: #0f0f1a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.expr {
+  color: #888;
+  font-size: 16px;
+  min-height: 20px;
+  word-wrap: break-word;
+  width: 100%;
+  text-align: right;
+  overflow-wrap: break-word;
+}
+#display {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 300;
+  width: 100%;
+  text-align: right;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 18px 0;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #2a2a3e;
+  color: #fff;
+  user-select: none;
+}
+button:hover { filter: brightness(1.2); }
+button:active { transform: scale(0.95); }
+.op { background: #ff9500; color: #fff; }
+.fn { background: #3a3a4e; color: #fff; }
+.eq { background: #ff9500; color: #fff; }
+.zero { grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="calculator">
+  <div class="display">
+    <div class="expr" id="expr"></div>
+    <div id="display">0</div>
+  </div>
+  <div class="buttons">
+    <button class="fn" data-action="clear">AC</button>
+    <button class="fn" data-action="sign">+/-</button>
+    <button class="fn" data-action="percent">%</button>
+    <button class="op" data-op="/">÷</button>
+
+    <button data-num="7">7</button>
+    <button data-num="8">8</button>
+    <button data-num="9">9</button>
+    <button class="op" data-op="*">×</button>
+
+    <button data-num="4">4</button>
+    <button data-num="5">5</button>
+    <button data-num="6">6</button>
+    <button class="op" data-op="-">−</button>
+
+    <button data-num="1">1</button>
+    <button data-num="2">2</button>
+    <button data-num="3">3</button>
+    <button class="op" data-op="+">+</button>
+
+    <button class="zero" data-num="0">0</button>
+    <button data-num=".">.</button>
+    <button class="eq" data-action="equals">=</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const display = document.getElementById('display');
+  const exprEl = document.getElementById('expr');
+  let expression = '';
+  let justEvaluated = false;
+
+  function updateDisplay(){
+    exprEl.textContent = expression.replace(/\*/g,'×').replace(/\//g,'÷');
+    // show current number or result
+    const tokens = expression.match(/(\d+\.?\d*|\.\d+)$/);
+    if (tokens) display.textContent = tokens[0];
+    else if (expression === '') display.textContent = '0';
+    else display.textContent = '0';
+  }
+
+  // Tokenize and evaluate with proper operator precedence
+  function evaluate(expr){
+    // Tokenize
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length){
+      const c = expr[i];
+      if (/\s/.test(c)){ i++; continue; }
+      if (/[0-9.]/.test(c)){
+        let num = '';
+        while (i < expr.length && /[0-9.]/.test(expr[i])){ num += expr[i]; i++; }
+        tokens.push({type:'num', value: parseFloat(num)});
+      } else if ('+-*/'.includes(c)){
+        // unary minus / plus
+        if ((c === '-' || c === '+') && (tokens.length === 0 || tokens[tokens.length-1].type === 'op')){
+          let sign = c === '-' ? -1 : 1;
+          i++;
+          while (i < expr.length && (expr[i] === '+' || expr[i] === '-')){
+            if (expr[i] === '-') sign = -sign;
+            i++;
+          }
+          let num = '';
+          while (i < expr.length && /[0-9.]/.test(expr[i])){ num += expr[i]; i++; }
+          if (num === '') throw new Error('bad');
+          tokens.push({type:'num', value: sign * parseFloat(num)});
+        } else {
+          tokens.push({type:'op', value: c});
+          i++;
+        }
+      } else {
+        throw new Error('bad char');
+      }
+    }
+    if (tokens.length === 0) return 0;
+
+    // First pass: * and /
+    const pass1 = [];
+    let j = 0;
+    while (j < tokens.length){
+      const t = tokens[j];
+      if (t.type === 'op' && (t.value === '*' || t.value === '/')){
+        const prev = pass1.pop();
+        const next = tokens[j+1];
+        if (!prev || !next || prev.type !== 'num' || next.type !== 'num') throw new Error('bad');
+        let r;
+        if (t.value === '*') r = prev.value * next.value;
+        else {
+          if (next.value === 0) throw new Error('div0');
+          r = prev.value / next.value;
+        }
+        pass1.push({type:'num', value: r});
+        j += 2;
+      } else {
+        pass1.push(t);
+        j++;
+      }
+    }
+
+    // Second pass: + and -
+    let result = pass1[0].value;
+    for (let k = 1; k < pass1.length; k += 2){
+      const op = pass1[k].value;
+      const v = pass1[k+1].value;
+      if (op === '+') result += v;
+      else if (op === '-') result -= v;
+      else throw new Error('bad');
+    }
+    return result;
+  }
+
+  function formatResult(n){
+    if (!isFinite(n)) return 'Error';
+    const s = parseFloat(n.toPrecision(12)).toString();
+    return s;
+  }
+
+  function inputNum(n){
+    if (justEvaluated){
+      expression = '';
+      justEvaluated = false;
+    }
+    if (n === '.'){
+      // prevent multiple dots in current number
+      const m = expression.match(/(\d*\.?\d*)$/);
+      if (m && m[0].includes('.')) return;
+      if (!m || m[0] === '') { expression += '0'; }
+    }
+    expression += n;
+    updateDisplay();
+  }
+
+  function inputOp(op){
+    justEvaluated = false;
+    if (expression === '' && op !== '-') return;
+    const last = expression[expression.length-1];
+    if ('+-*/'.includes(last)){
+      expression = expression.slice(0,-1) + op;
+    } else {
+      expression += op;
+    }
+    updateDisplay();
+  }
+
+  function doEquals(){
+    if (expression === '') return;
+    try {
+      const r = evaluate(expression);
+      const out = formatResult(r);
+      exprEl.textContent = expression.replace(/\*/g,'×').replace(/\//g,'÷') + ' =';
+      display.textContent = out;
+      expression = out === 'Error' ? '' : out;
+      justEvaluated = true;
+    } catch(e){
+      display.textContent = 'Error';
+      expression = '';
+      justEvaluated = true;
+    }
+  }
+
+  function clearAll(){
+    expression = '';
+    justEvaluated = false;
+    updateDisplay();
+  }
+
+  function toggleSign(){
+    const m = expression.match(/(-?\d*\.?\d+)$/);
+    if (!m) return;
+    const num = m[0];
+    const start = expression.length - num.length;
+    let newNum;
+    if (num.startsWith('-')){
+      newNum = num.slice(1);
+      // also need to remove if prev char makes it unary; simple: just flip
+    } else {
+      newNum = '-' + num;
+    }
+    // check char before
+    const before = expression.slice(0, start);
+    const lastBefore = before[before.length-1];
+    if (newNum.startsWith('-') && '+-*/'.includes(lastBefore)){
+      // wrap? simplest: replace
+    }
+    expression = before + newNum;
+    updateDisplay();
+  }
+
+  function percent(){
+    const m = expression.match(/(\d*\.?\d+)$/);
+    if (!m) return;
+    const num = parseFloat(m[0]);
+    const start = expression.length - m[0].length;
+    expression = expression.slice(0,start) + (num/100).toString();
+    updateDisplay();
+  }
+
+  document.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if (btn.dataset.num !== undefined) inputNum(btn.dataset.num);
+      else if (btn.dataset.op) inputOp(btn.dataset.op);
+      else if (btn.dataset.action === 'clear') clearAll();
+      else if (btn.dataset.action === 'equals') doEquals();
+      else if (btn.dataset.action === 'sign') toggleSign();
+      else if (btn.dataset.action === 'percent') percent();
+    });
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    const k = e.key;
+    if (/[0-9.]/.test(k)) inputNum(k);
+    else if ('+-*/'.includes(k)) inputOp(k);
+    else if (k === 'Enter' || k === '=') { e.preventDefault(); doEquals(); }
+    else if (k === 'Escape') clearAll();
+    else if (k === 'Backspace'){
+      if (justEvaluated){ clearAll(); return; }
+      expression = expression.slice(0,-1);
+      updateDisplay();
+    }
+  });
+
+  updateDisplay();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>网页日历</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.calendar {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 100%;
+    max-width: 420px;
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 24px;
+    text-align: center;
+}
+
+.calendar-header .year {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.calendar-header .month-title {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.calendar-nav button {
+    background: none;
+    border: 2px solid #667eea;
+    color: #667eea;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.calendar-nav button:hover {
+    background: #667eea;
+    color: #fff;
+}
+
+.calendar-nav .nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.calendar-body {
+    padding: 16px 24px 24px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+}
+
+.weekdays div {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    padding: 8px 0;
+    text-transform: uppercase;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.days button {
+    aspect-ratio: 1;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.days button:hover {
+    background: #f0f0f0;
+}
+
+.days button.today {
+    background: #e8eaff;
+    color: #667eea;
+    font-weight: 700;
+}
+
+.days button.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-weight: 700;
+}
+
+.days button.other-month {
+    color: #ccc;
+}
+
+.days button.other-month:hover {
+    background: #f8f8f8;
+}
+
+.selected-date {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f8f9ff;
+    border-radius: 8px;
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+}
+
+.selected-date strong {
+    color: #667eea;
+}
+</style>
+</head>
+<body>
+
+<div class="calendar">
+    <div class="calendar-header">
+        <div class="year" id="headerYear"></div>
+        <div class="month-title" id="headerMonth"></div>
+    </div>
+    <div class="calendar-nav">
+        <button id="prevMonth" aria-label="上个月">&#8249;</button>
+        <span class="nav-title" id="navTitle"></span>
+        <button id="nextMonth" aria-label="下个月">&#8250;</button>
+    </div>
+    <div class="calendar-body">
+        <div class="weekdays">
+            <div>日</div>
+            <div>一</div>
+            <div>二</div>
+            <div>三</div>
+            <div>四</div>
+            <div>五</div>
+            <div>六</div>
+        </div>
+        <div class="days" id="daysGrid"></div>
+        <div class="selected-date" id="selectedDate"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+    const monthFullNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+    let currentDate = new Date();
+    let viewYear = currentDate.getFullYear();
+    let viewMonth = currentDate.getMonth();
+    let selectedDay = currentDate.getDate();
+    let selectedMonth = currentDate.getMonth();
+    let selectedYear = currentDate.getFullYear();
+
+    const headerYear = document.getElementById('headerYear');
+    const headerMonth = document.getElementById('headerMonth');
+    const navTitle = document.getElementById('navTitle');
+    const daysGrid = document.getElementById('daysGrid');
+    const selectedDateEl = document.getElementById('selectedDate');
+    const prevBtn = document.getElementById('prevMonth');
+    const nextBtn = document.getElementById('nextMonth');
+
+    function render() {
+        headerYear.textContent = viewYear + '年';
+        headerMonth.textContent = monthNames[viewMonth];
+        navTitle.textContent = viewYear + '年 ' + monthFullNames[viewMonth];
+
+        daysGrid.innerHTML = '';
+
+        const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+        const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+
+        const today = new Date();
+        const todayYear = today.getFullYear();
+        const todayMonth = today.getMonth();
+        const todayDate = today.getDate();
+
+        // Previous month days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const btn = document.createElement('button');
+            btn.textContent = daysInPrevMonth - i;
+            btn.classList.add('other-month');
+            btn.setAttribute('type', 'button');
+            daysGrid.appendChild(btn);
+        }
+
+        // Current month days
+        for (let d = 1; d <= daysInMonth; d++) {
+            const btn = document.createElement('button');
+            btn.textContent = d;
+            btn.setAttribute('type', 'button');
+
+            if (d === todayDate && viewMonth === todayMonth && viewYear === todayYear) {
+                btn.classList.add('today');
+            }
+
+            if (d === selectedDay && viewMonth === selectedMonth && viewYear === selectedYear) {
+                btn.classList.add('selected');
+            }
+
+            btn.addEventListener('click', function() {
+                selectedDay = d;
+                selectedMonth = viewMonth;
+                selectedYear = viewYear;
+                render();
+            });
+
+            daysGrid.appendChild(btn);
+        }
+
+        // Next month days
+        const totalCells = firstDay + daysInMonth;
+        const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+        for (let i = 1; i <= remaining; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            btn.classList.add('other-month');
+            btn.setAttribute('type', 'button');
+            daysGrid.appendChild(btn);
+        }
+
+        // Update selected date display
+        const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const selDate = new Date(selectedYear, selectedMonth, selectedDay);
+        selectedDateEl.innerHTML = '选中日期：<strong>' + selectedYear + '年' + (selectedMonth + 1) + '月' + selectedDay + '日 ' + weekDays[selDate.getDay()] + '</strong>';
+    }
+
+    prevBtn.addEventListener('click', function() {
+        viewMonth--;
+        if (viewMonth < 0) {
+            viewMonth = 11;
+            viewYear--;
+        }
+        render();
+    });
+
+    nextBtn.addEventListener('click', function() {
+        viewMonth++;
+        if (viewMonth > 11) {
+            viewMonth = 0;
+            viewYear++;
+        }
+        render();
+    });
+
+    render();
+})();
+</script>
+
+</body>
+</html>

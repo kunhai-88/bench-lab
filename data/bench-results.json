@@ -1,0 +1,3773 @@
+{
+  "schemaVersion": 1,
+  "promptStyle": "natural-user-request-v1",
+  "generatedAt": "2026-04-29T07:46:55.372Z",
+  "fxRate": 6.8314,
+  "models": [
+    {
+      "id": "minimax/minimax-m2.7",
+      "name": "MiniMax M2.7",
+      "provider": "MiniMax",
+      "accent": "#f6e27a",
+      "pricing": {
+        "input": 0.3,
+        "output": 1.2,
+        "cache": 0.059
+      },
+      "openRouterName": "MiniMax: MiniMax M2.7",
+      "supportedParameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ]
+    },
+    {
+      "id": "openai/gpt-5.5",
+      "name": "GPT-5.5",
+      "provider": "OpenAI",
+      "accent": "#c6ff3d",
+      "pricing": {
+        "input": 5,
+        "output": 30,
+        "cache": 0.5
+      },
+      "openRouterName": "OpenAI: GPT-5.5",
+      "supportedParameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools"
+      ]
+    },
+    {
+      "id": "anthropic/claude-opus-4.7",
+      "name": "Claude Opus 4.7",
+      "provider": "Anthropic",
+      "accent": "#ff6547",
+      "pricing": {
+        "input": 5,
+        "output": 25,
+        "cache": 0.5
+      }
+    },
+    {
+      "id": "google/gemini-3.1-pro-preview",
+      "name": "Gemini 3.1 Pro",
+      "provider": "Google",
+      "accent": "#3d78ff",
+      "pricing": {
+        "input": 2,
+        "output": 12,
+        "cache": 0.2,
+        "reasoning": 12
+      }
+    },
+    {
+      "id": "moonshotai/kimi-k2.6",
+      "name": "Kimi K2.6",
+      "provider": "Moonshot AI",
+      "accent": "#32d6c0",
+      "pricing": {
+        "input": 0.7448,
+        "output": 4.655,
+        "cache": 0.1463
+      }
+    },
+    {
+      "id": "z-ai/glm-5.1",
+      "name": "GLM 5.1",
+      "provider": "Z.ai",
+      "accent": "#ff8ec3",
+      "pricing": {
+        "input": 1.0499999999999998,
+        "output": 3.5,
+        "cache": 0.5249999999999999
+      },
+      "openRouterName": "Z.ai: GLM 5.1",
+      "supportedParameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "parallel_tool_calls",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ]
+    },
+    {
+      "id": "deepseek/deepseek-v4-pro",
+      "name": "DeepSeek V4 Pro",
+      "provider": "DeepSeek",
+      "accent": "#7cffb2",
+      "pricing": {
+        "input": 0.435,
+        "output": 0.87,
+        "cache": 0.003625
+      },
+      "openRouterName": "DeepSeek: DeepSeek V4 Pro",
+      "supportedParameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "response_format",
+        "seed",
+        "stop",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ]
+    },
+    {
+      "id": "xiaomi/mimo-v2.5-pro",
+      "name": "MiMo V2.5 Pro",
+      "provider": "Xiaomi",
+      "accent": "#58c2ff",
+      "pricing": {
+        "input": 1,
+        "output": 3,
+        "cache": 0.2
+      }
+    },
+    {
+      "id": "alibaba/tongyi-deepresearch-30b-a3b",
+      "name": "Tongyi DeepResearch 30B A3B",
+      "provider": "Alibaba",
+      "accent": "#ffb347",
+      "pricing": {
+        "input": 0.09,
+        "output": 0.45,
+        "cache": 0.09
+      }
+    },
+    {
+      "id": "xiaomi/mimo-v2-pro-20260318",
+      "name": "MiMo V2 Pro (2026-03-18)",
+      "provider": "Xiaomi",
+      "accent": "#58c2ff",
+      "pricing": {
+        "input": 1,
+        "output": 3,
+        "cache": 0.2
+      }
+    },
+    {
+      "id": "qwen/qwen3.6-max-preview-20260420",
+      "name": "Qwen3.6 Max Preview",
+      "provider": "Alibaba",
+      "accent": "#ffb347",
+      "pricing": {
+        "input": 0.00104,
+        "output": 0.00624,
+        "cache": 0.0013
+      }
+    }
+  ],
+  "tasks": {
+    "calculator": {
+      "title": "计算器",
+      "badge": "7 项检查",
+      "previewTitle": "计算器页面",
+      "artifact": "生成页面",
+      "tests": [
+        [
+          "可发现控件",
+          "calculator controls and display can be discovered by behavior"
+        ],
+        [
+          "清除和退格",
+          "clear resets display and backspace removes one digit"
+        ],
+        [
+          "基础四则运算",
+          "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+        ],
+        [
+          "运算优先级",
+          "18 ÷ 3 + 4 × 2 = 14"
+        ],
+        [
+          "小数精度",
+          "0.1 + 0.2 ≈ 0.3"
+        ],
+        [
+          "错误状态",
+          "8 ÷ 0 shows an error state"
+        ],
+        [
+          "键盘输入",
+          "Escape / Enter / Backspace work without mouse clicks"
+        ]
+      ],
+      "promptSummary": "测试模型能否交付一个交互完整的网页计算器。",
+      "prompt": "请生成一个可直接打开使用的网页计算器。要求界面完整、交互清晰、无需外部依赖。"
+    },
+    "calendar": {
+      "title": "日历",
+      "badge": "7 项检查",
+      "previewTitle": "日历页面",
+      "artifact": "生成页面",
+      "tests": [
+        [
+          "可发现控件",
+          "calendar controls and day grid can be discovered by behavior"
+        ],
+        [
+          "月份标题",
+          "a current month or year title is rendered"
+        ],
+        [
+          "星期表头",
+          "weekday labels are rendered"
+        ],
+        [
+          "日期网格",
+          "at least 28 day cells are rendered"
+        ],
+        [
+          "月份切换",
+          "next/previous month navigation changes the title or grid"
+        ],
+        [
+          "日期选择",
+          "a day can be selected"
+        ],
+        [
+          "键盘或焦点",
+          "day cells or navigation controls are keyboard reachable"
+        ]
+      ],
+      "promptSummary": "测试模型能否交付一个交互完整的网页日历。",
+      "prompt": "请生成一个可直接打开使用的网页日历。要求界面完整、交互清晰、无需外部依赖。"
+    }
+  },
+  "runs": {
+    "calculator": {
+      "minimax/minimax-m2.7": {
+        "input": 113,
+        "output": 3456,
+        "cache": 0,
+        "reasoning": 2434,
+        "latency": 52.65,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "MiniMax",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=minimax/minimax-m2.7, attempts=1"
+          ],
+          [
+            "40.2s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "52.6s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.0041811,
+        "totalCostCny": 0.0285728,
+        "generationId": "gen-1777245960-nkuC2lHULDUvLlOm1vUI",
+        "generationIds": [
+          "gen-1777245960-nkuC2lHULDUvLlOm1vUI"
+        ],
+        "artifactPath": "generated/calculator/minimax-minimax-m2-7/index.html",
+        "rawRunPath": ".bench-runs/calculator/minimax-minimax-m2-7.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": true,
+            "message": "18 ÷ 3 + 4 × 2 = 14"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": true,
+            "message": "8 ÷ 0 shows error"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 4066,
+        "reasoningLength": 8653,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 113,
+            "output": 3456,
+            "cache": 0,
+            "reasoning": 2434,
+            "totalCost": 0.0041811,
+            "totalCostCny": 0.0285728,
+            "generationId": "gen-1777245960-nkuC2lHULDUvLlOm1vUI",
+            "providerName": "MiniMax",
+            "elapsedMs": 40201,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 4066,
+            "reasoningLength": 8653,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "minimax/minimax-m2.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": null,
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": null,
+          "maxRetries": 1
+        }
+      },
+      "openai/gpt-5.5": {
+        "input": 372,
+        "output": 7205,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 89,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "OpenAI",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=openai/gpt-5.5, attempts=2"
+          ],
+          [
+            "29.3s",
+            "Artifact generated",
+            "Generated HTML page · 4/7 passed"
+          ],
+          [
+            "34.5s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "89.0s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.21800999999999998,
+        "totalCostCny": 1.48985854,
+        "generationId": "gen-1777257259-zP7UgAQdZMpAvDNvgCqW",
+        "generationIds": [
+          "gen-1777257217-zEgnP6Wmnf27F3ubfpwr",
+          "gen-1777257259-zP7UgAQdZMpAvDNvgCqW"
+        ],
+        "artifactPath": "generated/calculator/openai-gpt-5-5/index.html",
+        "rawRunPath": ".bench-runs/calculator/openai-gpt-5-5.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": true,
+            "message": "18 ÷ 3 + 4 × 2 = 14"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": true,
+            "message": "8 ÷ 0 shows error"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 14196,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 130,
+            "output": 3451,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.10418,
+            "totalCostCny": 0.7119557,
+            "generationId": "gen-1777257217-zEgnP6Wmnf27F3ubfpwr",
+            "providerName": "OpenAI",
+            "elapsedMs": 29273,
+            "passed": 4,
+            "score": 57,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 13032,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "openai/gpt-5.5",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 242,
+            "output": 3754,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.11383,
+            "totalCostCny": 0.77790284,
+            "generationId": "gen-1777257259-zP7UgAQdZMpAvDNvgCqW",
+            "providerName": "OpenAI",
+            "elapsedMs": 34521,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 14196,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "openai/gpt-5.5",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "anthropic/claude-opus-4.7": {
+        "input": 553,
+        "output": 6664,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 77.27,
+        "passed": 6,
+        "score": 86,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Anthropic",
+        "verdict": "真实生成页面通过 6/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=anthropic/claude-opus-4.7, attempts=2"
+          ],
+          [
+            "23.1s",
+            "Artifact generated",
+            "Generated HTML page · 6/7 passed"
+          ],
+          [
+            "27.4s",
+            "Repair attempt",
+            "Generated HTML page · 6/7 passed"
+          ],
+          [
+            "77.3s",
+            "Final tests",
+            "6/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.169365,
+        "totalCostCny": 1.15628873,
+        "generationId": "gen-1777371322-OtRSQbSlvOF984oByc8d",
+        "generationIds": [
+          "gen-1777371286-eaonZgsoSHzkoyCzK6WE",
+          "gen-1777371322-OtRSQbSlvOF984oByc8d"
+        ],
+        "artifactPath": "generated/calculator/anthropic-claude-opus-4-7/index.html",
+        "rawRunPath": ".bench-runs/calculator/anthropic-claude-opus-4-7.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": false,
+            "message": "control not found: ⌫ / backspace / delete / del / ← / key-backspace"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": true,
+            "message": "18 ÷ 3 + 4 × 2 = 14"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": true,
+            "message": "8 ÷ 0 shows error"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8648,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 217,
+            "output": 2992,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.075885,
+            "totalCostCny": 0.51808207,
+            "generationId": "gen-1777371286-eaonZgsoSHzkoyCzK6WE",
+            "providerName": "Anthropic",
+            "elapsedMs": 23130,
+            "passed": 6,
+            "score": 86,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 7196,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "anthropic/claude-opus-4.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 336,
+            "output": 3672,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.09348,
+            "totalCostCny": 0.63820666,
+            "generationId": "gen-1777371322-OtRSQbSlvOF984oByc8d",
+            "providerName": "Anthropic",
+            "elapsedMs": 27445,
+            "passed": 6,
+            "score": 86,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8648,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "anthropic/claude-opus-4.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "google/gemini-3.1-pro-preview": {
+        "input": 348,
+        "output": 14467,
+        "cache": 0,
+        "reasoning": 8860,
+        "latency": 179.41,
+        "passed": 6,
+        "score": 86,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Google AI Studio",
+        "verdict": "真实生成页面通过 6/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=google/gemini-3.1-pro-preview, attempts=2"
+          ],
+          [
+            "92.5s",
+            "Artifact generated",
+            "Generated HTML page · 4/7 passed"
+          ],
+          [
+            "65.3s",
+            "Repair attempt",
+            "Generated HTML page · 6/7 passed"
+          ],
+          [
+            "179.4s",
+            "Final tests",
+            "6/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.1743,
+        "totalCostCny": 1.18998096,
+        "generationId": "gen-1777371469-FEBxNPDyyAShFMT9U1IP",
+        "generationIds": [
+          "gen-1777371363-fdBVUjIRHZjbnKRC4fit",
+          "gen-1777371469-FEBxNPDyyAShFMT9U1IP"
+        ],
+        "artifactPath": "generated/calculator/google-gemini-3-1-pro-preview/index.html",
+        "rawRunPath": ".bench-runs/calculator/google-gemini-3-1-pro-preview.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": true,
+            "message": "18 ÷ 3 + 4 × 2 = 14"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=错误"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 7198,
+        "reasoningLength": 9279,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 114,
+            "output": 6894,
+            "cache": 0,
+            "reasoning": 3343,
+            "totalCost": 0.082956,
+            "totalCostCny": 0.5663572,
+            "generationId": "gen-1777371363-fdBVUjIRHZjbnKRC4fit",
+            "providerName": "Google",
+            "elapsedMs": 92538,
+            "passed": 4,
+            "score": 57,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 14984,
+            "reasoningLength": 3829,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "google/gemini-3.1-pro-preview",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": null,
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 234,
+            "output": 7573,
+            "cache": 0,
+            "reasoning": 5517,
+            "totalCost": 0.091344,
+            "totalCostCny": 0.62362376,
+            "generationId": "gen-1777371469-FEBxNPDyyAShFMT9U1IP",
+            "providerName": "Google AI Studio",
+            "elapsedMs": 65302,
+            "passed": 6,
+            "score": 86,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 7198,
+            "reasoningLength": 9279,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "google/gemini-3.1-pro-preview",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": null,
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": null,
+          "maxRetries": 1
+        }
+      },
+      "moonshotai/kimi-k2.6": {
+        "input": 334,
+        "output": 5376,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 152.68,
+        "passed": 5,
+        "score": 71,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Moonshot AI",
+        "verdict": "真实生成页面通过 5/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=moonshotai/kimi-k2.6, attempts=2"
+          ],
+          [
+            "74.5s",
+            "Artifact generated",
+            "Generated HTML page · 4/7 passed"
+          ],
+          [
+            "57.4s",
+            "Repair attempt",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "152.7s",
+            "Final tests",
+            "5/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.021803,
+        "totalCostCny": 0.14899952,
+        "generationId": "gen-1777257861-IgNzJrl4rPcxBuwgZVpt",
+        "generationIds": [
+          "gen-1777257777-hENGj9tVtFS2dFCZ5vCv",
+          "gen-1777257861-IgNzJrl4rPcxBuwgZVpt"
+        ],
+        "artifactPath": "generated/calculator/moonshotai-kimi-k2-6/index.html",
+        "rawRunPath": ".bench-runs/calculator/moonshotai-kimi-k2-6.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=8"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=错误"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8957,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 122,
+            "output": 3381,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.0136216,
+            "totalCostCny": 0.09308865,
+            "generationId": "gen-1777257777-hENGj9tVtFS2dFCZ5vCv",
+            "providerName": "Io Net",
+            "elapsedMs": 74521,
+            "passed": 4,
+            "score": 57,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 14583,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "moonshotai/kimi-k2.6",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 212,
+            "output": 1995,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.0081814,
+            "totalCostCny": 0.05591087,
+            "generationId": "gen-1777257861-IgNzJrl4rPcxBuwgZVpt",
+            "providerName": "Moonshot AI",
+            "elapsedMs": 57396,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8957,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "moonshotai/kimi-k2.6",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "z-ai/glm-5.1": {
+        "input": 374,
+        "output": 8746,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 194.21,
+        "passed": 6,
+        "score": 86,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Z.ai",
+        "verdict": "真实生成页面通过 6/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=z-ai/glm-5.1, attempts=2"
+          ],
+          [
+            "100.1s",
+            "Artifact generated",
+            "Generated HTML page · 1/7 passed"
+          ],
+          [
+            "70.7s",
+            "Repair attempt",
+            "Generated HTML page · 6/7 passed"
+          ],
+          [
+            "194.2s",
+            "Final tests",
+            "6/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.039006,
+        "totalCostCny": 0.2665631,
+        "generationId": "gen-1777258041-J65RjVbAzLVbvE2bRB41",
+        "generationIds": [
+          "gen-1777257930-aIQLCMSlNsf3jNbLOM6B",
+          "gen-1777258041-J65RjVbAzLVbvE2bRB41"
+        ],
+        "artifactPath": "generated/calculator/z-ai-glm-5-1/index.html",
+        "rawRunPath": ".bench-runs/calculator/z-ai-glm-5-1.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": true,
+            "message": "18 ÷ 3 + 4 × 2 = 14"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=错误"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 11223,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 111,
+            "output": 5444,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.024109,
+            "totalCostCny": 0.1647585,
+            "generationId": "gen-1777257930-aIQLCMSlNsf3jNbLOM6B",
+            "providerName": "Z.ai",
+            "elapsedMs": 100061,
+            "passed": 1,
+            "score": 14,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 19051,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "z-ai/glm-5.1",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 263,
+            "output": 3302,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.014897,
+            "totalCostCny": 0.10180461,
+            "generationId": "gen-1777258041-J65RjVbAzLVbvE2bRB41",
+            "providerName": "Z.ai",
+            "elapsedMs": 70745,
+            "passed": 6,
+            "score": 86,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 11223,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "z-ai/glm-5.1",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "deepseek/deepseek-v4-pro": {
+        "input": 317,
+        "output": 6953,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 203.09,
+        "passed": 5,
+        "score": 71,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "DeepSeek",
+        "verdict": "真实生成页面通过 5/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=deepseek/deepseek-v4-pro, attempts=2"
+          ],
+          [
+            "62.5s",
+            "Artifact generated",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "117.1s",
+            "Repair attempt",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "203.1s",
+            "Final tests",
+            "5/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.021705108,
+        "totalCostCny": 0.14833054,
+        "generationId": "gen-1777258197-1NaPTAJSWcZjPT1m5RuC",
+        "generationIds": [
+          "gen-1777258124-xrLHlFEgqtYBSZFC759D",
+          "gen-1777258197-1NaPTAJSWcZjPT1m5RuC"
+        ],
+        "artifactPath": "generated/calculator/deepseek-deepseek-v4-pro/index.html",
+        "rawRunPath": ".bench-runs/calculator/deepseek-deepseek-v4-pro.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=20"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=错误"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 15359,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 117,
+            "output": 2681,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.00953346,
+            "totalCostCny": 0.06515071,
+            "generationId": "gen-1777258124-xrLHlFEgqtYBSZFC759D",
+            "providerName": "SiliconFlow",
+            "elapsedMs": 62514,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 12188,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "deepseek/deepseek-v4-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 200,
+            "output": 4272,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.012171648,
+            "totalCostCny": 0.08317983,
+            "generationId": "gen-1777258197-1NaPTAJSWcZjPT1m5RuC",
+            "providerName": "DeepSeek",
+            "elapsedMs": 117088,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 15359,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "deepseek/deepseek-v4-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "xiaomi/mimo-v2.5-pro": {
+        "input": 328,
+        "output": 4616,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 85.69,
+        "passed": 5,
+        "score": 71,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Xiaomi",
+        "verdict": "真实生成页面通过 5/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=xiaomi/mimo-v2.5-pro, attempts=2"
+          ],
+          [
+            "33.0s",
+            "Artifact generated",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "29.7s",
+            "Repair attempt",
+            "Generated HTML page · 4/7 passed"
+          ],
+          [
+            "85.7s",
+            "Final tests",
+            "5/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.014176,
+        "totalCostCny": 0.09678239,
+        "generationId": "gen-1777371818-7oJ5Wo8QbVLEv537t18z",
+        "generationIds": [
+          "gen-1777371818-7oJ5Wo8QbVLEv537t18z",
+          "gen-1777371861-rDEXAT9D8Ikpqc2qLzXg"
+        ],
+        "artifactPath": "generated/calculator/xiaomi-mimo-v2-5-pro/index.html",
+        "rawRunPath": ".bench-runs/calculator/xiaomi-mimo-v2-5-pro.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=20"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=0"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 11177,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 122,
+            "output": 2370,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.007232,
+            "totalCostCny": 0.04937431,
+            "generationId": "gen-1777371818-7oJ5Wo8QbVLEv537t18z",
+            "providerName": "Xiaomi",
+            "elapsedMs": 33013,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 11177,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2.5-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 206,
+            "output": 2246,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.006944,
+            "totalCostCny": 0.04740808,
+            "generationId": "gen-1777371861-rDEXAT9D8Ikpqc2qLzXg",
+            "providerName": "Xiaomi",
+            "elapsedMs": 29671,
+            "passed": 4,
+            "score": 57,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 11034,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2.5-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "alibaba/tongyi-deepresearch-30b-a3b": {
+        "input": 378,
+        "output": 4352,
+        "cache": 57,
+        "reasoning": 1612,
+        "latency": 122.33,
+        "passed": 2,
+        "score": 29,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "AtlasCloud",
+        "verdict": "真实生成页面通过 2/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=alibaba/tongyi-deepresearch-30b-a3b, attempts=2"
+          ],
+          [
+            "44.8s",
+            "Artifact generated",
+            "Generated HTML page · 2/7 passed"
+          ],
+          [
+            "54.5s",
+            "Repair attempt",
+            "Generated HTML page · 2/7 passed"
+          ],
+          [
+            "122.3s",
+            "Final tests",
+            "2/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.00199242,
+        "totalCostCny": 0.01360265,
+        "generationId": "gen-1777371962-2ZJBCFA1pY0hmJfErlpM",
+        "generationIds": [
+          "gen-1777371904-uYWiEyGaxZxR48aIzwSv",
+          "gen-1777371962-2ZJBCFA1pY0hmJfErlpM"
+        ],
+        "artifactPath": "generated/calculator/alibaba-tongyi-deepresearch-30b-a3b/index.html",
+        "rawRunPath": ".bench-runs/calculator/alibaba-tongyi-deepresearch-30b-a3b.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": false,
+            "message": "display=13"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=3.869927e-2"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": false,
+            "message": "display=0.202"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=0.1"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": false,
+            "message": "display=13337"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8119,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 122,
+            "output": 2114,
+            "cache": 3,
+            "reasoning": 800,
+            "totalCost": 0.00096228,
+            "totalCostCny": 0.00656968,
+            "generationId": "gen-1777371904-uYWiEyGaxZxR48aIzwSv",
+            "providerName": "Alibaba",
+            "elapsedMs": 44836,
+            "passed": 2,
+            "score": 29,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 6344,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "alibaba/tongyi-deepresearch-30b-a3b",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 256,
+            "output": 2238,
+            "cache": 54,
+            "reasoning": 812,
+            "totalCost": 0.00103014,
+            "totalCostCny": 0.00703297,
+            "generationId": "gen-1777371962-2ZJBCFA1pY0hmJfErlpM",
+            "providerName": "AtlasCloud",
+            "elapsedMs": 54535,
+            "passed": 2,
+            "score": 29,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8119,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "alibaba/tongyi-deepresearch-30b-a3b",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "xiaomi/mimo-v2-pro-20260318": {
+        "input": 357,
+        "output": 3946,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 74.68,
+        "passed": 5,
+        "score": 71,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Xiaomi",
+        "verdict": "真实生成页面通过 5/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=xiaomi/mimo-v2-pro-20260318, attempts=2"
+          ],
+          [
+            "29.2s",
+            "Artifact generated",
+            "Generated HTML page · 4/7 passed"
+          ],
+          [
+            "22.5s",
+            "Repair attempt",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "74.7s",
+            "Final tests",
+            "5/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.012195000000000001,
+        "totalCostCny": 0.08329185,
+        "generationId": "gen-1777428631-uAfWdcVmb1iFH5X4TySE",
+        "generationIds": [
+          "gen-1777428589-VfVywJdBx4jEYThuPuSt",
+          "gen-1777428631-uAfWdcVmb1iFH5X4TySE"
+        ],
+        "artifactPath": "generated/calculator/xiaomi-mimo-v2-pro-20260318/index.html",
+        "rawRunPath": ".bench-runs/calculator/xiaomi-mimo-v2-pro-20260318.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=20"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=0"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8009,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 122,
+            "output": 2235,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.006827,
+            "totalCostCny": 0.04662841,
+            "generationId": "gen-1777428589-VfVywJdBx4jEYThuPuSt",
+            "providerName": "Xiaomi",
+            "elapsedMs": 29200,
+            "passed": 4,
+            "score": 57,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 11174,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2-pro-20260318",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 235,
+            "output": 1711,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.005368,
+            "totalCostCny": 0.03666344,
+            "generationId": "gen-1777428631-uAfWdcVmb1iFH5X4TySE",
+            "providerName": "Xiaomi",
+            "elapsedMs": 22517,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8009,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2-pro-20260318",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "qwen/qwen3.6-max-preview-20260420": {
+        "input": 345,
+        "output": 5337,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 127.58,
+        "passed": 6,
+        "score": 86,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Alibaba",
+        "verdict": "真实生成页面通过 6/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=qwen/qwen3.6-max-preview-20260420, attempts=2"
+          ],
+          [
+            "53.2s",
+            "Artifact generated",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "46.9s",
+            "Repair attempt",
+            "Generated HTML page · 6/7 passed"
+          ],
+          [
+            "127.6s",
+            "Final tests",
+            "6/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.03366168,
+        "totalCostCny": 0.22990927,
+        "generationId": "gen-1777428730-rsi66czDpnyfFA9VSr1G",
+        "generationIds": [
+          "gen-1777428663-HjiO8kM03aR72IXcCmV1",
+          "gen-1777428730-rsi66czDpnyfFA9VSr1G"
+        ],
+        "artifactPath": "generated/calculator/qwen-qwen3-6-max-preview-20260420/index.html",
+        "rawRunPath": ".bench-runs/calculator/qwen-qwen3-6-max-preview-20260420.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=20"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": true,
+            "message": "8 ÷ 0 shows error"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 11271,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 130,
+            "output": 2644,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.01663376,
+            "totalCostCny": 0.11360858,
+            "generationId": "gen-1777428663-HjiO8kM03aR72IXcCmV1",
+            "providerName": "Alibaba",
+            "elapsedMs": 53193,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 10986,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 215,
+            "output": 2693,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.01702792,
+            "totalCostCny": 0.11630069,
+            "generationId": "gen-1777428730-rsi66czDpnyfFA9VSr1G",
+            "providerName": "Alibaba",
+            "elapsedMs": 46943,
+            "passed": 6,
+            "score": 86,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 11271,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      }
+    },
+    "calendar": {
+      "minimax/minimax-m2.7": {
+        "input": 112,
+        "output": 4374,
+        "cache": 0,
+        "reasoning": 3316,
+        "latency": 61.69,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "MiniMax",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=minimax/minimax-m2.7, attempts=1"
+          ],
+          [
+            "52.1s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "61.7s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.0052824,
+        "totalCostCny": 0.03609887,
+        "generationId": "gen-1777246013-P86xN28yN402KuCM48iK",
+        "generationIds": [
+          "gen-1777246013-P86xN28yN402KuCM48iK"
+        ],
+        "artifactPath": "generated/calendar/minimax-minimax-m2-7/index.html",
+        "rawRunPath": ".bench-runs/calendar/minimax-minimax-m2-7.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 4296,
+        "reasoningLength": 12115,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 112,
+            "output": 4374,
+            "cache": 0,
+            "reasoning": 3316,
+            "totalCost": 0.0052824,
+            "totalCostCny": 0.03609887,
+            "generationId": "gen-1777246013-P86xN28yN402KuCM48iK",
+            "providerName": "MiniMax",
+            "elapsedMs": 52094,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 4296,
+            "reasoningLength": 12115,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "minimax/minimax-m2.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": null,
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": null,
+          "maxRetries": 1
+        }
+      },
+      "openai/gpt-5.5": {
+        "input": 423,
+        "output": 12877,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 121.42,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "OpenAI",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=openai/gpt-5.5, attempts=2"
+          ],
+          [
+            "60.3s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "43.4s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "121.4s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.388425,
+        "totalCostCny": 2.65445761,
+        "generationId": "gen-1777258745-tTtaWsJS6orWbAKE2t7Y",
+        "generationIds": [
+          "gen-1777258676-A6Du2eg1TOxBJt3MxhUa",
+          "gen-1777258745-tTtaWsJS6orWbAKE2t7Y"
+        ],
+        "artifactPath": "generated/calendar/openai-gpt-5-5/index.html",
+        "rawRunPath": ".bench-runs/calendar/openai-gpt-5-5.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 18103,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 130,
+            "output": 7655,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.2303,
+            "totalCostCny": 1.57384717,
+            "generationId": "gen-1777258676-A6Du2eg1TOxBJt3MxhUa",
+            "providerName": "OpenAI",
+            "elapsedMs": 60251,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 27165,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "openai/gpt-5.5",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 293,
+            "output": 5222,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.158125,
+            "totalCostCny": 1.08061044,
+            "generationId": "gen-1777258745-tTtaWsJS6orWbAKE2t7Y",
+            "providerName": "OpenAI",
+            "elapsedMs": 43390,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 18103,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "openai/gpt-5.5",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "anthropic/claude-opus-4.7": {
+        "input": 672,
+        "output": 8398,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 69.89,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Amazon Bedrock",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=anthropic/claude-opus-4.7, attempts=2"
+          ],
+          [
+            "28.8s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "26.9s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "69.9s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.21331,
+        "totalCostCny": 1.45631003,
+        "generationId": "gen-1777371576-IuUKJ1UeaswnN8ZcwazI",
+        "generationIds": [
+          "gen-1777371542-OQ3aYsCTucHUBGLPYkXL",
+          "gen-1777371576-IuUKJ1UeaswnN8ZcwazI"
+        ],
+        "artifactPath": "generated/calendar/anthropic-claude-opus-4-7/index.html",
+        "rawRunPath": ".bench-runs/calendar/anthropic-claude-opus-4-7.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8708,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 216,
+            "output": 4446,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.11223,
+            "totalCostCny": 0.76621666,
+            "generationId": "gen-1777371542-OQ3aYsCTucHUBGLPYkXL",
+            "providerName": "Amazon Bedrock",
+            "elapsedMs": 28833,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 10238,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "anthropic/claude-opus-4.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 456,
+            "output": 3952,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.10108,
+            "totalCostCny": 0.69009338,
+            "generationId": "gen-1777371576-IuUKJ1UeaswnN8ZcwazI",
+            "providerName": "Amazon Bedrock",
+            "elapsedMs": 26882,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8708,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "anthropic/claude-opus-4.7",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "google/gemini-3.1-pro-preview": {
+        "input": 114,
+        "output": 5379,
+        "cache": 0,
+        "reasoning": 3077,
+        "latency": 54.21,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "Google",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=google/gemini-3.1-pro-preview, attempts=1"
+          ],
+          [
+            "43.0s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "54.2s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.064776,
+        "totalCostCny": 0.44223871,
+        "generationId": "gen-1777371613-fFg10dBioCGtqsygANwb",
+        "generationIds": [
+          "gen-1777371613-fFg10dBioCGtqsygANwb"
+        ],
+        "artifactPath": "generated/calendar/google-gemini-3-1-pro-preview/index.html",
+        "rawRunPath": ".bench-runs/calendar/google-gemini-3-1-pro-preview.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 8478,
+        "reasoningLength": 3477,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 114,
+            "output": 5379,
+            "cache": 0,
+            "reasoning": 3077,
+            "totalCost": 0.064776,
+            "totalCostCny": 0.44223871,
+            "generationId": "gen-1777371613-fFg10dBioCGtqsygANwb",
+            "providerName": "Google",
+            "elapsedMs": 43006,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 8478,
+            "reasoningLength": 3477,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "google/gemini-3.1-pro-preview",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": null,
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": null,
+          "maxRetries": 1
+        }
+      },
+      "moonshotai/kimi-k2.6": {
+        "input": 410,
+        "output": 8550,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 283.15,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Moonshot AI",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=moonshotai/kimi-k2.6, attempts=2"
+          ],
+          [
+            "190.4s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "70.7s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "283.1s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.03459575,
+        "totalCostCny": 0.23633741,
+        "generationId": "gen-1777448734-C8rP8rpVQOHHGyCM8Cro",
+        "generationIds": [
+          "gen-1777448532-7Vf3adJocRn4YVHnunK6",
+          "gen-1777448734-C8rP8rpVQOHHGyCM8Cro"
+        ],
+        "artifactPath": "generated/calendar/moonshotai-kimi-k2-6/index.html",
+        "rawRunPath": ".bench-runs/calendar/moonshotai-kimi-k2-6.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 9812,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 125,
+            "output": 6294,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.025301,
+            "totalCostCny": 0.17284125,
+            "generationId": "gen-1777448532-7Vf3adJocRn4YVHnunK6",
+            "providerName": "Moonshot AI",
+            "elapsedMs": 190357,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 23138,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "moonshotai/kimi-k2.6",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 285,
+            "output": 2256,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.00929475,
+            "totalCostCny": 0.06349616,
+            "generationId": "gen-1777448734-C8rP8rpVQOHHGyCM8Cro",
+            "providerName": "Moonshot AI",
+            "elapsedMs": 70730,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 9812,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "moonshotai/kimi-k2.6",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 600000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 2
+        }
+      },
+      "z-ai/glm-5.1": {
+        "input": 383,
+        "output": 15308,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 173.68,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Z.ai",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=z-ai/glm-5.1, attempts=2"
+          ],
+          [
+            "72.4s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "85.8s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "173.7s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.06789029,
+        "totalCostCny": 0.46395545,
+        "generationId": "gen-1777259436-sX2nziYBkBWASPjZRU6V",
+        "generationIds": [
+          "gen-1777259357-XYCJDYA71v5XJM1KS4lC",
+          "gen-1777259436-sX2nziYBkBWASPjZRU6V"
+        ],
+        "artifactPath": "generated/calendar/z-ai-glm-5-1/index.html",
+        "rawRunPath": ".bench-runs/calendar/z-ai-glm-5-1.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 16095,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 111,
+            "output": 10549,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.04656989,
+            "totalCostCny": 0.31825397,
+            "generationId": "gen-1777259357-XYCJDYA71v5XJM1KS4lC",
+            "providerName": "AtlasCloud",
+            "elapsedMs": 72436,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 33523,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "z-ai/glm-5.1",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 272,
+            "output": 4759,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.0213204,
+            "totalCostCny": 0.14570148,
+            "generationId": "gen-1777259436-sX2nziYBkBWASPjZRU6V",
+            "providerName": "Z.ai",
+            "elapsedMs": 85811,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 16095,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "z-ai/glm-5.1",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "deepseek/deepseek-v4-pro": {
+        "input": 116,
+        "output": 3189,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 94.15,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "DeepSeek",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=deepseek/deepseek-v4-pro, attempts=1"
+          ],
+          [
+            "85.2s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "94.2s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.01129956,
+        "totalCostCny": 0.07722006,
+        "generationId": "gen-1777259531-WFVfzrQleGFyUOLrPTpD",
+        "generationIds": [
+          "gen-1777259531-WFVfzrQleGFyUOLrPTpD"
+        ],
+        "artifactPath": "generated/calendar/deepseek-deepseek-v4-pro/index.html",
+        "rawRunPath": ".bench-runs/calendar/deepseek-deepseek-v4-pro.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 13625,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 116,
+            "output": 3189,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.01129956,
+            "totalCostCny": 0.07722006,
+            "generationId": "gen-1777259531-WFVfzrQleGFyUOLrPTpD",
+            "providerName": "DeepSeek",
+            "elapsedMs": 85172,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 13625,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "deepseek/deepseek-v4-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "xiaomi/mimo-v2.5-pro": {
+        "input": 123,
+        "output": 2490,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 55.12,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "Xiaomi",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=xiaomi/mimo-v2.5-pro, attempts=1"
+          ],
+          [
+            "44.8s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "55.1s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.007593,
+        "totalCostCny": 0.05183893,
+        "generationId": "gen-1777372026-vBHsk24ml9jplfmBcqjL",
+        "generationIds": [
+          "gen-1777372026-vBHsk24ml9jplfmBcqjL"
+        ],
+        "artifactPath": "generated/calendar/xiaomi-mimo-v2-5-pro/index.html",
+        "rawRunPath": ".bench-runs/calendar/xiaomi-mimo-v2-5-pro.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 12205,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 123,
+            "output": 2490,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.007593,
+            "totalCostCny": 0.05183893,
+            "generationId": "gen-1777372026-vBHsk24ml9jplfmBcqjL",
+            "providerName": "Xiaomi",
+            "elapsedMs": 44840,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 12205,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2.5-pro",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "alibaba/tongyi-deepresearch-30b-a3b": {
+        "input": 123,
+        "output": 3880,
+        "cache": 3,
+        "reasoning": 888,
+        "latency": 98.45,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "Alibaba",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=alibaba/tongyi-deepresearch-30b-a3b, attempts=1"
+          ],
+          [
+            "87.7s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "98.5s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.00175707,
+        "totalCostCny": 0.01199587,
+        "generationId": "gen-1777372081-PYWtR7NGKse6BIOnH2T7",
+        "generationIds": [
+          "gen-1777372081-PYWtR7NGKse6BIOnH2T7"
+        ],
+        "artifactPath": "generated/calendar/alibaba-tongyi-deepresearch-30b-a3b/index.html",
+        "rawRunPath": ".bench-runs/calendar/alibaba-tongyi-deepresearch-30b-a3b.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 14111,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 123,
+            "output": 3880,
+            "cache": 3,
+            "reasoning": 888,
+            "totalCost": 0.00175707,
+            "totalCostCny": 0.01199587,
+            "generationId": "gen-1777372081-PYWtR7NGKse6BIOnH2T7",
+            "providerName": "Alibaba",
+            "elapsedMs": 87677,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 14111,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "alibaba/tongyi-deepresearch-30b-a3b",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "xiaomi/mimo-v2-pro-20260318": {
+        "input": 413,
+        "output": 6503,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 100.5,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Xiaomi",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=xiaomi/mimo-v2-pro-20260318, attempts=2"
+          ],
+          [
+            "46.0s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "33.3s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "100.5s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.019922000000000002,
+        "totalCostCny": 0.13606726,
+        "generationId": "gen-1777428847-58KfEAmgbmlDiSCd7SEE",
+        "generationIds": [
+          "gen-1777428791-xCRiuydhfsalBy5sS5GH",
+          "gen-1777428847-58KfEAmgbmlDiSCd7SEE"
+        ],
+        "artifactPath": "generated/calendar/xiaomi-mimo-v2-pro-20260318/index.html",
+        "rawRunPath": ".bench-runs/calendar/xiaomi-mimo-v2-pro-20260318.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 13311,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 123,
+            "output": 3897,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.011814,
+            "totalCostCny": 0.08068962,
+            "generationId": "gen-1777428791-xCRiuydhfsalBy5sS5GH",
+            "providerName": "Xiaomi",
+            "elapsedMs": 46006,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 18093,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "xiaomi/mimo-v2-pro-20260318",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 290,
+            "output": 2606,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.008108,
+            "totalCostCny": 0.05537764,
+            "generationId": "gen-1777428847-58KfEAmgbmlDiSCd7SEE",
+            "providerName": "Xiaomi",
+            "elapsedMs": 33311,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 13311,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "xiaomi/mimo-v2-pro-20260318",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "qwen/qwen3.6-max-preview-20260420": {
+        "input": 429,
+        "output": 7212,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 152.32,
+        "passed": 7,
+        "score": 100,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Alibaba",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=qwen/qwen3.6-max-preview-20260420, attempts=2"
+          ],
+          [
+            "74.4s",
+            "Artifact generated",
+            "Generated page · 0/7 passed"
+          ],
+          [
+            "59.0s",
+            "Repair attempt",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "152.3s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0.045449039999999996,
+        "totalCostCny": 0.31041694,
+        "generationId": "gen-1777428974-9XNcteytGvRQHkr9XC7l",
+        "generationIds": [
+          "gen-1777428891-3hUxJV9e6feFIR8l8gll",
+          "gen-1777428974-9XNcteytGvRQHkr9XC7l"
+        ],
+        "artifactPath": "generated/calendar/qwen-qwen3-6-max-preview-20260420/index.html",
+        "rawRunPath": ".bench-runs/calendar/qwen-qwen3-6-max-preview-20260420.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 12395,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 130,
+            "output": 4136,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.02594384,
+            "totalCostCny": 0.17719643,
+            "generationId": "gen-1777428891-3hUxJV9e6feFIR8l8gll",
+            "providerName": "Alibaba",
+            "elapsedMs": 74384,
+            "passed": 0,
+            "score": 0,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 16201,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated page",
+            "request": {
+              "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 299,
+            "output": 3076,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0.0195052,
+            "totalCostCny": 0.13322052,
+            "generationId": "gen-1777428974-9XNcteytGvRQHkr9XC7l",
+            "providerName": "Alibaba",
+            "elapsedMs": 59012,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 12395,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      }
+    }
+  }
+}

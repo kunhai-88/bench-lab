@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.5, minimum-scale=0.5">
+  <title>简约计算器 | 完整功能</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #2b3a4f 0%, #1d2b3a 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: #1e2c3a;
+      border-radius: 48px;
+      box-shadow: 
+        0 30px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      padding: 24px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .display {
+      background: #0f1a24;
+      border-radius: 32px;
+      padding: 18px 20px;
+      box-shadow: inset 0 6px 10px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      min-height: 90px;
+      word-break: break-word;
+    }
+
+    .expression {
+      color: #8e9daf;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      min-height: 22px;
+      font-weight: 400;
+      opacity: 0.9;
+      width: 100%;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .result {
+      color: #f0f4fa;
+      font-size: 2.8rem;
+      font-weight: 500;
+      line-height: 1.2;
+      width: 100%;
+      text-align: right;
+      transition: font-size 0.15s ease;
+      letter-spacing: -0.5px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      background: #2c3e50;
+      border: none;
+      border-radius: 28px;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #ecf0f1;
+      padding: 18px 4px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      background: rgba(44, 62, 80, 0.7);
+      box-shadow: 0 8px 14px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transition: all 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active {
+      transform: scale(0.94);
+      background: rgba(52, 73, 94, 0.85);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    /* 功能键特殊颜色 */
+    button.clear,
+    button.backspace {
+      background: rgba(192, 57, 43, 0.8);
+      color: white;
+      font-weight: 600;
+    }
+
+    button.clear:active,
+    button.backspace:active {
+      background: rgba(231, 76, 60, 0.9);
+    }
+
+    button.operator {
+      background: rgba(230, 145, 56, 0.85);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.7rem;
+    }
+
+    button.operator:active {
+      background: rgba(243, 156, 18, 0.9);
+    }
+
+    button.equals {
+      background: #2980b9;
+      background: rgba(41, 128, 185, 0.9);
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+      grid-column: span 1;
+    }
+
+    button.equals:active {
+      background: #3498db;
+    }
+
+    button.zero {
+      grid-column: span 2;
+      border-radius: 32px;
+    }
+
+    /* 调整小屏字体 */
+    @media (max-width: 400px) {
+      .calculator {
+        padding: 18px 14px 22px;
+        gap: 16px;
+      }
+      button {
+        font-size: 1.3rem;
+        padding: 16px 2px;
+      }
+      .result {
+        font-size: 2.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <!-- 显示区域 -->
+    <div class="display">
+      <div class="expression" id="expressionDisplay"></div>
+      <div class="result" id="resultDisplay">0</div>
+    </div>
+
+    <!-- 按钮布局 -->
+    <div class="buttons">
+      <!-- 第一行 -->
+      <button class="clear" id="btnClear">C</button>
+      <button class="backspace" id="btnBackspace">⌫</button>
+      <button class="operator" id="btnDivide">÷</button>
+      <button class="operator" id="btnMultiply">×</button>
+
+      <!-- 第二行 -->
+      <button id="btn7">7</button>
+      <button id="btn8">8</button>
+      <button id="btn9">9</button>
+      <button class="operator" id="btnSubtract">−</button>
+
+      <!-- 第三行 -->
+      <button id="btn4">4</button>
+      <button id="btn5">5</button>
+      <button id="btn6">6</button>
+      <button class="operator" id="btnAdd">+</button>
+
+      <!-- 第四行 -->
+      <button id="btn1">1</button>
+      <button id="btn2">2</button>
+      <button id="btn3">3</button>
+      <button class="equals" id="btnEquals">=</button>
+
+      <!-- 第五行 -->
+      <button class="zero" id="btn0">0</button>
+      <button id="btnDot">.</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // DOM 元素
+      const expressionDisplay = document.getElementById('expressionDisplay');
+      const resultDisplay = document.getElementById('resultDisplay');
+
+      // 状态变量
+      let currentOperand = '0';          // 当前正在输入的数字（字符串形式）
+      let previousOperand = '';         // 前一个操作数
+      let operation = null;            // 当前运算符 (+, -, *, /)
+      let shouldResetScreen = false;   // 是否在下次输入数字时重置屏幕
+      let expressionString = '';       // 用于显示上方的表达式（完整算式）
+
+      // 辅助函数：更新显示
+      function updateDisplay() {
+        // 更新主结果区域
+        resultDisplay.textContent = currentOperand;
+        
+        // 更新表达式区域
+        if (expressionString) {
+          expressionDisplay.textContent = expressionString;
+        } else {
+          expressionDisplay.textContent = '';
+        }
+
+        // 动态调整字体大小：当数字很长时缩小字体
+        const length = currentOperand.length;
+        if (length > 12) {
+          resultDisplay.style.fontSize = '1.8rem';
+        } else if (length > 9) {
+          resultDisplay.style.fontSize = '2.2rem';
+        } else {
+          resultDisplay.style.fontSize = '2.8rem';
+        }
+      }
+
+      // 重置所有状态 (C)
+      function clearAll() {
+        currentOperand = '0';
+        previousOperand = '';
+        operation = null;
+        shouldResetScreen = false;
+        expressionString = '';
+        updateDisplay();
+      }
+
+      // 删除最后一个字符 (退格)
+      function deleteLast() {
+        if (shouldResetScreen) {
+          // 如果刚完成一次运算，退格应当清空当前操作数并重置标志
+          currentOperand = '0';
+          shouldResetScreen = false;
+          updateDisplay();
+          return;
+        }
+
+        // 如果当前操作数长度为1 或 只有负号等情况，变为0
+        if (currentOperand.length === 1 || (currentOperand.length === 2 && currentOperand.startsWith('-'))) {
+          currentOperand = '0';
+        } else {
+          currentOperand = currentOperand.slice(0, -1);
+        }
+        
+        // 同步更新表达式字符串：如果表达式末尾与当前操作数相关，需要调整
+        // 简单处理：重新构建表达式字符串基于状态，但为了保持一致性，我们采用更稳健的方式：
+        // 当退格时，如果存在运算符和previousOperand，表达式应反映当前操作数的变化。
+        // 我们将在每次操作后重建expressionString，避免不同步。
+        rebuildExpressionFromState();
+        updateDisplay();
+      }
+
+      // 根据当前状态重建表达式字符串 (用于显示)
+      function rebuildExpressionFromState() {
+        if (operation && previousOperand !== '') {
+          // 有运算符和前一操作数
+          let opSymbol = getOperatorSymbol(operation);
+          expressionString = `${previousOperand} ${opSymbol} ${currentOperand}`;
+        } else {
+          // 没有运算符或前一操作数为空，表达式只显示当前操作数或空
+          expressionString = currentOperand;
+        }
+      }
+
+      function getOperatorSymbol(op) {
+        if (op === '+') return '+';
+        if (op === '-') return '−';
+        if (op === '*') return '×';
+        if (op === '/') return '÷';
+        return op;
+      }
+
+      // 追加数字
+      function appendNumber(number) {
+        if (number === '.' && currentOperand.includes('.')) return; // 禁止多个小数点
+
+        if (shouldResetScreen) {
+          // 如果应该重置屏幕（例如刚按了运算符或等于），则从新数字开始
+          currentOperand = number;
+          shouldResetScreen = false;
+        } else {
+          // 正常追加
+          if (currentOperand === '0' && number !== '.') {
+            currentOperand = number;
+          } else {
+            currentOperand += number;
+          }
+        }
+
+        // 更新表达式字符串
+        rebuildExpressionFromState();
+        updateDisplay();
+      }
+
+      // 处理运算符点击
+      function handleOperator(op) {
+        // 如果已经有运算符且当前操作数不为空，先计算中间结果
+        if (operation !== null && !shouldResetScreen) {
+          // 执行计算
+          const result = performCalculation();
+          if (result === null) {
+            // 计算出错（如除以0），显示错误并重置
+            displayError();
+            return;
+          }
+          // 将计算结果设置为当前操作数
+          currentOperand = result;
+          // 更新表达式：将之前表达式结果作为新的previousOperand
+          previousOperand = result;
+        } else {
+          // 如果没有待处理运算，或者刚重置屏幕，直接将当前操作数作为previousOperand
+          previousOperand = currentOperand;
+        }
+
+        // 设置新运算符
+        operation = op;
+        // 下一次输入数字需要重置屏幕
+        shouldResetScreen = true;
+
+        // 重建表达式：显示 previousOperand 和运算符
+        let opSymbol = getOperatorSymbol(op);
+        expressionString = `${previousOperand} ${opSymbol}`;
+        updateDisplay();
+      }
+
+      // 执行实际计算 (基于 previousOperand, operation, currentOperand)
+      function performCalculation() {
+        const prev = parseFloat(previousOperand);
+        const current = parseFloat(currentOperand);
+        
+        if (isNaN(prev) || isNaN(current)) return null;
+
+        let computation;
+        switch (operation) {
+          case '+':
+            computation = prev + current;
+            break;
+          case '-':
+            computation = prev - current;
+            break;
+          case '*':
+            computation = prev * current;
+            break;
+          case '/':
+            if (current === 0) {
+              return null; // 除零错误
+            }
+            computation = prev / current;
+            break;
+          default:
+            return null;
+        }
+
+        // 处理浮点数精度问题，保留合理位数
+        const resultString = parseFloat(computation.toPrecision(12)).toString();
+        return resultString;
+      }
+
+      // 处理等号
+      function handleEquals() {
+        // 如果没有运算符，或者shouldResetScreen为true且没有previousOperand？需要处理连续按等号的情况
+        if (operation === null) {
+          // 没有运算符，直接返回，表达式不变
+          rebuildExpressionFromState();
+          updateDisplay();
+          return;
+        }
+
+        if (shouldResetScreen && previousOperand !== '') {
+          // 这种情况：用户输入了数字，按了运算符，然后又按了等号（没有输入第二个操作数）
+          // 通常行为：使用previousOperand和currentOperand相同？或者忽略。我们采用标准行为：用当前操作数作为第二个操作数。
+          // 但shouldResetScreen为true表示等待输入数字，此时currentOperand仍是之前的值。
+          // 实际上currentOperand就是之前的值，可以直接计算。
+        }
+
+        // 保存当前表达式用于显示结果
+        const currentExpr = `${previousOperand} ${getOperatorSymbol(operation)} ${currentOperand} =`;
+        
+        const result = performCalculation();
+        
+        if (result === null) {
+          displayError();
+          return;
+        }
+
+        // 设置表达式显示为完整算式
+        expressionString = currentExpr;
+        // 更新当前操作数为结果
+        currentOperand = result;
+        // 清除运算符和前一操作数，以便后续连续运算
+        operation = null;
+        previousOperand = '';
+        shouldResetScreen = true; // 结果之后，如果输入数字会重置
+
+        updateDisplay();
+      }
+
+      // 显示错误状态
+      function displayError() {
+        // 设置显示为错误
+        resultDisplay.textContent = '错误';
+        expressionDisplay.textContent = expressionString || '错误';
+        // 重置内部状态
+        currentOperand = '0';
+        previousOperand = '';
+        operation = null;
+        shouldResetScreen = false;
+        expressionString = '';
+        // 短暂延迟后恢复显示0 (但保留错误提示直到用户操作)
+        setTimeout(() => {
+          // 如果仍然显示错误，则重置为0
+          if (resultDisplay.textContent === '错误') {
+            clearAll();
+          }
+        }, 1200);
+      }
+
+      // 处理小数点
+      function appendDot() {
+        if (shouldResetScreen) {
+          currentOperand = '0.';
+          shouldResetScreen = false;
+          rebuildExpressionFromState();
+          updateDisplay();
+          return;
+        }
+        if (!currentOperand.includes('.')) {
+          currentOperand += '.';
+          rebuildExpressionFromState();
+          updateDisplay();
+        }
+      }
+
+      // 初始化显示
+      updateDisplay();
+
+      // 绑定按钮事件
+      document.getElementById('btnClear').addEventListener('click', clearAll);
+      document.getElementById('btnBackspace').addEventListener('click', deleteLast);
+      
+      document.getElementById('btn7').addEventListener('click', () => appendNumber('7'));
+      document.getElementById('btn8').addEventListener('click', () => appendNumber('8'));
+      document.getElementById('btn9').addEventListener('click', () => appendNumber('9'));
+      document.getElementById('btn4').addEventListener('click', () => appendNumber('4'));
+      document.getElementById('btn5').addEventListener('click', () => appendNumber('5'));
+      document.getElementById('btn6').addEventListener('click', () => appendNumber('6'));
+      document.getElementById('btn1').addEventListener('click', () => appendNumber('1'));
+      document.getElementById('btn2').addEventListener('click', () => appendNumber('2'));
+      document.getElementById('btn3').addEventListener('click', () => appendNumber('3'));
+      document.getElementById('btn0').addEventListener('click', () => appendNumber('0'));
+      
+      document.getElementById('btnDot').addEventListener('click', appendDot);
+
+      document.getElementById('btnAdd').addEventListener('click', () => handleOperator('+'));
+      document.getElementById('btnSubtract').addEventListener('click', () => handleOperator('-'));
+      document.getElementById('btnMultiply').addEventListener('click', () => handleOperator('*'));
+      document.getElementById('btnDivide').addEventListener('click', () => handleOperator('/'));
+      
+      document.getElementById('btnEquals').addEventListener('click', handleEquals);
+
+      // 键盘支持 (可选，增强体验)
+      window.addEventListener('keydown', (e) => {
+        const key = e.key;
+        // 防止页面滚动/默认行为
+        if (key >= '0' && key <= '9') {
+          e.preventDefault();
+          appendNumber(key);
+        } else if (key === '.') {
+          e.preventDefault();
+          appendDot();
+        } else if (key === '+' || key === '-') {
+          e.preventDefault();
+          handleOperator(key);
+        } else if (key === '*') {
+          e.preventDefault();
+          handleOperator('*');
+        } else if (key === '/') {
+          e.preventDefault();
+          handleOperator('/');
+        } else if (key === 'Enter' || key === '=') {
+          e.preventDefault();
+          handleEquals();
+        } else if (key === 'Backspace') {
+          e.preventDefault();
+          deleteLast();
+        } else if (key === 'Escape' || key === 'Delete') {
+          e.preventDefault();
+          clearAll();
+        }
+      });
+
+      // 确保触摸设备无延迟
+    })();
+  </script>
+</body>
+</html>

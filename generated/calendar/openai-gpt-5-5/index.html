@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网页日历</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg1: #f4f7ff;
+      --bg2: #eef8f5;
+      --card: rgba(255, 255, 255, 0.86);
+      --text: #172033;
+      --muted: #667085;
+      --line: rgba(30, 41, 59, 0.11);
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-soft: rgba(59, 130, 246, 0.13);
+      --today: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.13);
+      --radius: 26px;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(96, 165, 250, 0.32), transparent 32%),
+        radial-gradient(circle at 85% 18%, rgba(52, 211, 153, 0.24), transparent 28%),
+        radial-gradient(circle at 55% 88%, rgba(168, 85, 247, 0.13), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+    }
+
+    .app {
+      width: min(980px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+    }
+
+    .calendar-card,
+    .side-card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .calendar-card {
+      padding: 22px;
+    }
+
+    .calendar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .title-wrap {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    #monthTitle {
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.1;
+      margin: 0;
+      font-weight: 850;
+      letter-spacing: -0.04em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .icon-btn,
+    .today-btn {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+      min-height: 42px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      outline: none;
+    }
+
+    .icon-btn {
+      width: 42px;
+      font-size: 24px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .today-btn {
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .icon-btn:hover,
+    .today-btn:hover {
+      transform: translateY(-1px);
+      background: #fff;
+      border-color: rgba(59, 130, 246, 0.32);
+      box-shadow: 0 10px 24px rgba(59, 130, 246, 0.13);
+    }
+
+    .icon-btn:focus-visible,
+    .today-btn:focus-visible,
+    .day:focus-visible {
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.24);
+      border-color: var(--primary);
+    }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      padding: 8px 0 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .weekday {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 8px 0;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day {
+      position: relative;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.58);
+      border-radius: 18px;
+      min-height: 82px;
+      padding: 10px;
+      cursor: pointer;
+      color: var(--text);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      outline: none;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .day:hover {
+      transform: translateY(-2px);
+      background: #fff;
+      border-color: rgba(59, 130, 246, 0.25);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .day-number {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .day-lunar {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .other-month {
+      opacity: 0.42;
+      background: rgba(255, 255, 255, 0.32);
+    }
+
+    .weekend .day-number {
+      color: var(--danger);
+    }
+
+    .today {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.09);
+    }
+
+    .today::after {
+      content: "今天";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 11px;
+      color: #047857;
+      background: rgba(16, 185, 129, 0.15);
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-weight: 800;
+    }
+
+    .selected {
+      color: white;
+      border-color: var(--primary-dark);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28);
+    }
+
+    .selected .day-lunar,
+    .selected .day-number {
+      color: white;
+    }
+
+    .selected.today::after {
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .side-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .date-panel {
+      border-radius: 22px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
+      color: white;
+      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.25);
+    }
+
+    .date-panel .small {
+      opacity: 0.82;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .date-panel .big {
+      font-size: 52px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .date-panel .full {
+      margin-top: 12px;
+      font-size: 15px;
+      line-height: 1.55;
+      opacity: 0.95;
+    }
+
+    .info-box {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.52);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .info-box h2 {
+      margin: 0 0 10px;
+      font-size: 17px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(30, 41, 59, 0.08);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .info-row:first-of-type {
+      border-top: 0;
+    }
+
+    .info-row strong {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        align-items: flex-start;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .side-card {
+        order: -1;
+      }
+
+      .calendar-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .controls {
+        justify-content: flex-start;
+      }
+
+      .day {
+        min-height: 64px;
+        border-radius: 14px;
+        padding: 8px;
+      }
+
+      .day-lunar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .calendar-card,
+      .side-card {
+        border-radius: 20px;
+        padding: 14px;
+      }
+
+      .weekdays,
+      .days-grid {
+        gap: 4px;
+      }
+
+      .weekday {
+        font-size: 12px;
+      }
+
+      .day {
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+      }
+
+      .day-number {
+        font-size: 15px;
+      }
+
+      .today::after {
+        display: none;
+      }
+
+      .icon-btn {
+        width: 40px;
+        min-height: 40px;
+      }
+
+      .today-btn {
+        min-height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="网页日历应用">
+    <section class="calendar-card" aria-label="日历">
+      <header class="calendar-top">
+        <div class="title-wrap">
+          <div class="eyebrow">Calendar</div>
+          <h1 id="monthTitle" aria-live="polite">2026年 4月</h1>
+        </div>
+        <div class="controls" aria-label="日历控制">
+          <button class="icon-btn" id="prevYear" type="button" aria-label="上一年" title="上一年">«</button>
+          <button class="icon-btn" id="prevMonth" type="button" aria-label="上一月" title="上一月">‹</button>
+          <button class="today-btn" id="todayBtn" type="button">今天</button>
+          <button class="icon-btn" id="nextMonth" type="button" aria-label="下一月" title="下一月">›</button>
+          <button class="icon-btn" id="nextYear" type="button" aria-label="下一年" title="下一年">»</button>
+        </div>
+      </header>
+
+      <div class="weekdays" role="row" aria-label="星期表头">
+        <div class="weekday" role="columnheader">周日</div>
+        <div class="weekday" role="columnheader">周一</div>
+        <div class="weekday" role="columnheader">周二</div>
+        <div class="weekday" role="columnheader">周三</div>
+        <div class="weekday" role="columnheader">周四</div>
+        <div class="weekday" role="columnheader">周五</div>
+        <div class="weekday" role="columnheader">周六</div>
+      </div>
+
+      <div class="days-grid" id="calendarGrid" role="grid" aria-label="日期网格"></div>
+    </section>
+
+    <aside class="side-card" aria-label="日期详情">
+      <div class="date-panel">
+        <div class="small" id="selectedWeekday">星期一</div>
+        <div class="big" id="selectedDay">27</div>
+        <div class="full" id="selectedFull">2026年4月27日</div>
+      </div>
+
+      <div class="info-box">
+        <h2>日期信息</h2>
+        <div class="info-row">
+          <span>所选日期</span>
+          <strong id="infoDate">2026-04-27</strong>
+        </div>
+        <div class="info-row">
+          <span>本月天数</span>
+          <strong id="infoMonthDays">30天</strong>
+        </div>
+        <div class="info-row">
+          <span>一年中的第几天</span>
+          <strong id="infoYearDay">第117天</strong>
+        </div>
+        <div class="info-row">
+          <span>周数</span>
+          <strong id="infoWeekNo">第18周</strong>
+        </div>
+      </div>
+
+      <p class="hint">提示：可点击任意日期选择；使用 Tab 聚焦日期后，可用方向键移动，Enter 或空格确认选择。</p>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      const monthTitle = document.getElementById("monthTitle");
+      const grid = document.getElementById("calendarGrid");
+      const selectedWeekday = document.getElementById("selectedWeekday");
+      const selectedDay = document.getElementById("selectedDay");
+      const selectedFull = document.getElementById("selectedFull");
+      const infoDate = document.getElementById("infoDate");
+      const infoMonthDays = document.getElementById("infoMonthDays");
+      const infoYearDay = document.getElementById("infoYearDay");
+      const infoWeekNo = document.getElementById("infoWeekNo");
+
+      const weekdayNames = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+      const lunarHints = ["初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十",
+        "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十",
+        "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十", "月末"];
+
+      const now = new Date();
+      let viewYear = now.getFullYear();
+      let viewMonth = now.getMonth();
+      let selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      function pad(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function sameDate(a, b) {
+        return a.getFullYear() === b.getFullYear() &&
+          a.getMonth() === b.getMonth() &&
+          a.getDate() === b.getDate();
+      }
+
+      function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+      }
+
+      function formatISO(date) {
+        return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+      }
+
+      function dayOfYear(date) {
+        const start = new Date(date.getFullYear(), 0, 1);
+        return Math.floor((date - start) / 86400000) + 1;
+      }
+
+      function weekNumber(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      }
+
+      function updateSidePanel() {
+        selectedWeekday.textContent = weekdayNames[selectedDate.getDay()];
+        selectedDay.textContent = selectedDate.getDate();
+        selectedFull.textContent = selectedDate.getFullYear() + "年" + (selectedDate.getMonth() + 1) + "月" + selectedDate.getDate() + "日";
+        infoDate.textContent = formatISO(selectedDate);
+        infoMonthDays.textContent = daysInMonth(selectedDate.getFullYear(), selectedDate.getMonth()) + "天";
+        infoYearDay.textContent = "第" + dayOfYear(selectedDate) + "天";
+        infoWeekNo.textContent = "第" + weekNumber(selectedDate) + "周";
+      }
+
+      function selectDate(date, focusAfterRender) {
+        selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        viewYear = selectedDate.getFullYear();
+        viewMonth = selectedDate.getMonth();
+        renderCalendar();
+        updateSidePanel();
+
+        if (focusAfterRender) {
+          const btn = grid.querySelector('[data-date="' + formatISO(selectedDate) + '"]');
+          if (btn) btn.focus();
+        }
+      }
+
+      function renderCalendar() {
+        monthTitle.textContent = viewYear + "年 " + (viewMonth + 1) + "月";
+        grid.innerHTML = "";
+
+        const firstDay = new Date(viewYear, viewMonth, 1);
+        const startOffset = firstDay.getDay();
+        const startDate = new Date(viewYear, viewMonth, 1 - startOffset);
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        for (let i = 0; i < 42; i++) {
+          const date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+          const btn = document.createElement("button");
+          const isCurrentMonth = date.getMonth() === viewMonth;
+          const isToday = sameDate(date, today);
+          const isSelected = sameDate(date, selectedDate);
+          const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+          btn.type = "button";
+          btn.className = "day" +
+            (isCurrentMonth ? "" : " other-month") +
+            (isToday ? " today" : "") +
+            (isSelected ? " selected" : "") +
+            (isWeekend ? " weekend" : "");
+          btn.setAttribute("role", "gridcell");
+          btn.setAttribute("aria-label", date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日 " + weekdayNames[date.getDay()]);
+          btn.setAttribute("aria-selected", isSelected ? "true" : "false");
+          btn.setAttribute("data-date", formatISO(date));
+          btn.tabIndex = isSelected ? 0 : -1;
+
+          const num = document.createElement("span");
+          num.className = "day-number";
+          num.textContent = date.getDate();
+
+          const hint = document.createElement("span");
+          hint.className = "day-lunar";
+          hint.textContent = lunarHints[(date.getDate() - 1) % lunarHints.length];
+
+          btn.appendChild(num);
+          btn.appendChild(hint);
+
+          btn.addEventListener("click", function () {
+            selectDate(date, true);
+          });
+
+          btn.addEventListener("keydown", function (event) {
+            let next = null;
+
+            if (event.key === "ArrowLeft") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
+            if (event.key === "ArrowRight") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+            if (event.key === "ArrowUp") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7);
+            if (event.key === "ArrowDown") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 7);
+            if (event.key === "Home") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay());
+            if (event.key === "End") next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + (6 - date.getDay()));
+
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectDate(date, true);
+              return;
+            }
+
+            if (next) {
+              event.preventDefault();
+              selectDate(next, true);
+            }
+          });
+
+          grid.appendChild(btn);
+        }
+      }
+
+      document.getElementById("prevMonth").addEventListener("click", function () {
+        viewMonth--;
+        if (viewMonth < 0) {
+          viewMonth = 11;
+          viewYear--;
+        }
+        renderCalendar();
+      });
+
+      document.getElementById("nextMonth").addEventListener("click", function () {
+        viewMonth++;
+        if (viewMonth > 11) {
+          viewMonth = 0;
+          viewYear++;
+        }
+        renderCalendar();
+      });
+
+      document.getElementById("prevYear").addEventListener("click", function () {
+        viewYear--;
+        renderCalendar();
+      });
+
+      document.getElementById("nextYear").addEventListener("click", function () {
+        viewYear++;
+        renderCalendar();
+      });
+
+      document.getElementById("todayBtn").addEventListener("click", function () {
+        selectDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()), true);
+      });
+
+      renderCalendar();
+      updateSidePanel();
+    })();
+  </script>
+</body>
+</html>

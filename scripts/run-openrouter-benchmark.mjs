@@ -1,14 +1,21 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import http from "node:http";
+import https from "node:https";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
-const openRouterUrl = "https://openrouter.ai/api/v1/chat/completions";
-const generationUrl = "https://openrouter.ai/api/v1/generation";
-const modelsUrl = "https://openrouter.ai/api/v1/models";
+const openRouterBaseUrl = (
+  process.env.OPENROUTER_BASE_URL ||
+  process.env.OPENROUTER_PROXY_URL ||
+  "https://openrouter.ai/api/v1"
+).replace(/\/$/, "");
+const openRouterUrl = `${openRouterBaseUrl}/chat/completions`;
+const generationUrl = `${openRouterBaseUrl}/generation`;
+const modelsUrl = `${openRouterBaseUrl}/models`;
 const fallbackFxRate = 6.8336;
 const promptStyle = "natural-user-request-v1";
 
@@ -31,18 +38,11 @@ const modelCatalog = [
     pricing: { input: 5, output: 30, cache: 0.5 },
   },
   {
-    id: "anthropic/claude-opus-4.6",
-    name: "Claude Opus 4.6",
+    id: "anthropic/claude-opus-4.7",
+    name: "Claude Opus 4.7",
     provider: "Anthropic",
     accent: "#ff6547",
     pricing: { input: 5, output: 25, cache: 0.5 },
-  },
-  {
-    id: "anthropic/claude-sonnet-4.6",
-    name: "Claude Sonnet 4.6",
-    provider: "Anthropic",
-    accent: "#f4b942",
-    pricing: { input: 3, output: 15, cache: 0.3 },
   },
   {
     id: "google/gemini-3.1-pro-preview",
@@ -57,6 +57,20 @@ const modelCatalog = [
     provider: "Moonshot AI",
     accent: "#32d6c0",
     pricing: { input: 0.7448, output: 4.655, cache: 0.1463 },
+  },
+  {
+    id: "xiaomi/mimo-v2-pro-20260318",
+    name: "MiMo V2 Pro (2026-03-18)",
+    provider: "Xiaomi",
+    accent: "#58c2ff",
+    pricing: { input: 1, output: 3, cache: 0.2 },
+  },
+  {
+    id: "qwen/qwen3.6-max-preview-20260420",
+    name: "Qwen3.6 Max Preview",
+    provider: "Alibaba",
+    accent: "#ffb347",
+    pricing: { input: 0.00104, output: 0.00624, cache: 0.0013 },
   },
   {
     id: "minimax/minimax-m2.7",
@@ -77,31 +91,17 @@ const modelCatalog = [
     name: "DeepSeek V4 Pro",
     provider: "DeepSeek",
     accent: "#7cffb2",
-    pricing: { input: 0.435, output: 0.87, cache: 0.03625 },
-  },
-  {
-    id: "deepseek/deepseek-v4-flash",
-    name: "DeepSeek V4 Flash",
-    provider: "DeepSeek",
-    accent: "#65f7ff",
-    pricing: { input: 0.14, output: 0.28 },
-  },
-  {
-    id: "deepseek/deepseek-v3.2",
-    name: "DeepSeek V3.2",
-    provider: "DeepSeek",
-    accent: "#9ea7ff",
-    pricing: { input: 0.252, output: 0.378, cache: 0.0252 },
+    pricing: { input: 0.435, output: 0.87, cache: 0.003625 },
   },
 ];
 
 const tasks = {
   calculator: {
-    title: "计算器任务",
-    badge: "7 tests",
-    previewTitle: "计算器 Demo",
-    artifact: "generated app",
-    promptSummary: "自然语言需求：写一个可以正常使用的网页计算器。",
+    title: "计算器",
+    badge: "7 项检查",
+    previewTitle: "计算器页面",
+    artifact: "生成页面",
+    promptSummary: "测试模型能否交付一个交互完整的网页计算器。",
     tests: [
       ["可发现控件", "calculator controls and display can be discovered by behavior"],
       ["清除和退格", "clear resets display and backspace removes one digit"],
@@ -111,14 +111,14 @@ const tasks = {
       ["错误状态", "8 ÷ 0 shows an error state"],
       ["键盘输入", "Escape / Enter / Backspace work without mouse clicks"],
     ],
-    prompt: "写一个可以正常使用的网页计算器。页面要完整、好看，直接打开就能用。",
+    prompt: "请生成一个可直接打开使用的网页计算器。要求界面完整、交互清晰、无需外部依赖。",
   },
   calendar: {
-    title: "日历任务",
-    badge: "7 tests",
-    previewTitle: "日历 Demo",
-    artifact: "generated app",
-    promptSummary: "自然语言需求：写一个可以正常使用的网页日历。",
+    title: "日历",
+    badge: "7 项检查",
+    previewTitle: "日历页面",
+    artifact: "生成页面",
+    promptSummary: "测试模型能否交付一个交互完整的网页日历。",
     tests: [
       ["可发现控件", "calendar controls and day grid can be discovered by behavior"],
       ["月份标题", "a current month or year title is rendered"],
@@ -128,7 +128,7 @@ const tasks = {
       ["日期选择", "a day can be selected"],
       ["键盘或焦点", "day cells or navigation controls are keyboard reachable"],
     ],
-    prompt: "写一个可以正常使用的网页日历。页面要完整、好看，直接打开就能用。",
+    prompt: "请生成一个可直接打开使用的网页日历。要求界面完整、交互清晰、无需外部依赖。",
   },
 };
 
@@ -148,6 +148,11 @@ Environment:
   MAX_RETRIES=1              Repair attempts after failed browser tests.
   ARTIFACT_OUTPUT_MODE=html   Ask models for a complete standalone HTML file.
   OPENROUTER_JSON_MODE=0     Disable response_format json_object if a provider rejects it.
+  OPENROUTER_PROXY_URL=http://134.209.104.212:8787/v1
+                             Alias for custom OpenRouter-compatible endpoint.
+  OPENROUTER_BASE_URL=http://134.209.104.212:8787/v1
+                             Custom OpenRouter-compatible endpoint (takes precedence over OPENROUTER_PROXY_URL).
+  OPENROUTER_PROXY_API_KEY=... Set X-Proxy-API-Key header for private proxy requests.
   OPENROUTER_TIMEOUT_MS=480000
                              Per-call timeout.
   OPENROUTER_REASONING_EFFORT=none
@@ -179,6 +184,9 @@ async function loadLocalEnv() {
     "MAX_RETRIES",
     "ARTIFACT_OUTPUT_MODE",
     "OPENROUTER_JSON_MODE",
+    "OPENROUTER_PROXY_URL",
+    "OPENROUTER_BASE_URL",
+    "OPENROUTER_PROXY_API_KEY",
     "OPENROUTER_TIMEOUT_MS",
     "OPENROUTER_REASONING_EFFORT",
     "OPENROUTER_REASONING_EXCLUDE",
@@ -228,6 +236,76 @@ function safeSegment(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+function proxyHeaders() {
+  return {
+    ...(
+      process.env.OPENROUTER_PROXY_API_KEY
+        ? { "X-Proxy-API-Key": process.env.OPENROUTER_PROXY_API_KEY }
+        : {}
+    ),
+    "Accept-Encoding": "identity",
+  };
+}
+
+function headersWithAuthorization(apiKey, includeContentType = true) {
+  return {
+    ...proxyHeaders(),
+    Authorization: `Bearer ${apiKey}`,
+    ...(includeContentType ? { "Content-Type": "application/json" } : {}),
+    "HTTP-Referer": "http://localhost/openrouter-bench-lab",
+    "X-Title": "OpenRouter Bench Lab",
+  };
+}
+
+function headersForGeneration(apiKey) {
+  return {
+    ...proxyHeaders(),
+    Authorization: `Bearer ${apiKey}`,
+  };
+}
+
+async function requestText(url, { method = "GET", headers = {}, body = null, timeoutMs = requestTimeoutMs } = {}) {
+  const target = new URL(url);
+  const transport = target.protocol === "https:" ? https : http;
+  const options = {
+    protocol: target.protocol,
+    hostname: target.hostname,
+    port: target.port || (target.protocol === "https:" ? 443 : 80),
+    path: `${target.pathname}${target.search}`,
+    method,
+    headers,
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = transport.request(options, (res) => {
+      let text = "";
+      res.setEncoding("utf8");
+      res.on("data", (chunk) => {
+        text += chunk;
+      });
+      res.on("end", () => {
+        resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode, text });
+      });
+      res.on("error", (error) => {
+        reject(new Error(sanitizeErrorMessage(error.message)));
+      });
+    });
+
+    const timeout = setTimeout(() => {
+      req.destroy(new Error(`OpenRouter request timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    req.on("error", (error) => {
+      clearTimeout(timeout);
+      reject(new Error(sanitizeErrorMessage(error.message)));
+    });
+
+    req.on("response", () => clearTimeout(timeout));
+    if (body !== null) req.write(body);
+    req.end();
+  });
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -256,9 +334,11 @@ function parseUsdPerToken(value) {
 
 async function hydrateModelCatalog(catalog) {
   try {
-    const response = await fetch(modelsUrl);
+    const response = await requestText(modelsUrl, {
+      headers: proxyHeaders(),
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const payload = await response.json();
+    const payload = JSON.parse(response.text);
     const liveModels = new Map((payload.data || []).map((model) => [model.id, model]));
 
     return catalog.map((model) => {
@@ -330,7 +410,7 @@ ${repairBlock}
 要求：
 - 只返回完整 HTML 文档，从 <!doctype html> 开始。
 - HTML、CSS、JavaScript 都写在同一个文件里。
-- 页面直接打开就能用，不要依赖外部库、远程资源或网络请求。
+- 页面需要能直接打开使用，不依赖外部库、远程资源或网络请求。
 - 不要解释思路，不要输出 JSON。
 `,
       },
@@ -355,13 +435,13 @@ Return exactly this JSON shape:
   "title": "short title",
   "summary": "one sentence describing the implementation",
   "html": "body-only HTML markup",
-  "css": "CSS for this demo only",
-  "js": "JavaScript for this demo only"
+  "css": "CSS for this page only",
+  "js": "JavaScript for this page only"
 }
 
 Important:
 - The HTML must be body-only markup. Do not include <html>, <head>, or <body>.
-- Keep CSS scoped to the demo where practical.
+- Keep CSS scoped to the generated page where practical.
 - Keep JS self-contained.
 - The result will be embedded in a sandboxed iframe.
 `,
@@ -416,7 +496,7 @@ function normalizeParsedArtifact(value) {
   const documentHtml = typeof parsed.documentHtml === "string" ? parsed.documentHtml : "";
   return {
     ...parsed,
-    title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title : "Generated demo",
+    title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title : "Generated page",
     summary: typeof parsed.summary === "string" ? parsed.summary : "",
     html,
     css,
@@ -460,7 +540,7 @@ function coerceArtifactFromContent(content) {
   const maybeHtml = htmlFence ? htmlFence[1].trim() : content.trim();
   if (/<!doctype html|<html[\s>]/i.test(maybeHtml)) {
     return {
-      title: "Generated HTML demo",
+      title: "Generated HTML page",
       summary: "The model returned a complete HTML document instead of JSON.",
       runnable: true,
       documentHtml: maybeHtml,
@@ -502,7 +582,7 @@ function makeNoContentArtifact({ responseKind, finishReason, reasoningLength }) 
 
   return {
     title: "No runnable artifact",
-    summary: `${reason} No demo could be tested.`,
+    summary: `${reason} No page could be tested.`,
     runnable: false,
     responseKind,
     html: `
@@ -620,29 +700,16 @@ async function requestOpenRouterCompletion(apiKey, initialBody) {
 }
 
 async function fetchOpenRouter(apiKey, body) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {
-    const response = await fetch(openRouterUrl, {
+    const response = await requestText(openRouterUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost/openrouter-bench-lab",
-        "X-Title": "OpenRouter Bench Lab",
-      },
+      headers: headersWithAuthorization(apiKey),
       body: JSON.stringify(body),
-      signal: controller.signal,
     });
-    const text = await response.text();
+    const text = response.text;
     return { ok: response.ok, status: response.status, text };
   } catch (error) {
-    if (error.name === "AbortError") {
-      throw new Error(`OpenRouter request timed out after ${requestTimeoutMs}ms`);
-    }
     throw new Error(sanitizeErrorMessage(error.message));
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
@@ -651,11 +718,12 @@ async function fetchGeneration(apiKey, generationId) {
     await sleep(650 + attempt * 300);
     const url = new URL(generationUrl);
     url.searchParams.set("id", generationId);
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${apiKey}` },
+    const response = await requestText(url.toString(), {
+      method: "GET",
+      headers: headersForGeneration(apiKey),
     });
     if (response.ok) {
-      const json = await response.json();
+      const json = JSON.parse(response.text);
       return json.data || json;
     }
   }
@@ -1063,6 +1131,9 @@ async function runOne({ apiKey, model, taskId }) {
   let repairContext = null;
   let finalCall = null;
   let finalTests = null;
+  let selectedCall = null;
+  let selectedTests = null;
+  let selectedAttemptIndex = -1;
   const attempts = [];
   const totals = { input: 0, output: 0, cache: 0, reasoning: 0, totalCost: 0 };
 
@@ -1130,6 +1201,17 @@ async function runOne({ apiKey, model, taskId }) {
     finalCall = call;
     finalTests = browserTests;
 
+    const candidateIsUsable = call.responseKind === "content" && call.parsed.runnable !== false;
+    const selectedIsUsable = selectedCall?.responseKind === "content" && selectedCall.parsed.runnable !== false;
+    if (
+      !selectedCall ||
+      (candidateIsUsable && (!selectedIsUsable || browserTests.passed >= selectedTests.passed))
+    ) {
+      selectedCall = call;
+      selectedTests = browserTests;
+      selectedAttemptIndex = attemptIndex;
+    }
+
     if (browserTests.passed === expected) break;
     if (attemptIndex < maxRetries) {
       repairContext = {
@@ -1139,6 +1221,18 @@ async function runOne({ apiKey, model, taskId }) {
       console.log(`  repair ${attemptIndex + 1}/${maxRetries}: ${browserTests.passed}/${expected} tests passed`);
     }
   }
+
+  if (selectedCall) {
+    finalCall = selectedCall;
+    finalTests = selectedTests;
+    if (selectedAttemptIndex !== attempts.at(-1)?.index) {
+      const selectedArtifactHtml = buildArtifactHtml({ model, taskId, parsed: selectedCall.parsed });
+      await mkdir(path.dirname(artifactFile), { recursive: true });
+      await writeFile(artifactFile, selectedArtifactHtml, "utf8");
+    }
+  }
+
+  const selectedAttempt = attempts.find((attempt) => attempt.index === selectedAttemptIndex) || attempts.at(-1);
 
   await writeJson(rawFile, {
     response: sanitizeOpenRouterResponse(finalCall.json),
@@ -1150,7 +1244,7 @@ async function runOne({ apiKey, model, taskId }) {
     finishReason: finalCall.finishReason,
     responseKind: finalCall.responseKind,
     attempts,
-    request: attempts.at(-1)?.request || null,
+    request: selectedAttempt?.request || null,
   });
 
   const input = totals.input;
@@ -1165,14 +1259,14 @@ async function runOne({ apiKey, model, taskId }) {
   const finishReason = finalCall.finishReason;
   const parsed = finalCall.parsed;
   const verdict = responseKind === "reasoning_only"
-    ? `调用产生了 ${reasoning} 个 reasoning tokens，但没有返回可执行 demo 内容。`
+    ? `调用产生了 ${reasoning} 个 reasoning tokens，但没有返回可执行页面。`
     : responseKind === "empty"
-      ? "调用成功但没有返回可执行 demo 内容。"
+      ? "调用成功，但没有返回可执行页面。"
       : parsed.runnable === false
-        ? `模型返回了文本，但不是可执行 demo；自动测试通过 ${passed}/${expected}。`
+        ? `模型返回了文本，但不是可执行页面；自动测试通过 ${passed}/${expected}。`
         : passed === expected
-          ? "真实生成的 demo 通过了全部自动测试。"
-          : `真实生成的 demo 通过 ${passed}/${expected} 个自动测试。`;
+          ? "真实生成页面通过了全部自动测试。"
+          : `真实生成页面通过 ${passed}/${expected} 个自动测试。`;
 
   const run = {
     input,
@@ -1184,7 +1278,7 @@ async function runOne({ apiKey, model, taskId }) {
     score,
     retries: Math.max(0, attempts.length - 1),
     tools: finalTests.mode === "browser" ? attempts.length : 0,
-    providerName: attempts.at(-1)?.providerName || model.provider,
+    providerName: selectedAttempt?.providerName || model.provider,
     verdict,
     trace: [
       ["00.0s", "OpenRouter request", `model=${model.id}, attempts=${attempts.length}`],
@@ -1203,7 +1297,7 @@ async function runOne({ apiKey, model, taskId }) {
     ],
     totalCost,
     totalCostCny: Number((totalCost * fxRate).toFixed(8)),
-    generationId: attempts.at(-1)?.generationId || null,
+    generationId: selectedAttempt?.generationId || null,
     generationIds: attempts.map((attempt) => attempt.generationId).filter(Boolean),
     artifactPath: artifactRelPath,
     rawRunPath: path.relative(rootDir, rawFile),
@@ -1219,7 +1313,7 @@ async function runOne({ apiKey, model, taskId }) {
       jsonMode: artifactOutputMode !== "html" && process.env.OPENROUTER_JSON_MODE !== "0",
       artifactOutputMode,
       requestTimeoutMs,
-      reasoning: attempts.at(-1)?.request?.reasoning || null,
+      reasoning: selectedAttempt?.request?.reasoning || null,
       maxRetries,
     },
   };
@@ -1280,6 +1374,10 @@ async function main() {
           totalCostCny: 0,
           generationId: null,
           artifactPath: "",
+          responseKind: "error",
+          finishReason: "error",
+          contentLength: 0,
+          reasoningLength: 0,
           testResults: tasks[taskId].tests.map(([name, assertion]) => ({
             name,
             assertion,

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整网页计算器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: #f5f5f5; 
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            padding: 20px;
+            width: 320px;
+        }
+        .display {
+            background: #222;
+            border-radius: 5px;
+            color: white;
+            font-size: 2.5rem;
+            height: 100px;
+            margin-bottom: 20px;
+            padding: 10px;
+            text-align: right;
+            overflow: hidden;
+            min-height: 80px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            background: #4a4a4a;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+            height: 60px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #5a5a5a;
+        }
+        button:active {
+            background: #6a6a6a;
+        }
+        .operator { background: #ff9800; }
+        .operator:hover { background: #ffaa33; }
+        .operator:active { background: #ff8800; }
+        .equals { background: #2196F3; }
+        .equals:hover { background: #42a5f5; }
+        .equals:active { background: #0288d1; }
+        .clear { background: #f44336; }
+        .clear:hover { background: #ff5544; }
+        .clear:active { background: #d32f2f; }
+        .span2 { grid-column: span 2; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button onclick="backspace()">⌫</button>
+            <button class="operator" onclick="appendOperator('%')">%</button>
+            <button class="operator" onclick="appendOperator('/')">÷</button>
+            
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+            
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('-')">-</button>
+            
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendDecimal()">.</button>
+            <button class="equals" onclick="calculate()" id="equals">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentInput = '0';
+        let currentOperator = '';
+        let previousInput = '';
+        let calculationPerformed = false;
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+            // Limit display length for large numbers
+            if (display.textContent.length > 10) {
+                display.textContent = parseFloat(display.textContent).toExponential(6);
+            }
+        }
+
+        function appendNumber(number) {
+            if (calculationPerformed) {
+                currentInput = number;
+                calculationPerformed = false;
+            } else if (currentInput === '0' || currentInput === 'Error') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (calculationPerformed) {
+                currentInput = '0.';
+                calculationPerformed = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(operator) {
+            if (currentOperator && !calculationPerformed) {
+                calculate();
+            }
+            previousInput = currentInput;
+            currentOperator = operator;
+            calculationPerformed = false;
+        }
+
+        function calculate() {
+            if (!currentOperator || calculationPerformed) return;
+            
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(current)) {
+                result = 'Error';
+            } else {
+                switch (currentOperator) {
+                    case '+': result = prev + current; break;
+                    case '-': result = prev - current; break;
+                    case '*': result = prev * current; break;
+                    case '/': 
+                        if (current === 0) {
+                            result = 'Error';
+                        } else {
+                            result = prev / current;
+                        }
+                        break;
+                    case '%': result = prev % current; break;
+                }
+            }
+            
+            // Handle decimal precision
+            if (typeof result === 'number') {
+                result = parseFloat(result.toFixed(10));
+                // Remove trailing zeros
+                result = result.toString().replace(/\.?0+$/, '');
+            }
+            
+            currentInput = result.toString();
+            currentOperator = '';
+            calculationPerformed = true;
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            currentOperator = '';
+            previousInput = '';
+            calculationPerformed = false;
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (calculationPerformed) {
+                clearDisplay();
+                return;
+            }
+            
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            if (event.key >= '0' && event.key <= '9') {
+                appendNumber(event.key);
+            } else if (event.key === '.') {
+                appendDecimal();
+            } else if (event.key === '+') {
+                appendOperator('+');
+            } else if (event.key === '-') {
+                appendOperator('-');
+            } else if (event.key === '*') {
+                appendOperator('*');
+            } else if (event.key === '/') {
+                appendOperator('/');
+            } else if (event.key === '%') {
+                appendOperator('%');
+            } else if (event.key === 'Enter' || event.key === '=') {
+                calculate();
+            } else if (event.key === 'Backspace') {
+                backspace();
+            } else if (event.key === 'c' || event.key === 'C') {
+                clearDisplay();
+            }
+            event.preventDefault();
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>

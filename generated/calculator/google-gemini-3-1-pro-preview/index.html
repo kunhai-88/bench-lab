@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页计算器</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --calc-bg: #222;
+            --display-bg: #333;
+            --btn-bg: #444;
+            --btn-hover: #555;
+            --btn-active: #666;
+            --op-bg: #ff9500;
+            --op-hover: #ffaa33;
+            --op-active: #e08300;
+            --func-bg: #a5a5a5;
+            --func-hover: #b5b5b5;
+            --func-active: #8d8d8d;
+            --text-light: #fff;
+            --text-dark: #000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .calculator {
+            background-color: var(--calc-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            width: 340px;
+        }
+
+        .display {
+            background-color: var(--display-bg);
+            color: var(--text-light);
+            font-size: 3rem;
+            text-align: right;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            word-break: break-all;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            line-height: 1.1;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            font-size: 1.5rem;
+            padding: 20px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            background-color: var(--btn-bg);
+            color: var(--text-light);
+            transition: all 0.15s ease;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        button:active {
+            background-color: var(--btn-active);
+            transform: scale(0.95);
+        }
+
+        button.operator {
+            background-color: var(--op-bg);
+            font-size: 1.8rem;
+        }
+
+        button.operator:hover {
+            background-color: var(--op-hover);
+        }
+
+        button.operator:active {
+            background-color: var(--op-active);
+        }
+
+        button.function {
+            background-color: var(--func-bg);
+            color: var(--text-dark);
+        }
+
+        button.function:hover {
+            background-color: var(--func-hover);
+        }
+
+        button.function:active {
+            background-color: var(--func-active);
+        }
+
+        button.equal {
+            background-color: var(--op-bg);
+            grid-column: 4;
+            grid-row: 4 / span 2;
+            font-size: 2rem;
+        }
+
+        button.equal:hover {
+            background-color: var(--op-hover);
+        }
+
+        button.equal:active {
+            background-color: var(--op-active);
+        }
+
+        button.zero {
+            grid-column: 1 / span 2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+        <button class="function" onclick="clearDisplay()">C</button>
+        <button class="function" onclick="backspace()">⌫</button>
+        <button class="operator" onclick="append('/')">/</button>
+        <button class="operator" onclick="append('*')">*</button>
+
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="operator" onclick="append('-')">-</button>
+
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button class="operator" onclick="append('+')">+</button>
+
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="equal" onclick="calculate()">=</button>
+
+        <button class="zero" onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+    </div>
+</div>
+
+<script>
+    let currentExpression = '0';
+    let isError = false;
+    const display = document.getElementById('display');
+
+    function updateDisplay() {
+        display.innerText = currentExpression;
+    }
+
+    function clearDisplay() {
+        currentExpression = '0';
+        isError = false;
+        updateDisplay();
+    }
+
+    function backspace() {
+        if (isError) {
+            clearDisplay();
+            return;
+        }
+        if (currentExpression.length > 1) {
+            currentExpression = currentExpression.slice(0, -1);
+        } else {
+            currentExpression = '0';
+        }
+        updateDisplay();
+    }
+
+    function append(char) {
+        if (isError) {
+            currentExpression = '0';
+            isError = false;
+        }
+
+        const isOperator = ['+', '-', '*', '/'].includes(char);
+        const lastChar = currentExpression.slice(-1);
+
+        if (currentExpression === '0') {
+            if (isOperator || char === '.') {
+                currentExpression += char;
+            } else {
+                currentExpression = char;
+            }
+        } else {
+            if (isOperator && ['+', '-', '*', '/'].includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1) + char;
+            } else {
+                currentExpression += char;
+            }
+        }
+        updateDisplay();
+    }
+
+    function calculate() {
+        if (isError) return;
+        
+        try {
+            if (/^[+\-*/.]+$/.test(currentExpression)) {
+                throw new Error('Invalid Expression');
+            }
+            
+            let result = new Function('return ' + currentExpression)();
+            
+            if (!isFinite(result) || isNaN(result)) {
+                throw new Error('Math Error');
+            }
+            
+            result = Math.round(result * 1e12) / 1e12;
+            currentExpression = String(result);
+        } catch (e) {
+            currentExpression = '错误';
+            isError = true;
+        }
+        updateDisplay();
+    }
+
+    document.addEventListener('keydown', (event) => {
+        const key = event.key;
+        if (/[0-9+\-*/.]/.test(key)) {
+            append(key);
+        } else if (key === 'Enter' || key === '=') {
+            calculate();
+        } else if (key === 'Backspace') {
+            backspace();
+        } else if (key === 'Escape' || key === 'c' || key === 'C') {
+            clearDisplay();
+        }
+    });
+</script>
+
+</body>
+</html>

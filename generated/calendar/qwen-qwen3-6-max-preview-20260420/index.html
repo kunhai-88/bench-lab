@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页日历</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f5f7fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --hover-bg: #eef2f7;
+            --selected-bg: #4a90e2;
+            --selected-text: #fff;
+            --today-bg: #e3f2fd;
+            --today-text: #1976d2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .calendar-container {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-year-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: default;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .nav-btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Weekday Headers */
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .weekday {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 500;
+            padding: 5px 0;
+        }
+
+        /* Days Grid */
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day-cell {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .day-cell:hover:not(.empty) {
+            background-color: var(--hover-bg);
+        }
+
+        .day-cell:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .day-cell.empty {
+            cursor: default;
+        }
+
+        .day-cell.today {
+            background-color: var(--today-bg);
+            color: var(--today-text);
+            font-weight: bold;
+        }
+
+        .day-cell.selected {
+            background-color: var(--selected-bg);
+            color: var(--selected-text);
+            font-weight: bold;
+        }
+
+        .day-cell.other-month {
+            color: #ccc;
+        }
+
+        /* Footer */
+        .calendar-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .selected-date-display {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="calendar-container" role="application" aria-label="Calendar">
+    <div class="calendar-header">
+        <div class="month-year-title" id="monthYearTitle" aria-live="polite"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevMonthBtn" aria-label="上一月">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <button class="nav-btn" id="nextMonthBtn" aria-label="下一月">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="weekdays" role="row">
+        <div class="weekday" role="columnheader">日</div>
+        <div class="weekday" role="columnheader">一</div>
+        <div class="weekday" role="columnheader">二</div>
+        <div class="weekday" role="columnheader">三</div>
+        <div class="weekday" role="columnheader">四</div>
+        <div class="weekday" role="columnheader">五</div>
+        <div class="weekday" role="columnheader">六</div>
+    </div>
+
+    <div class="days-grid" id="daysGrid" role="grid">
+        <!-- Days will be injected here by JS -->
+    </div>
+
+    <div class="calendar-footer">
+        已选择: <span id="selectedDateDisplay" class="selected-date-display">无</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // State
+        let currentDate = new Date();
+        let selectedDate = null;
+        let viewDate = new Date(); // The month/year currently being viewed
+
+        // DOM Elements
+        const monthYearTitle = document.getElementById('monthYearTitle');
+        const daysGrid = document.getElementById('daysGrid');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+
+        // Constants
+        const MONTH_NAMES = [
+            "一月", "二月", "三月", "四月", "五月", "六月",
+            "七月", "八月", "九月", "十月", "十一月", "十二月"
+        ];
+
+        // Helper: Check if two dates are the same day
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        // Helper: Format date for display
+        function formatDate(date) {
+            if (!date) return "无";
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
+            return `${y}年${m}月${d}日`;
+        }
+
+        // Render Calendar
+        function renderCalendar() {
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+
+            // Update Header
+            monthYearTitle.textContent = `${year}年 ${MONTH_NAMES[month]}`;
+
+            // Clear Grid
+            daysGrid.innerHTML = '';
+
+            // Get first day of the month (0-6, Sun-Sat)
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            // Get total days in current month
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Get total days in previous month
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            // Previous Month Padding
+            for (let i = firstDayOfMonth; i > 0; i--) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day-cell', 'other-month', 'empty');
+                dayDiv.textContent = daysInPrevMonth - i + 1;
+                dayDiv.setAttribute('tabindex', '-1'); // Not focusable by default for padding
+                daysGrid.appendChild(dayDiv);
+            }
+
+            // Current Month Days
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day-cell');
+                dayDiv.textContent = i;
+                dayDiv.setAttribute('role', 'gridcell');
+                dayDiv.setAttribute('tabindex', '0'); // Focusable
+                dayDiv.setAttribute('aria-label', `${year}年${month + 1}月${i}日`);
+                
+                const thisDate = new Date(year, month, i);
+
+                // Check Today
+                if (isSameDay(thisDate, today)) {
+                    dayDiv.classList.add('today');
+                }
+
+                // Check Selected
+                if (selectedDate && isSameDay(thisDate, selectedDate)) {
+                    dayDiv.classList.add('selected');
+                    dayDiv.setAttribute('aria-selected', 'true');
+                } else {
+                    dayDiv.setAttribute('aria-selected', 'false');
+                }
+
+                // Click Event
+                dayDiv.addEventListener('click', () => {
+                    selectedDate = thisDate;
+                    selectedDateDisplay.textContent = formatDate(selectedDate);
+                    renderCalendar();
+                });
+
+                // Keyboard Event (Enter/Space to select)
+                dayDiv.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectedDate = thisDate;
+                        selectedDateDisplay.textContent = formatDate(selectedDate);
+                        renderCalendar();
+                    }
+                });
+
+                daysGrid.appendChild(dayDiv);
+            }
+
+            // Next Month Padding (to fill 6 rows usually, or just complete the grid)
+            const totalCells = firstDayOfMonth + daysInMonth;
+            const remainingCells = 42 - totalCells; // 6 rows * 7 cols = 42
+            
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day-cell', 'other-month', 'empty');
+                dayDiv.textContent = i;
+                dayDiv.setAttribute('tabindex', '-1');
+                daysGrid.appendChild(dayDiv);
+            }
+        }
+
+        // Event Listeners for Navigation
+        prevMonthBtn.addEventListener('click', () => {
+            viewDate.setMonth(viewDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            viewDate.setMonth(viewDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Keyboard Navigation for the whole calendar container
+        document.querySelector('.calendar-container').addEventListener('keydown', (e) => {
+            const focusableDays = Array.from(document.querySelectorAll('.day-cell[tabindex="0"]'));
+            const currentIndex = focusableDays.indexOf(document.activeElement);
+
+            if (currentIndex === -1) return; // Not focused on a day
+
+            let nextIndex = -1;
+
+            switch(e.key) {
+                case 'ArrowRight':
+                    nextIndex = currentIndex + 1;
+                    break;
+                case 'ArrowLeft':
+                    nextIndex = currentIndex - 1;
+                    break;
+                case 'ArrowDown':
+                    nextIndex = currentIndex + 7;
+                    break;
+                case 'ArrowUp':
+                    nextIndex = currentIndex - 7;
+                    break;
+                default:
+                    return;
+            }
+
+            if (nextIndex >= 0 && nextIndex < focusableDays.length) {
+                e.preventDefault();
+                focusableDays[nextIndex].focus();
+            }
+        });
+
+        // Initial Render
+        renderCalendar();
+    })();
+</script>
+
+</body>
+</html>

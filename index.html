@@ -1,259 +1,162 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>页面生成模型对比</title>
-    <meta
-      name="description"
-      content="对比不同模型生成同一网页任务时的可用性、成本、耗时和实际页面效果。"
-    />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenRouter Bench Lab · 模型网页生成对比</title>
+  <meta
+    name="description"
+    content="选择一个案例，查看同一个需求下不同模型生成的页面、测试结果、Token、成本和耗时。"
+  />
+  <meta
+    name="keywords"
+    content="OpenRouter, 模型对比, 网页生成, benchmark, token, 成本, UI测试, 机器学习"
+  />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
+  <meta name="theme-color" content="#080906" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OpenRouter Bench Lab · 模型网页生成对比" />
+  <meta name="twitter:description" content="同一个需求，不同模型自动生成网页，附带Token、成本与测试结果。" />
+  <meta name="twitter:site" content="@OpenRouter" />
+  <meta name="twitter:image" content="https://openrouter-bench-lab.pages.dev/bench-lab-og.png" />
+  <meta name="twitter:image:alt" content="OpenRouter Bench Lab 模型网页生成对比看板" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="OpenRouter Bench Lab" />
+  <meta property="og:title" content="OpenRouter Bench Lab · 模型网页生成对比" />
+  <meta property="og:description" content="同一个需求，不同模型生成网页的对比看板：效果、成本、通过率与耗时。选择案例，快速比较。" />
+  <meta property="og:url" content="https://openrouter-bench-lab.pages.dev/" />
+  <meta property="og:image" content="https://openrouter-bench-lab.pages.dev/bench-lab-og.png" />
+  <meta property="og:image:secure_url" content="https://openrouter-bench-lab.pages.dev/bench-lab-og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="OpenRouter Bench Lab 模型网页生成对比看板" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://openrouter-bench-lab.pages.dev/" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MG09X1BDRM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-MG09X1BDRM');
+    </script>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080906'/%3E%3Cpath d='M9 9h46v46H9z' fill='%23c6ff3d'/%3E%3Cpath d='M18 22h28v6H18zm0 14h18v6H18z' fill='%23080906'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles.css?v=copy-1" />
+    <link rel="stylesheet" href="./styles.css?v=case-4" />
   </head>
   <body>
     <canvas id="signal-canvas" aria-hidden="true"></canvas>
     <main class="shell">
-      <header class="masthead">
+      <header class="page-header">
         <nav class="topline" aria-label="页面状态">
-          <a class="brand" href="#top" aria-label="页面生成模型对比">
+          <a class="brand" href="#top" aria-label="OpenRouter 网页生成评测">
             <span class="brand-mark">OR</span>
-            <span>模型对比</span>
+            <span>Bench Lab</span>
           </a>
           <div class="status-strip" aria-label="数据状态">
-            <span>实测结果</span>
-            <span>页面可试用</span>
+            <span>同一需求</span>
+            <span>真实结果</span>
             <span>汇率 <strong id="fx-pill">6.8336</strong></span>
           </div>
         </nav>
 
-        <section class="hero-grid" id="top">
-          <div class="hero-copy">
-            <p class="eyebrow">页面生成模型对比</p>
-            <h1>哪个模型更适合生成可用页面？</h1>
-            <p class="hero-sub">
-              先选一个模型，再切换计算器或日历任务。这里直接展示它生成的页面、通过了哪些检查、一次生成大约花多少钱。
+        <section class="intro-panel" id="top">
+          <div>
+            <p class="eyebrow">OpenRouter Bench Lab</p>
+            <h1>同一个需求，不同模型会做成什么样？</h1>
+            <p>
+              选一个案例，直接看每个模型生成出来的页面。价格、Token、耗时和测试结果放在旁边，方便你自己比较。
             </p>
           </div>
-
-          <div class="run-console" aria-label="结果摘要">
-            <div class="console-head">
-              <span class="pulse"></span>
-              <span>结果摘要</span>
-            </div>
-            <div id="usage-json" class="usage-summary"></div>
+          <div class="context-stack" aria-label="数据口径">
+            <span>正在看</span>
+            <strong id="active-case-summary">等待结果</strong>
+            <small id="data-timestamp">读取本地静态数据</small>
           </div>
+        </section>
+        <section class="share-toolbar" aria-label="分享">
+          <a id="x-share-link" class="share-btn" href="https://x.com/intent/tweet?text=%E8%AE%A9%E5%90%84%E4%B8%AAOpenRouter%E6%A8%A1%E5%9E%8B%E5%8D%B4%E7%94%A8%E6%9D%A5%E6%AF%95%E9%AA%8C%E7%9A%84%E7%BD%91%E9%A1%B5%E7%94%9F%E6%88%90%E7%BB%93%E6%9E%9C">去 X 分享</a>
+          <button id="copy-share-link" class="share-btn secondary">复制页面链接</button>
         </section>
       </header>
 
-      <section class="experiment-flow" aria-label="选择和查看结果">
-        <div class="flow-heading">
+      <section class="case-panel" aria-label="案例选择">
+        <div class="section-heading">
           <div>
-            <p class="eyebrow">先选模型</p>
-            <h2>选择一个模型版本</h2>
-            <p>
-              每张卡片都显示当前任务下的完成情况、成本和耗时。选中模型后，下面的页面效果、检查结果和对比排行会一起更新。
-            </p>
+            <p class="eyebrow">案例</p>
+            <h2>先选一个要看的案例</h2>
           </div>
-          <div class="flow-steps" aria-label="查看步骤">
-            <span class="flow-step is-active">1 模型</span>
-            <span class="flow-step">2 任务</span>
-            <span class="flow-step">3 页面效果</span>
+          <span id="case-count" class="neutral-chip">等待结果</span>
+        </div>
+        <div id="case-list" class="case-list"></div>
+      </section>
+
+      <section class="matrix-panel" aria-label="模型输出对比">
+        <div class="case-context" aria-label="当前案例要求">
+          <div>
+            <p class="eyebrow">统一需求</p>
+            <h2 id="active-case-title">计算器</h2>
+            <p id="active-case-prompt">-</p>
           </div>
+          <span id="active-case-checks" class="neutral-chip">-</span>
         </div>
 
-        <div id="model-selector" class="model-selector" aria-label="模型版本选择"></div>
-
-        <div class="control-band" aria-label="任务和设置">
-          <div class="task-tabs" role="tablist" aria-label="任务选择">
-            <button class="task-tab is-active" data-task="calculator" type="button" role="tab" aria-selected="true">
-              计算器
-            </button>
-            <button class="task-tab" data-task="calendar" type="button" role="tab" aria-selected="false">
-              日历
-            </button>
-          </div>
-
-          <div class="flow-readout" aria-label="正在查看">
-            <span>正在查看</span>
-            <strong id="flow-current">-</strong>
-            <small id="flow-current-detail">-</small>
-          </div>
-
-          <label class="fx-control">
-            <span>美元兑人民币</span>
-            <input id="fx-rate" type="number" min="0" step="0.0001" value="6.8336" />
+        <div class="matrix-toolbar" aria-label="对比设置">
+          <label class="select-control">
+            <span>排序</span>
+            <select id="sort-mode">
+              <option value="model">默认顺序</option>
+              <option value="cost">成本从低到高</option>
+              <option value="tokens">Token 从少到多</option>
+              <option value="latency">耗时从短到长</option>
+              <option value="passed">通过项从多到少</option>
+            </select>
           </label>
 
-          <button class="replay-button" id="replay-run" type="button">重新播放</button>
-        </div>
-      </section>
+          <label class="check-control">
+            <input id="filter-artifact" type="checkbox" />
+            <span>有页面</span>
+          </label>
 
-      <section class="prompt-panel primary-prompt" aria-label="任务要求">
-        <div class="panel-title compact">
-          <div>
-            <p class="eyebrow">任务要求</p>
-            <h2 id="prompt-title">发给模型的要求</h2>
-          </div>
-          <span id="prompt-chip" class="prompt-chip">计算器</span>
-        </div>
-        <div class="prompt-body">
-          <p id="prompt-summary" class="prompt-summary">-</p>
-          <pre id="task-prompt" class="prompt-text"></pre>
-        </div>
-      </section>
+          <label class="check-control">
+            <input id="filter-complete" type="checkbox" />
+            <span>全部通过</span>
+          </label>
 
-      <section class="demo-grid">
-        <article class="preview-panel" aria-label="实际生成页面">
-          <div class="panel-title preview-title">
-            <div>
-              <p class="eyebrow">实际页面</p>
-              <h2 id="preview-title">计算器页面</h2>
-            </div>
-            <span id="artifact-chip" class="artifact-chip">可试用</span>
-          </div>
-          <div id="artifact-preview" class="artifact-preview"></div>
-        </article>
-      </section>
-
-      <section class="summary-grid" aria-label="Summary metrics">
-        <article class="metric-tile">
-          <span class="metric-label">最低成本通过</span>
-          <strong id="metric-cheapest">-</strong>
-          <small id="metric-cheapest-detail">-</small>
-        </article>
-        <article class="metric-tile">
-          <span class="metric-label">完成度最高</span>
-          <strong id="metric-best">-</strong>
-          <small id="metric-best-detail">-</small>
-        </article>
-        <article class="metric-tile">
-          <span class="metric-label">最快通过</span>
-          <strong id="metric-fastest">-</strong>
-          <small id="metric-fastest-detail">-</small>
-        </article>
-        <article class="metric-tile">
-          <span class="metric-label">成本区间</span>
-          <strong id="metric-spread">-</strong>
-          <small id="metric-spread-detail">-</small>
-        </article>
-      </section>
-
-      <section class="main-grid">
-        <div class="leaderboard-panel" aria-label="模型横向对比">
-          <div class="panel-title">
-            <div>
-              <p class="eyebrow">横向对比</p>
-              <h2 id="task-title">计算器对比</h2>
-            </div>
-            <span id="task-badge" class="task-badge">7 项检查</span>
-          </div>
-
-          <div class="table-wrap">
-            <table class="model-table">
-              <thead>
-                <tr>
-                  <th>模型</th>
-                  <th>检查结果</th>
-                  <th>用量</th>
-                  <th>成本</th>
-                  <th>价格</th>
-                  <th>耗时</th>
-                  <th>综合表现</th>
-                </tr>
-              </thead>
-              <tbody id="model-rows"></tbody>
-            </table>
-          </div>
+          <label class="fx-control">
+            <span>USD/CNY</span>
+            <input id="fx-rate" type="number" min="0" step="0.0001" value="6.8336" />
+          </label>
         </div>
 
-        <aside class="detail-panel" aria-label="当前模型详情">
-          <div class="selected-model">
-            <span id="selected-provider">当前选择</span>
-            <h2 id="selected-name">模型</h2>
-            <p id="selected-verdict">-</p>
-          </div>
-
-          <div class="token-stack" aria-label="用量构成">
-            <div class="stack-bar">
-              <span class="stack-input" id="stack-input"></span>
-              <span class="stack-output" id="stack-output"></span>
-              <span class="stack-cache" id="stack-cache"></span>
-            </div>
-            <div class="stack-legend">
-              <span><i class="legend-input"></i>输入</span>
-              <span><i class="legend-output"></i>输出</span>
-              <span><i class="legend-cache"></i>缓存</span>
-            </div>
-          </div>
-
-          <div class="detail-stats">
-            <div>
-              <span>总用量</span>
-              <strong id="detail-tokens">-</strong>
-            </div>
-            <div>
-              <span>单项检查成本</span>
-              <strong id="detail-cost-pass">-</strong>
-            </div>
-            <div>
-              <span>修复次数</span>
-              <strong id="detail-retries">-</strong>
-            </div>
-            <div>
-              <span>检查轮次</span>
-              <strong id="detail-tools">-</strong>
-            </div>
-          </div>
-        </aside>
+        <div class="matrix-summary" id="matrix-summary">等待结果</div>
+        <div id="comparison-matrix" class="comparison-matrix" aria-live="polite"></div>
       </section>
 
-      <section class="evidence-grid">
-        <article class="tests-panel" aria-label="功能检查结果">
-          <div class="panel-title compact">
-            <div>
-              <p class="eyebrow">功能检查</p>
-              <h2>哪些能力通过了</h2>
-            </div>
-            <span id="pass-rate-chip" class="pass-chip">-</span>
-          </div>
-          <div id="test-list" class="test-list"></div>
-        </article>
-
-        <article class="scatter-panel" aria-label="成本和完成度位置">
-          <div class="panel-title compact">
-            <div>
-              <p class="eyebrow">成本 × 完成度</p>
-              <h2>性价比位置</h2>
-            </div>
-          </div>
-          <div id="scatter" class="scatter"></div>
-        </article>
-      </section>
-
-      <details class="trace-panel" aria-label="运行记录">
+      <details class="data-drawer" aria-label="完整数据表">
         <summary>
-          <div class="panel-title compact">
+          <div class="drawer-heading">
             <div>
-              <p class="eyebrow">运行记录</p>
-              <h2>本轮是怎么跑完的</h2>
+              <p class="eyebrow">完整数据</p>
+              <h2>查看所有指标</h2>
             </div>
-            <span class="trace-toggle">查看</span>
+            <span>展开</span>
           </div>
         </summary>
-        <ol id="trace-list" class="trace-list"></ol>
+        <div id="detail-table" class="detail-table-wrap"></div>
       </details>
 
       <footer class="footer-band">
-        <span>本地静态页面</span>
-        <span>可部署到 Cloudflare Pages</span>
-        <span>数据来自 OpenRouter 调用记录</span>
+        <span>同一个需求</span>
+        <span>真实生成页面</span>
+        <span>点击查看测试细节</span>
       </footer>
     </main>
 
-    <script src="./script.js?v=copy-2"></script>
+    <script src="./script.js?v=case-3"></script>
   </body>
 </html>

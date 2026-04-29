@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>网页日历</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#333}
+.calendar{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:480px;overflow:hidden}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.title{font-size:22px;font-weight:600;flex:1;text-align:center}
+.nav-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.nav-btn:hover{background:rgba(255,255,255,.35)}
+.nav-btn:focus{outline:2px solid #fff;outline-offset:2px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:#f8f9fc;border-bottom:1px solid #eee}
+.today-btn{background:#667eea;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:14px}
+.today-btn:hover{background:#5568d3}
+.info{font-size:13px;color:#666}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:#f8f9fc;padding:10px 8px;border-bottom:1px solid #eee}
+.weekday{text-align:center;font-size:13px;font-weight:600;color:#666;padding:6px 0}
+.weekday.sun,.weekday.sat{color:#e74c3c}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:12px}
+.day{aspect-ratio:1;border:none;background:transparent;border-radius:8px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:#333;font-family:inherit}
+.day:hover{background:#eef1ff}
+.day:focus{outline:2px solid #667eea;outline-offset:-2px}
+.day.other{color:#ccc}
+.day.today{background:#fff3cd;color:#856404;font-weight:700}
+.day.selected{background:#667eea;color:#fff;font-weight:600}
+.day.selected.today{background:#667eea;color:#fff}
+.day.weekend{color:#e74c3c}
+.day.other.weekend{color:#f5b7b1}
+.footer{padding:14px 24px;background:#f8f9fc;border-top:1px solid #eee;font-size:13px;color:#555;text-align:center;min-height:44px}
+</style>
+</head>
+<body>
+<div class="calendar" role="application" aria-label="日历">
+  <div class="header">
+    <button class="nav-btn" id="prevBtn" aria-label="上一月" title="上一月">‹</button>
+    <div class="title" id="title" aria-live="polite">2024年1月</div>
+    <button class="nav-btn" id="nextBtn" aria-label="下一月" title="下一月">›</button>
+  </div>
+  <div class="toolbar">
+    <button class="today-btn" id="todayBtn">今天</button>
+    <div class="info" id="info">使用方向键浏览日期</div>
+  </div>
+  <div class="weekdays" role="row">
+    <div class="weekday sun" role="columnheader">日</div>
+    <div class="weekday" role="columnheader">一</div>
+    <div class="weekday" role="columnheader">二</div>
+    <div class="weekday" role="columnheader">三</div>
+    <div class="weekday" role="columnheader">四</div>
+    <div class="weekday" role="columnheader">五</div>
+    <div class="weekday sat" role="columnheader">六</div>
+  </div>
+  <div class="days" id="days" role="grid"></div>
+  <div class="footer" id="footer">请选择一个日期</div>
+</div>
+
+<script>
+(function(){
+  const today = new Date();
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth();
+  let selected = null;
+
+  const titleEl = document.getElementById('title');
+  const daysEl = document.getElementById('days');
+  const footerEl = document.getElementById('footer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const todayBtn = document.getElementById('todayBtn');
+
+  function sameDay(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+
+  function render(){
+    titleEl.textContent = viewYear + '年' + (viewMonth+1) + '月';
+    daysEl.innerHTML = '';
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+    const daysInPrev = new Date(viewYear, viewMonth, 0).getDate();
+    const totalCells = Math.ceil((startWeekday + daysInMonth)/7)*7;
+
+    for(let i=0;i<totalCells;i++){
+      const btn = document.createElement('button');
+      btn.className = 'day';
+      btn.type = 'button';
+      btn.setAttribute('role','gridcell');
+      let dateObj, dayNum, isOther=false;
+      if(i<startWeekday){
+        dayNum = daysInPrev - startWeekday + 1 + i;
+        dateObj = new Date(viewYear, viewMonth-1, dayNum);
+        isOther = true;
+      } else if(i >= startWeekday + daysInMonth){
+        dayNum = i - startWeekday - daysInMonth + 1;
+        dateObj = new Date(viewYear, viewMonth+1, dayNum);
+        isOther = true;
+      } else {
+        dayNum = i - startWeekday + 1;
+        dateObj = new Date(viewYear, viewMonth, dayNum);
+      }
+      btn.textContent = dayNum;
+      btn.dataset.year = dateObj.getFullYear();
+      btn.dataset.month = dateObj.getMonth();
+      btn.dataset.date = dateObj.getDate();
+      if(isOther) btn.classList.add('other');
+      const wd = dateObj.getDay();
+      if(wd===0||wd===6) btn.classList.add('weekend');
+      if(sameDay(dateObj, today)) btn.classList.add('today');
+      if(sameDay(dateObj, selected)) btn.classList.add('selected');
+      btn.setAttribute('aria-label', dateObj.getFullYear()+'年'+(dateObj.getMonth()+1)+'月'+dateObj.getDate()+'日');
+      btn.tabIndex = (!isOther && dayNum === (selected && selected.getMonth()===viewMonth && selected.getFullYear()===viewYear ? selected.getDate() : (sameDay(new Date(viewYear,viewMonth,dayNum), today)?today.getDate():1))) ? 0 : -1;
+      btn.addEventListener('click', function(){
+        selectDate(new Date(parseInt(this.dataset.year),parseInt(this.dataset.month),parseInt(this.dataset.date)));
+      });
+      daysEl.appendChild(btn);
+    }
+    updateFooter();
+  }
+
+  function selectDate(d){
+    selected = d;
+    if(d.getFullYear()!==viewYear || d.getMonth()!==viewMonth){
+      viewYear = d.getFullYear();
+      viewMonth = d.getMonth();
+    }
+    render();
+    const target = [...daysEl.querySelectorAll('.day')].find(b=>!b.classList.contains('other') && parseInt(b.dataset.date)===d.getDate());
+    if(target) target.focus();
+  }
+
+  function updateFooter(){
+    if(selected){
+      const wdn = ['日','一','二','三','四','五','六'];
+      footerEl.textContent = '已选择：'+selected.getFullYear()+'年'+(selected.getMonth()+1)+'月'+selected.getDate()+'日 星期'+wdn[selected.getDay()];
+    } else {
+      footerEl.textContent = '请选择一个日期';
+    }
+  }
+
+  prevBtn.addEventListener('click', function(){
+    viewMonth--;
+    if(viewMonth<0){viewMonth=11;viewYear--;}
+    render();
+  });
+  nextBtn.addEventListener('click', function(){
+    viewMonth++;
+    if(viewMonth>11){viewMonth=0;viewYear++;}
+    render();
+  });
+  todayBtn.addEventListener('click', function(){
+    viewYear = today.getFullYear();
+    viewMonth = today.getMonth();
+    selectDate(new Date(today.getFullYear(),today.getMonth(),today.getDate()));
+  });
+
+  daysEl.addEventListener('keydown', function(e){
+    const active = document.activeElement;
+    if(!active || !active.classList.contains('day')) return;
+    const d = new Date(parseInt(active.dataset.year),parseInt(active.dataset.month),parseInt(active.dataset.date));
+    let handled = true;
+    switch(e.key){
+      case 'ArrowLeft': d.setDate(d.getDate()-1); break;
+      case 'ArrowRight': d.setDate(d.getDate()+1); break;
+      case 'ArrowUp': d.setDate(d.getDate()-7); break;
+      case 'ArrowDown': d.setDate(d.getDate()+7); break;
+      case 'Enter':
+      case ' ': selectDate(d); break;
+      case 'Home': d.setDate(1); break;
+      case 'End': d.setMonth(d.getMonth()+1); d.setDate(0); break;
+      case 'PageUp': d.setMonth(d.getMonth()-1); break;
+      case 'PageDown': d.setMonth(d.getMonth()+1); break;
+      default: handled=false;
+    }
+    if(handled){
+      e.preventDefault();
+      if(e.key!=='Enter' && e.key!==' '){
+        if(d.getFullYear()!==viewYear||d.getMonth()!==viewMonth){
+          viewYear=d.getFullYear();viewMonth=d.getMonth();
+          render();
+        }
+        const t = [...daysEl.querySelectorAll('.day')].find(b=>!b.classList.contains('other') && parseInt(b.dataset.date)===d.getDate() && parseInt(b.dataset.month)===d.getMonth());
+        if(t) t.focus();
+      }
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

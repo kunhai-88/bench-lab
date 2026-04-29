@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .calculator {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    width: 320px;
+  }
+  .display {
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 20px 20px 12px;
+    margin-bottom: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .expression {
+    color: rgba(255,255,255,0.4);
+    font-size: 14px;
+    min-height: 20px;
+    word-break: break-all;
+    text-align: right;
+    margin-bottom: 6px;
+  }
+  .result {
+    color: #fff;
+    font-size: 42px;
+    font-weight: 300;
+    word-break: break-all;
+    text-align: right;
+    line-height: 1.1;
+    transition: font-size 0.1s;
+  }
+  .result.small { font-size: 28px; }
+  .result.error { color: #ff6b6b; font-size: 28px; }
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  button {
+    border: none;
+    border-radius: 14px;
+    height: 64px;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+  }
+  button:active { transform: scale(0.93); }
+  button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  button:hover::after { opacity: 1; }
+
+  .btn-num {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .btn-op {
+    background: rgba(82, 130, 255, 0.25);
+    color: #7eb3ff;
+    border: 1px solid rgba(82,130,255,0.2);
+  }
+  .btn-eq {
+    background: linear-gradient(135deg, #5282ff, #7b5ea7);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 20px rgba(82,130,255,0.4);
+  }
+  .btn-clear {
+    background: rgba(255, 100, 100, 0.2);
+    color: #ff8080;
+    border: 1px solid rgba(255,100,100,0.2);
+  }
+  .btn-func {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 16px;
+  }
+  .btn-zero {
+    grid-column: span 2;
+  }
+  .btn-backspace {
+    background: rgba(255, 160, 50, 0.2);
+    color: #ffb347;
+    border: 1px solid rgba(255,160,50,0.2);
+    font-size: 22px;
+  }
+</style>
+</head>
+<body>
+<div class="calculator">
+  <div class="display">
+    <div class="expression" id="expression"></div>
+    <div class="result" id="result">0</div>
+  </div>
+  <div class="buttons">
+    <!-- Row 1 -->
+    <button class="btn-clear" id="btn-ac" onclick="clearAll()">AC</button>
+    <button class="btn-func" onclick="toggleSign()">+/−</button>
+    <button class="btn-func" onclick="percent()">%</button>
+    <button class="btn-backspace" id="btn-del" onclick="backspace()">⌫</button>
+    <!-- Row 2 -->
+    <button class="btn-num" onclick="inputDigit('7')">7</button>
+    <button class="btn-num" onclick="inputDigit('8')">8</button>
+    <button class="btn-num" onclick="inputDigit('9')">9</button>
+    <button class="btn-op" onclick="inputOp('÷')">÷</button>
+    <!-- Row 3 -->
+    <button class="btn-num" onclick="inputDigit('4')">4</button>
+    <button class="btn-num" onclick="inputDigit('5')">5</button>
+    <button class="btn-num" onclick="inputDigit('6')">6</button>
+    <button class="btn-op" onclick="inputOp('×')">×</button>
+    <!-- Row 4 -->
+    <button class="btn-num" onclick="inputDigit('1')">1</button>
+    <button class="btn-num" onclick="inputDigit('2')">2</button>
+    <button class="btn-num" onclick="inputDigit('3')">3</button>
+    <button class="btn-op" onclick="inputOp('−')">−</button>
+    <!-- Row 5 -->
+    <button class="btn-num btn-zero" onclick="inputDigit('0')">0</button>
+    <button class="btn-num" onclick="inputDot()">.</button>
+    <button class="btn-op" onclick="inputOp('+')">+</button>
+    <!-- Row 6 -->
+    <button class="btn-eq" style="grid-column:span 4" onclick="calculate()">=</button>
+  </div>
+</div>
+
+<script>
+  // State
+  let currentInput = '0';
+  let expression = '';
+  let tokens = []; // array of numbers and operators
+  let justCalculated = false;
+  let hasError = false;
+
+  const resultEl = document.getElementById('result');
+  const expressionEl = document.getElementById('expression');
+
+  function updateDisplay() {
+    resultEl.className = 'result';
+    if (hasError) {
+      resultEl.textContent = '错误';
+      resultEl.classList.add('error');
+      expressionEl.textContent = expression;
+      return;
+    }
+    resultEl.textContent = currentInput;
+    if (currentInput.length > 10) resultEl.classList.add('small');
+    expressionEl.textContent = expression;
+  }
+
+  function clearAll() {
+    currentInput = '0';
+    expression = '';
+    tokens = [];
+    justCalculated = false;
+    hasError = false;
+    updateDisplay();
+  }
+
+  function backspace() {
+    if (hasError) { clearAll(); return; }
+    if (justCalculated) { clearAll(); return; }
+    if (currentInput.length <= 1 || currentInput === '-0') {
+      currentInput = '0';
+    } else {
+      currentInput = currentInput.slice(0, -1);
+      if (currentInput === '-') currentInput = '0';
+    }
+    updateDisplay();
+  }
+
+  function inputDigit(d) {
+    if (hasError) clearAll();
+    if (justCalculated) {
+      // Start fresh number after calculation
+      currentInput = d;
+      tokens = [];
+      expression = '';
+      justCalculated = false;
+      updateDisplay();
+      return;
+    }
+    if (currentInput === '0' && d !== '.') {
+      currentInput = d;
+    } else if (currentInput === '-0') {
+      currentInput = '-' + d;
+    } else {
+      if (currentInput.replace('-','').replace('.','').length >= 15) return;
+      currentInput += d;
+    }
+    updateDisplay();
+  }
+
+  function inputDot() {
+    if (hasError) clearAll();
+    if (justCalculated) {
+      currentInput = '0.';
+      tokens = [];
+      expression = '';
+      justCalculated = false;
+      updateDisplay();
+      return;
+    }
+    if (currentInput.includes('.')) return;
+    currentInput += '.';
+    updateDisplay();
+  }
+
+  function inputOp(op) {
+    if (hasError) clearAll();
+    justCalculated = false;
+
+    // Push current number to tokens
+    let num = parseFloat(currentInput);
+    if (isNaN(num)) { hasError = true; updateDisplay(); return; }
+
+    if (tokens.length === 0) {
+      tokens.push(num);
+      expression = currentInput + ' ' + op;
+    } else {
+      // There's already an operator pending
+      // Evaluate with proper precedence: just push and let calculate handle it
+      tokens.push(num);
+      tokens.push(op);
+      expression = buildExpression() + ' ' + op;
+      // Remove the last op we just added for expression display
+      tokens.pop();
+      tokens.push(op);
+      // Recalculate expression display
+      expression = buildExpressionForDisplay() + ' ' + op;
+    }
+
+    // Rebuild properly
+    // tokens structure: [num, op, num, op, ...]
+    // Let's redo this cleanly
+    rebuildTokensOnOp(num, op);
+    updateDisplay();
+  }
+
+  function rebuildTokensOnOp(num, op) {
+    if (tokens.length === 0) {
+      tokens = [num, op];
+      expression = formatNum(num) + ' ' + op;
+    } else {
+      // tokens ends with an operator (last op)
+      // Replace last op or append
+      let lastItem = tokens[tokens.length - 1];
+      if (isOperator(lastItem)) {
+        // Replace operator
+        tokens[tokens.length - 1] = op;
+        expression = expression.slice(0, expression.lastIndexOf(' ')) + ' ' + op;
+      } else {
+        // Append number then operator
+        tokens.push(num);
+        tokens.push(op);
+        expression = buildExpressionDisplay();
+      }
+    }
+    currentInput = '0';
+  }
+
+  function isOperator(v) {
+    return v === '+' || v === '−' || v === '×' || v === '÷';
+  }
+
+  function buildExpressionDisplay() {
+    let s = '';
+    for (let i = 0; i < tokens.length; i++) {
+      if (i > 0) s += ' ';
+      s += isOperator(tokens[i]) ? tokens[i] : formatNum(tokens[i]);
+    }
+    return s;
+  }
+
+  function buildExpression() { return buildExpressionDisplay(); }
+  function buildExpressionForDisplay() { return buildExpressionDisplay(); }
+
+  function formatNum(n) {
+    let s = String(n);
+    if (s.length > 12) s = parseFloat(n.toPrecision(10)).toString();
+    return s;
+  }
+
+  function toggleSign() {
+    if (hasError) return;
+    if (currentInput === '0') return;
+    if (currentInput.startsWith('-')) {
+      currentInput = currentInput.slice(1);
+    } else {
+      currentInput = '-' + currentInput;
+    }
+    updateDisplay();
+  }
+
+  function percent() {
+    if (hasError) return;
+    let n = parseFloat(currentInput);
+    if (isNaN(n)) return;
+    currentInput = formatNum(n / 100);
+    updateDisplay();
+  }
+
+  function calculate() {
+    if (hasError) return;
+
+    let num = parseFloat(currentInput);
+    if (isNaN(num)) { hasError = true; updateDisplay(); return; }
+
+    let finalTokens;
+    if (tokens.length === 0) {
+      // No pending operation
+      expression = formatNum(num) + ' =';
+      resultEl.textContent = currentInput;
+      expressionEl.textContent = expression;
+      justCalculated = true;
+      return;
+    }
+
+    // Build final token list
+    let lastItem = tokens[tokens.length - 1];
+    if (isOperator(lastItem)) {
+      finalTokens = [...tokens, num];
+      expression = buildExpressionDisplay() + ' ' + formatNum(num) + ' =';
+    } else {
+      finalTokens = [...tokens];
+      expression = buildExpressionDisplay() + ' =';
+    }
+
+    // Evaluate with operator precedence (* / before + -)
+    let result = evaluateTokens(finalTokens);
+
+    if (result === null || !isFinite(result)) {
+      hasError = true;
+      expression = buildExpressionDisplay();
+      tokens = [];
+      currentInput = '0';
+      updateDisplay();
+      return;
+    }
+
+    let resultStr = formatNum(result);
+    expression = expression;
+    currentInput = resultStr;
+    tokens = [];
+    justCalculated = true;
+    hasError = false;
+    updateDisplay();
+  }
+
+  function evaluateTokens(toks) {
+    // toks: [num, op, num, op, num, ...]
+    // First pass: handle × and ÷
+    let pass1 = [...toks];
+    let i = 1;
+    while (i < pass1.length) {
+      let op = pass1[i];
+      if (op === '×' || op === '÷') {
+        let a = pass1[i-1];
+        let b = pass1[i+1];
+        let res;
+        if (op === '×') res = a * b;
+        else {
+          if (b === 0) return null;
+          res = a / b;
+        }
+        pass1.splice(i-1, 3, res);
+        // i stays the same
+      } else {
+        i += 2;
+      }
+    }
+    // Second pass: handle + and −
+    let result = pass1[0];
+    for (let j = 1; j < pass1.length; j += 2) {
+      let op = pass1[j];
+      let b = pass1[j+1];
+      if (op === '+') result += b;
+      else if (op === '−') result -= b;
+    }
+    return result;
+  }
+
+  // Keyboard support
+  document.addEventListener('keydown', function(e) {
+    const key = e.key;
+    if (key >= '0' && key <= '9') inputDigit(key);
+    else if (key === '.') inputDot();
+    else if (key === '+') inputOp('+');
+    else if (key === '-') inputOp('−');
+    else if (key === '*') inputOp('×');
+    else if (key === '/') { e.preventDefault(); inputOp('÷'); }
+    else if (key === 'Enter' || key === '=') calculate();
+    else if (key === 'Backspace') backspace();
+    else if (key === 'Escape') clearAll();
+    else if (key === '%') percent();
+  });
+
+  updateDisplay();
+</script>
+</body>
+</html>

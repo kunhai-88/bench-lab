@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精美日历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #d9e2ef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        .calendar-wrapper {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 30px 28px 35px;
+            box-shadow: 0 25px 50px -8px rgba(0, 20, 40, 0.25), 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 100%;
+            max-width: 520px;
+            transition: all 0.2s;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 0 6px;
+        }
+        .calendar-header .month-year {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a2639;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #1e2b3c, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.6);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: #2c3e50;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            line-height: 1;
+        }
+        .nav-btn:hover {
+            background: white;
+            box-shadow: 0 8px 16px rgba(0, 20, 40, 0.15);
+            transform: scale(1.02);
+            color: #0f1a2b;
+        }
+        .nav-btn:active {
+            transform: scale(0.94);
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #4a5b6e;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            padding: 0 4px;
+        }
+        .weekdays span {
+            padding: 8px 0 6px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .day-cell {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1f2b3a;
+            background: transparent;
+            transition: 0.15s ease;
+            cursor: default;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(2px);
+            border: 1px solid transparent;
+        }
+        .day-cell.other-month {
+            color: #8a9bb0;
+            opacity: 0.5;
+            background: transparent;
+            backdrop-filter: none;
+        }
+        .day-cell.today {
+            background: linear-gradient(145deg, #2c3e50, #1a2738);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 6px 14px rgba(26, 39, 56, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .day-cell:not(.other-month):hover {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(44, 62, 80, 0.15);
+            transform: scale(0.96);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+        }
+        .day-cell.today:hover {
+            background: linear-gradient(145deg, #1f3144, #131f2e);
+            transform: scale(0.96);
+        }
+        .calendar-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding: 0 6px;
+            color: #3d4f62;
+            font-size: 0.9rem;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0.2px;
+        }
+        .footer-left span {
+            background: rgba(255,255,255,0.5);
+            padding: 4px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .footer-right {
+            display: flex;
+            gap: 12px;
+        }
+        .footer-right button {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1f2b3a;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: 0.15s;
+        }
+        .footer-right button:hover {
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+        @media (max-width: 480px) {
+            .calendar-wrapper {
+                padding: 20px 16px 25px;
+                border-radius: 36px;
+            }
+            .calendar-header .month-year {
+                font-size: 1.5rem;
+            }
+            .day-cell {
+                font-size: 0.9rem;
+            }
+            .nav-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="calendar-wrapper">
+    <div class="calendar-header">
+        <div class="month-year" id="monthYearDisplay">2025年3月</div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevMonthBtn">←</button>
+            <button class="nav-btn" id="nextMonthBtn">→</button>
+        </div>
+    </div>
+    <div class="weekdays">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="days-grid" id="daysGrid"></div>
+    <div class="calendar-footer">
+        <div class="footer-left"><span id="todayInfo">今天</span></div>
+        <div class="footer-right">
+            <button id="todayBtn">回到今天</button>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const daysGrid = document.getElementById('daysGrid');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const todayBtn = document.getElementById('todayBtn');
+        const todayInfo = document.getElementById('todayInfo');
+
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth(); // 0-11
+
+        const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+        function renderCalendar(year, month) {
+            // 更新标题
+            monthYearDisplay.textContent = year + '年' + monthNames[month];
+
+            // 当月第一天
+            const firstDay = new Date(year, month, 1);
+            // 当月最后一天
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            // 当月第一天是星期几 (0=日)
+            const startWeekday = firstDay.getDay();
+
+            // 上个月最后一天
+            const prevLastDay = new Date(year, month, 0).getDate();
+
+            // 准备网格 (最多6行)
+            const totalCells = 42; // 6行 x 7列
+            let gridHTML = '';
+
+            for (let i = 0; i < totalCells; i++) {
+                let dayNumber;
+                let isOtherMonth = false;
+                let isToday = false;
+
+                // 计算日期
+                if (i < startWeekday) {
+                    // 上个月
+                    dayNumber = prevLastDay - startWeekday + 1 + i;
+                    isOtherMonth = true;
+                } else if (i >= startWeekday + daysInMonth) {
+                    // 下个月
+                    dayNumber = i - startWeekday - daysInMonth + 1;
+                    isOtherMonth = true;
+                } else {
+                    // 当月
+                    dayNumber = i - startWeekday + 1;
+                    // 判断是否今天
+                    if (year === today.getFullYear() && month === today.getMonth() && dayNumber === today.getDate()) {
+                        isToday = true;
+                    }
+                }
+
+                let cellClass = 'day-cell';
+                if (isOtherMonth) cellClass += ' other-month';
+                if (isToday) cellClass += ' today';
+
+                gridHTML += `<div class="${cellClass}">${dayNumber}</div>`;
+            }
+
+            daysGrid.innerHTML = gridHTML;
+
+            // 更新今天信息
+            const todayStr = today.getFullYear() + '年' + (today.getMonth()+1) + '月' + today.getDate() + '日';
+            const weekdaysStr = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekdayName = weekdaysStr[today.getDay()];
+            todayInfo.textContent = todayStr + ' ' + weekdayName;
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentYear, currentMonth);
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentYear, currentMonth);
+        }
+
+        function goToToday() {
+            currentYear = today.getFullYear();
+            currentMonth = today.getMonth();
+            renderCalendar(currentYear, currentMonth);
+        }
+
+        // 绑定事件
+        prevMonthBtn.addEventListener('click', prevMonth);
+        nextMonthBtn.addEventListener('click', nextMonth);
+        todayBtn.addEventListener('click', goToToday);
+
+        // 初始渲染
+        renderCalendar(currentYear, currentMonth);
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网页计算器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(100, 181, 246, .32), transparent 34%),
+        radial-gradient(circle at 85% 18%, rgba(186, 104, 200, .28), transparent 30%),
+        radial-gradient(circle at 50% 95%, rgba(77, 208, 225, .22), transparent 36%),
+        linear-gradient(135deg, #141a2e 0%, #111827 50%, #0b1020 100%);
+      color: #fff;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .calculator {
+      width: min(420px, 100%);
+      border-radius: 30px;
+      padding: 22px;
+      background: rgba(18, 25, 43, .72);
+      border: 1px solid rgba(255, 255, 255, .16);
+      box-shadow:
+        0 28px 80px rgba(0, 0, 0, .46),
+        inset 0 1px 0 rgba(255, 255, 255, .12);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: rgba(255, 255, 255, .74);
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #5eead4;
+      box-shadow: 0 0 18px rgba(94, 234, 212, .9);
+    }
+
+    .screen {
+      min-height: 142px;
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.055));
+      border: 1px solid rgba(255,255,255,.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .expression {
+      min-height: 30px;
+      color: rgba(255,255,255,.58);
+      font-size: 20px;
+      line-height: 1.35;
+      text-align: right;
+      word-break: break-all;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .display {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #fff;
+      text-align: right;
+      font-size: clamp(42px, 11vw, 62px);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      font-variant-numeric: tabular-nums;
+      padding: 0;
+    }
+
+    .display::selection {
+      background: rgba(94, 234, 212, .35);
+    }
+
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      border: 0;
+      min-height: 68px;
+      border-radius: 21px;
+      font-size: 25px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #f8fafc;
+      background: rgba(255, 255, 255, .105);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 10px 18px rgba(0,0,0,.18);
+      transition: transform .08s ease, filter .12s ease, background .12s ease, box-shadow .12s ease;
+      user-select: none;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+      background: rgba(255, 255, 255, .145);
+    }
+
+    button:active,
+    button.active {
+      transform: translateY(2px) scale(.985);
+      box-shadow:
+        inset 0 2px 6px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.12);
+    }
+
+    .control {
+      background: rgba(148, 163, 184, .22);
+      color: #e2e8f0;
+    }
+
+    .operator {
+      background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(37,99,235,.92));
+      color: #fff;
+    }
+
+    .equals {
+      background: linear-gradient(180deg, #2dd4bf, #0d9488);
+      color: #042f2e;
+      font-size: 31px;
+    }
+
+    .danger {
+      background: linear-gradient(180deg, rgba(251,113,133,.95), rgba(225,29,72,.92));
+      color: #fff;
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+
+    .hint {
+      margin-top: 15px;
+      text-align: center;
+      color: rgba(255,255,255,.45);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 12px;
+      }
+
+      .calculator {
+        padding: 16px;
+        border-radius: 26px;
+      }
+
+      .screen {
+        min-height: 128px;
+        border-radius: 21px;
+      }
+
+      .keys {
+        gap: 10px;
+      }
+
+      button {
+        min-height: 62px;
+        border-radius: 18px;
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator" aria-label="计算器">
+    <div class="brand">
+      <span>Calculator</span>
+      <span class="brand-dot" aria-hidden="true"></span>
+    </div>
+
+    <section class="screen" aria-live="polite">
+      <div id="expression" class="expression"></div>
+      <input id="display" class="display" type="text" value="0" readonly aria-label="计算结果">
+    </section>
+
+    <section class="keys">
+      <button class="danger" data-action="clear" aria-label="清除">AC</button>
+      <button class="control" data-action="backspace" aria-label="退格">⌫</button>
+      <button class="control" data-action="percent" aria-label="百分号">%</button>
+      <button class="operator" data-value="/" aria-label="除">÷</button>
+
+      <button data-value="7">7</button>
+      <button data-value="8">8</button>
+      <button data-value="9">9</button>
+      <button class="operator" data-value="*" aria-label="乘">×</button>
+
+      <button data-value="4">4</button>
+      <button data-value="5">5</button>
+      <button data-value="6">6</button>
+      <button class="operator" data-value="-" aria-label="减">−</button>
+
+      <button data-value="1">1</button>
+      <button data-value="2">2</button>
+      <button data-value="3">3</button>
+      <button class="operator" data-value="+" aria-label="加">+</button>
+
+      <button class="zero" data-value="0">0</button>
+      <button data-value=".">.</button>
+      <button class="equals" data-action="equals" aria-label="等于">=</button>
+    </section>
+
+    <div class="hint">支持键盘输入：数字、+ - * /、Enter、Backspace、Delete、Esc</div>
+  </main>
+
+  <script>
+    (function () {
+      const display = document.getElementById('display');
+      const expressionEl = document.getElementById('expression');
+      const buttons = Array.from(document.querySelectorAll('button'));
+
+      let expr = '';
+      let justEvaluated = false;
+      let errorState = false;
+
+      function shownExpression(value) {
+        return value
+          .replace(/\*/g, '×')
+          .replace(/\//g, '÷')
+          .replace(/-/g, '−');
+      }
+
+      function updateDisplay() {
+        expressionEl.textContent = shownExpression(expr);
+        if (!expr) {
+          display.value = '0';
+        } else if (!errorState) {
+          display.value = shownExpression(expr);
+        }
+      }
+
+      function clearAll() {
+        expr = '';
+        justEvaluated = false;
+        errorState = false;
+        display.value = '0';
+        expressionEl.textContent = '';
+      }
+
+      function isOperator(ch) {
+        return ['+', '-', '*', '/'].includes(ch);
+      }
+
+      function currentNumber() {
+        const parts = expr.split(/[+\-*/]/);
+        return parts[parts.length - 1] || '';
+      }
+
+      function inputValue(value) {
+        if (errorState) clearAll();
+
+        if (justEvaluated) {
+          if (/[0-9.]/.test(value)) {
+            expr = '';
+          }
+          justEvaluated = false;
+        }
+
+        if (/[0-9]/.test(value)) {
+          if (expr === '0') {
+            expr = value;
+          } else {
+            expr += value;
+          }
+          updateDisplay();
+          return;
+        }
+
+        if (value === '.') {
+          const num = currentNumber();
+          if (!num.includes('.')) {
+            if (expr === '' || isOperator(expr.slice(-1))) {
+              expr += '0.';
+            } else {
+              expr += '.';
+            }
+          }
+          updateDisplay();
+          return;
+        }
+
+        if (isOperator(value)) {
+          if (expr === '') {
+            if (value === '-') expr = '-';
+            updateDisplay();
+            return;
+          }
+
+          const last = expr.slice(-1);
+          if (isOperator(last)) {
+            if (value === '-' && last !== '-') {
+              expr += value;
+            } else {
+              expr = expr.slice(0, -1) + value;
+            }
+          } else {
+            expr += value;
+          }
+          updateDisplay();
+        }
+      }
+
+      function backspace() {
+        if (errorState || justEvaluated) {
+          clearAll();
+          return;
+        }
+        expr = expr.slice(0, -1);
+        updateDisplay();
+      }
+
+      function percent() {
+        if (errorState) clearAll();
+        if (!expr || isOperator(expr.slice(-1))) return;
+
+        const match = expr.match(/(-?\d+(?:\.\d+)?)$/);
+        if (!match) return;
+
+        const number = match[0];
+        const replacement = String(parseFloat(number) / 100);
+        expr = expr.slice(0, match.index) + replacement;
+        updateDisplay();
+      }
+
+      function tokenize(s) {
+        const tokens = [];
+        let i = 0;
+
+        while (i < s.length) {
+          const ch = s[i];
+
+          if (/[0-9.]/.test(ch) || (ch === '-' && (i === 0 || isOperator(s[i - 1])))) {
+            let num = ch;
+            i++;
+
+            while (i < s.length && /[0-9.]/.test(s[i])) {
+              num += s[i];
+              i++;
+            }
+
+            if (num === '-' || num === '.' || num === '-.' || (num.match(/\./g) || []).length > 1) {
+              throw new Error('invalid');
+            }
+
+            tokens.push(parseFloat(num));
+            continue;
+          }
+
+          if (isOperator(ch)) {
+            tokens.push(ch);
+            i++;
+            continue;
+          }
+
+          throw new Error('invalid');
+        }
+
+        return tokens;
+      }
+
+      function evaluateExpression(s) {
+        s = s.replace(/[+\-*/]+$/, '');
+        if (!s || s === '-') throw new Error('invalid');
+
+        const tokens = tokenize(s);
+        const firstPass = [];
+
+        for (let i = 0; i < tokens.length; i++) {
+          const token = tokens[i];
+
+          if (token === '*' || token === '/') {
+            const left = firstPass.pop();
+            const right = tokens[++i];
+
+            if (typeof left !== 'number' || typeof right !== 'number') throw new Error('invalid');
+            if (token === '/' && right === 0) throw new Error('divide by zero');
+
+            firstPass.push(token === '*' ? left * right : left / right);
+          } else {
+            firstPass.push(token);
+          }
+        }
+
+        let result = firstPass[0];
+        for (let i = 1; i < firstPass.length; i += 2) {
+          const op = firstPass[i];
+          const right = firstPass[i + 1];
+
+          if (typeof result !== 'number' || typeof right !== 'number') throw new Error('invalid');
+          if (op === '+') result += right;
+          else if (op === '-') result -= right;
+          else throw new Error('invalid');
+        }
+
+        if (!Number.isFinite(result)) throw new Error('invalid');
+        return result;
+      }
+
+      function formatNumber(num) {
+        if (Object.is(num, -0)) num = 0;
+        const rounded = Number(parseFloat(num.toPrecision(12)));
+        if (Math.abs(rounded) >= 1e12 || (Math.abs(rounded) > 0 && Math.abs(rounded) < 1e-9)) {
+          return rounded.toExponential(8).replace(/\.?0+e/, 'e');
+        }
+        return String(rounded);
+      }
+
+      function equals() {
+        if (errorState) return clearAll();
+
+        try {
+          const original = expr;
+          const result = evaluateExpression(expr);
+          const formatted = formatNumber(result);
+          expressionEl.textContent = shownExpression(original.replace(/[+\-*/]+$/, '') + '=');
+          display.value = formatted;
+          expr = formatted;
+          justEvaluated = true;
+        } catch (e) {
+          display.value = 'Error';
+          expressionEl.textContent = '';
+          expr = '';
+          errorState = true;
+          justEvaluated = false;
+        }
+      }
+
+      document.querySelector('.keys').addEventListener('click', function (e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+
+        const action = btn.dataset.action;
+        const value = btn.dataset.value;
+
+        if (action === 'clear') clearAll();
+        else if (action === 'backspace') backspace();
+        else if (action === 'percent') percent();
+        else if (action === 'equals') equals();
+        else if (value) inputValue(value);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        const key = e.key;
+
+        if (/^[0-9]$/.test(key)) {
+          inputValue(key);
+        } else if (key === '.') {
+          inputValue('.');
+        } else if (['+', '-', '*', '/'].includes(key)) {
+          inputValue(key);
+        } else if (key === 'Enter' || key === '=') {
+          e.preventDefault();
+          equals();
+        } else if (key === 'Backspace') {
+          e.preventDefault();
+          backspace();
+        } else if (key === 'Delete' || key === 'Del') {
+          e.preventDefault();
+          backspace();
+        } else if (key === 'Escape') {
+          clearAll();
+        } else if (key === '%') {
+          percent();
+        } else {
+          return;
+        }
+
+        const btn = buttons.find(b =>
+          b.dataset.value === key ||
+          (key === 'Enter' && b.dataset.action === 'equals') ||
+          (key === '=' && b.dataset.action === 'equals') ||
+          (key === 'Backspace' && b.dataset.action === 'backspace') ||
+          ((key === 'Delete' || key === 'Del') && b.dataset.action === 'backspace') ||
+          (key === 'Escape' && b.dataset.action === 'clear') ||
+          (key === '%' && b.dataset.action === 'percent')
+        );
+
+        if (btn) {
+          btn.classList.add('active');
+          setTimeout(() => btn.classList.remove('active'), 100);
+        }
+      });
+
+      clearAll();
+    })();
+  </script>
+</body>
+</html>

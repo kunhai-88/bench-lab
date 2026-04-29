@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页日历</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f5f7fa;
+            --calendar-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #a0aab5;
+            --border-color: #e4e7ea;
+            --hover-bg: #f0f4f8;
+            --today-bg: #e8f2fc;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .calendar-wrapper {
+            background: var(--calendar-bg);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .month-year {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .icon-btn {
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .day:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .day.other-month {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .day.today {
+            background-color: var(--today-bg);
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .day.selected {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .day.selected:hover {
+            background-color: #3a7bc8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calendar-wrapper">
+        <div class="header">
+            <div class="month-year" id="month-year"></div>
+            <div class="controls">
+                <button class="icon-btn" id="prev-btn" title="上个月">&lt;</button>
+                <button id="today-btn">今天</button>
+                <button class="icon-btn" id="next-btn" title="下个月">&gt;</button>
+            </div>
+        </div>
+        <div class="weekdays">
+            <div>日</div>
+            <div>一</div>
+            <div>二</div>
+            <div>三</div>
+            <div>四</div>
+            <div>五</div>
+            <div>六</div>
+        </div>
+        <div class="days" id="days-container"></div>
+    </div>
+
+    <script>
+        const monthYearDisplay = document.getElementById('month-year');
+        const daysContainer = document.getElementById('days-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const todayBtn = document.getElementById('today-btn');
+
+        const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+
+        let currentDate = new Date();
+        let selectedDate = new Date();
+
+        function renderCalendar() {
+            daysContainer.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            monthYearDisplay.textContent = `${year}年 ${monthNames[month]}`;
+            
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            const today = new Date();
+            
+            for (let i = firstDayOfMonth; i > 0; i--) {
+                const dayEl = document.createElement('div');
+                dayEl.classList.add('day', 'other-month');
+                dayEl.textContent = daysInPrevMonth - i + 1;
+                
+                const prevMonthDate = new Date(year, month - 1, daysInPrevMonth - i + 1);
+                dayEl.addEventListener('click', () => selectDate(prevMonthDate));
+                
+                daysContainer.appendChild(dayEl);
+            }
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.classList.add('day');
+                dayEl.textContent = i;
+                
+                const currentDayDate = new Date(year, month, i);
+                
+                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
+                    dayEl.classList.add('today');
+                }
+                
+                if (selectedDate && year === selectedDate.getFullYear() && month === selectedDate.getMonth() && i === selectedDate.getDate()) {
+                    dayEl.classList.add('selected');
+                }
+                
+                dayEl.addEventListener('click', () => selectDate(currentDayDate));
+                
+                daysContainer.appendChild(dayEl);
+            }
+            
+            const totalCells = firstDayOfMonth + daysInMonth;
+            const remainingCells = 42 - totalCells; 
+            
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.classList.add('day', 'other-month');
+                dayEl.textContent = i;
+                
+                const nextMonthDate = new Date(year, month + 1, i);
+                dayEl.addEventListener('click', () => selectDate(nextMonthDate));
+                
+                daysContainer.appendChild(dayEl);
+            }
+        }
+
+        function selectDate(date) {
+            selectedDate = date;
+            currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            renderCalendar();
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        todayBtn.addEventListener('click', () => {
+            const today = new Date();
+            selectedDate = today;
+            currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            renderCalendar();
+        });
+
+        renderCalendar();
+    </script>
+</body>
+</html>

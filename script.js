@@ -9,18 +9,11 @@ const models = [
     pricing: { input: 5, output: 30, cache: 0.5 },
   },
   {
-    id: "anthropic/claude-opus-4.6",
-    name: "Claude Opus 4.6",
+    id: "anthropic/claude-opus-4.7",
+    name: "Claude Opus 4.7",
     provider: "Anthropic",
     accent: "#ff6547",
     pricing: { input: 5, output: 25, cache: 0.5 },
-  },
-  {
-    id: "anthropic/claude-sonnet-4.6",
-    name: "Claude Sonnet 4.6",
-    provider: "Anthropic",
-    accent: "#f4b942",
-    pricing: { input: 3, output: 15, cache: 0.3 },
   },
   {
     id: "google/gemini-3.1-pro-preview",
@@ -35,6 +28,20 @@ const models = [
     provider: "Moonshot AI",
     accent: "#32d6c0",
     pricing: { input: 0.7448, output: 4.655, cache: 0.1463 },
+  },
+  {
+    id: "xiaomi/mimo-v2-pro-20260318",
+    name: "MiMo V2 Pro",
+    provider: "Xiaomi",
+    accent: "#58c2ff",
+    pricing: { input: 1, output: 3, cache: 0.2 },
+  },
+  {
+    id: "qwen/qwen3.6-max-preview-20260420",
+    name: "Qwen3.6 Max Preview",
+    provider: "Alibaba",
+    accent: "#ffb347",
+    pricing: { input: 0.00104, output: 0.00624, cache: 0.0013 },
   },
   {
     id: "minimax/minimax-m2.7",
@@ -55,31 +62,17 @@ const models = [
     name: "DeepSeek V4 Pro",
     provider: "DeepSeek",
     accent: "#7cffb2",
-    pricing: { input: 0.435, output: 0.87, cache: 0.03625 },
-  },
-  {
-    id: "deepseek/deepseek-v4-flash",
-    name: "DeepSeek V4 Flash",
-    provider: "DeepSeek",
-    accent: "#65f7ff",
-    pricing: { input: 0.14, output: 0.28, cache: 0 },
-  },
-  {
-    id: "deepseek/deepseek-v3.2",
-    name: "DeepSeek V3.2",
-    provider: "DeepSeek",
-    accent: "#9ea7ff",
-    pricing: { input: 0.252, output: 0.378, cache: 0.0252 },
+    pricing: { input: 0.435, output: 0.87, cache: 0.003625 },
   },
 ];
+
+const hiddenModelIds = new Set([
+  "alibaba/tongyi-deepresearch-30b-a3b",
+]);
 
 const tasks = {
   calculator: {
     title: "计算器",
-    badge: "7 项检查",
-    previewTitle: "计算器页面",
-    artifact: "示例预览",
-    promptSummary: "要求模型生成一个能直接使用的网页计算器。",
     tests: [
       ["可发现控件", "calculator controls and display can be discovered by behavior"],
       ["清除和退格", "clear resets display and backspace removes one digit"],
@@ -89,14 +82,10 @@ const tasks = {
       ["错误状态", "divide by zero shows error"],
       ["键盘输入", "Enter / Backspace / Escape"],
     ],
-    prompt: "写一个可以正常使用的网页计算器。页面要完整、好看，直接打开就能用。",
+    prompt: "请生成一个可直接打开使用的网页计算器。要求界面完整、交互清晰、无需外部依赖。",
   },
   calendar: {
     title: "日历",
-    badge: "7 项检查",
-    previewTitle: "日历页面",
-    artifact: "示例预览",
-    promptSummary: "要求模型生成一个能直接使用的网页日历。",
     tests: [
       ["可发现控件", "calendar controls and day grid can be discovered by behavior"],
       ["月份标题", "a current month or year title is rendered"],
@@ -106,348 +95,27 @@ const tasks = {
       ["日期选择", "a day can be selected"],
       ["键盘或焦点", "day cells or navigation controls are keyboard reachable"],
     ],
-    prompt: "写一个可以正常使用的网页日历。页面要完整、好看，直接打开就能用。",
+    prompt: "请生成一个可直接打开使用的网页日历。要求界面完整、交互清晰、无需外部依赖。",
   },
 };
 
 const runs = {
-  calculator: {
-    "openai/gpt-5.5": {
-      input: 1138,
-      output: 2716,
-      cache: 0,
-      reasoning: 0,
-      latency: 8.9,
-      passed: 6,
-      score: 96,
-      retries: 0,
-      tools: 3,
-      providerName: "OpenAI",
-      verdict: "所有测试通过，表达式解析和键盘路径都稳定。",
-      trace: [
-        ["00.0s", "Prompt packed", "任务、约束、Jest 断言一次性写入 prompt。"],
-        ["01.8s", "Code drafted", "生成 tokenizer、parser、UI state 三段代码。"],
-        ["07.2s", "Tests executed", "6 个断言全部通过，没有触发重试。"],
-      ],
-    },
-    "anthropic/claude-opus-4.6": {
-      input: 1214,
-      output: 3084,
-      cache: 0,
-      reasoning: 0,
-      latency: 10.8,
-      passed: 6,
-      score: 95,
-      retries: 0,
-      tools: 4,
-      providerName: "Anthropic",
-      verdict: "所有测试通过，错误状态文案更清楚，但输出代码更长。",
-      trace: [
-        ["00.0s", "Prompt packed", "保留了测试描述和交互要求。"],
-        ["02.6s", "Implementation split", "生成 display、engine、keyboard handler。"],
-        ["09.5s", "Tests executed", "6 个断言全部通过。"],
-      ],
-    },
-    "anthropic/claude-sonnet-4.6": {
-      input: 1198,
-      output: 2462,
-      cache: 0,
-      reasoning: 0,
-      latency: 7.2,
-      passed: 6,
-      score: 93,
-      retries: 0,
-      tools: 3,
-      providerName: "Anthropic",
-      verdict: "所有测试通过，代码更短，UI 边界状态略少。",
-      trace: [
-        ["00.0s", "Prompt packed", "任务规格和测试列表进入上下文。"],
-        ["01.4s", "Code drafted", "直接生成可测的 reducer 风格实现。"],
-        ["06.4s", "Tests executed", "6 个断言全部通过。"],
-      ],
-    },
-    "google/gemini-3.1-pro-preview": {
-      input: 1168,
-      output: 2220,
-      cache: 0,
-      reasoning: 0,
-      latency: 6.4,
-      passed: 5,
-      score: 87,
-      retries: 1,
-      tools: 3,
-      providerName: "Google",
-      verdict: "优先级和键盘通过，小数精度断言失败一次。",
-      trace: [
-        ["00.0s", "Prompt packed", "要求输出单文件实现和测试可运行。"],
-        ["01.1s", "Code drafted", "实现速度快，但直接使用浮点相加。"],
-        ["05.8s", "Tests executed", "小数精度失败，重试后仍保留轻微误差。"],
-      ],
-    },
-    "moonshotai/kimi-k2.6": {
-      input: 1245,
-      output: 2860,
-      cache: 0,
-      reasoning: 0,
-      latency: 9.7,
-      passed: 6,
-      score: 94,
-      retries: 0,
-      tools: 4,
-      providerName: "Moonshot AI",
-      verdict: "所有测试通过，生成了更完整的边界检查。",
-      trace: [
-        ["00.0s", "Prompt packed", "把测试和 UI 预期合并。"],
-        ["02.2s", "Code drafted", "生成较完整的 lexer 和 evaluator。"],
-        ["08.6s", "Tests executed", "6 个断言全部通过。"],
-      ],
-    },
-    "minimax/minimax-m2.7": {
-      input: 1122,
-      output: 2146,
-      cache: 0,
-      reasoning: 0,
-      latency: 4.8,
-      passed: 5,
-      score: 84,
-      retries: 1,
-      tools: 2,
-      providerName: "MiniMax",
-      verdict: "成本低、速度快，除零错误状态没有稳定复位。",
-      trace: [
-        ["00.0s", "Prompt packed", "规格裁剪到核心计算器能力。"],
-        ["00.9s", "Code drafted", "快速生成 UI 和基础计算逻辑。"],
-        ["04.1s", "Tests executed", "除零后继续输入的断言失败。"],
-      ],
-    },
-    "z-ai/glm-5.1": {
-      input: 1179,
-      output: 2380,
-      cache: 0,
-      reasoning: 0,
-      latency: 7.9,
-      passed: 5,
-      score: 86,
-      retries: 1,
-      tools: 3,
-      providerName: "Z.ai",
-      verdict: "主要功能通过，键盘 Backspace 分支遗漏。",
-      trace: [
-        ["00.0s", "Prompt packed", "任务和断言作为同一轮上下文。"],
-        ["01.6s", "Code drafted", "生成按钮路径完整，键盘路径少一个分支。"],
-        ["07.1s", "Tests executed", "Backspace 断言失败。"],
-      ],
-    },
-    "deepseek/deepseek-v4-pro": {
-      input: 1210,
-      output: 2575,
-      cache: 0,
-      reasoning: 0,
-      latency: 8.1,
-      passed: 6,
-      score: 94,
-      retries: 0,
-      tools: 3,
-      providerName: "DeepSeek",
-      verdict: "所有测试通过，成本优势非常明显。",
-      trace: [
-        ["00.0s", "Prompt packed", "保留完整测试输入和输出格式要求。"],
-        ["01.7s", "Code drafted", "生成表达式求值器和防错状态机。"],
-        ["07.3s", "Tests executed", "6 个断言全部通过。"],
-      ],
-    },
-    "deepseek/deepseek-v3.2": {
-      input: 1072,
-      output: 1810,
-      cache: 0,
-      reasoning: 0,
-      latency: 5.6,
-      passed: 4,
-      score: 73,
-      retries: 2,
-      tools: 2,
-      providerName: "DeepSeek",
-      verdict: "极低成本，但优先级和键盘输入都有失败。",
-      trace: [
-        ["00.0s", "Prompt packed", "压缩 prompt 以控制成本。"],
-        ["01.0s", "Code drafted", "使用简单 eval 替代安全 parser。"],
-        ["05.0s", "Tests executed", "优先级和键盘输入失败。"],
-      ],
-    },
-  },
-  calendar: {
-    "openai/gpt-5.5": {
-      input: 1652,
-      output: 4210,
-      cache: 0,
-      reasoning: 0,
-      latency: 12.4,
-      passed: 8,
-      score: 97,
-      retries: 0,
-      tools: 5,
-      providerName: "OpenAI",
-      verdict: "所有日历断言通过，事件状态和日期边界都稳定。",
-      trace: [
-        ["00.0s", "Prompt packed", "输入日期规则、事件状态和键盘断言。"],
-        ["03.8s", "Date engine", "生成 month matrix、recurrence、focus reducer。"],
-        ["11.3s", "Tests executed", "8 个断言全部通过。"],
-      ],
-    },
-    "anthropic/claude-opus-4.6": {
-      input: 1728,
-      output: 4900,
-      cache: 0,
-      reasoning: 0,
-      latency: 15.1,
-      passed: 8,
-      score: 96,
-      retries: 0,
-      tools: 6,
-      providerName: "Anthropic",
-      verdict: "所有断言通过，解释性命名最好，但输出最多。",
-      trace: [
-        ["00.0s", "Prompt packed", "保留所有日期边界条件。"],
-        ["04.4s", "State modeled", "拆出 day cell、event store、keyboard reducer。"],
-        ["14.0s", "Tests executed", "8 个断言全部通过。"],
-      ],
-    },
-    "anthropic/claude-sonnet-4.6": {
-      input: 1690,
-      output: 3860,
-      cache: 0,
-      reasoning: 0,
-      latency: 9.6,
-      passed: 7,
-      score: 90,
-      retries: 1,
-      tools: 4,
-      providerName: "Anthropic",
-      verdict: "基础日历通过，重复事件展开漏掉跨周终止条件。",
-      trace: [
-        ["00.0s", "Prompt packed", "任务规格和断言进入上下文。"],
-        ["02.2s", "Code drafted", "日期矩阵正确，重复事件较简化。"],
-        ["08.7s", "Tests executed", "weekly recurrence 断言失败。"],
-      ],
-    },
-    "google/gemini-3.1-pro-preview": {
-      input: 1608,
-      output: 3520,
-      cache: 0,
-      reasoning: 0,
-      latency: 8.7,
-      passed: 7,
-      score: 91,
-      retries: 1,
-      tools: 4,
-      providerName: "Google",
-      verdict: "日期网格正确，删除事件后残留一个 UI 状态。",
-      trace: [
-        ["00.0s", "Prompt packed", "日历矩阵和事件 CRUD 一次性输入。"],
-        ["01.9s", "Code drafted", "快速生成 month grid 和 event map。"],
-        ["07.8s", "Tests executed", "删除事件断言失败。"],
-      ],
-    },
-    "moonshotai/kimi-k2.6": {
-      input: 1815,
-      output: 4670,
-      cache: 0,
-      reasoning: 0,
-      latency: 13.7,
-      passed: 8,
-      score: 95,
-      retries: 0,
-      tools: 6,
-      providerName: "Moonshot AI",
-      verdict: "所有断言通过，状态组织完整，成本低于欧美旗舰。",
-      trace: [
-        ["00.0s", "Prompt packed", "保留完整断言和 UI 目标。"],
-        ["03.7s", "Date engine", "生成可测 date helpers 和 event reducer。"],
-        ["12.5s", "Tests executed", "8 个断言全部通过。"],
-      ],
-    },
-    "minimax/minimax-m2.7": {
-      input: 1575,
-      output: 3340,
-      cache: 0,
-      reasoning: 0,
-      latency: 6.2,
-      passed: 6,
-      score: 82,
-      retries: 2,
-      tools: 3,
-      providerName: "MiniMax",
-      verdict: "很便宜，跨月补位和重复事件不稳定。",
-      trace: [
-        ["00.0s", "Prompt packed", "压缩任务描述以减少输入 token。"],
-        ["01.2s", "Code drafted", "生成基础月视图和事件渲染。"],
-        ["05.5s", "Tests executed", "跨月补位、重复事件失败。"],
-      ],
-    },
-    "z-ai/glm-5.1": {
-      input: 1630,
-      output: 3975,
-      cache: 0,
-      reasoning: 0,
-      latency: 10.2,
-      passed: 7,
-      score: 89,
-      retries: 1,
-      tools: 4,
-      providerName: "Z.ai",
-      verdict: "大部分通过，键盘焦点移动边界有偏差。",
-      trace: [
-        ["00.0s", "Prompt packed", "日期边界和键盘断言写入上下文。"],
-        ["02.8s", "Code drafted", "month matrix 正确，focus reducer 少边界。"],
-        ["09.3s", "Tests executed", "arrow navigation 断言失败。"],
-      ],
-    },
-    "deepseek/deepseek-v4-pro": {
-      input: 1780,
-      output: 4280,
-      cache: 0,
-      reasoning: 0,
-      latency: 11.5,
-      passed: 8,
-      score: 94,
-      retries: 0,
-      tools: 5,
-      providerName: "DeepSeek",
-      verdict: "所有断言通过，综合成本最低。",
-      trace: [
-        ["00.0s", "Prompt packed", "保留完整测试矩阵。"],
-        ["03.1s", "Date engine", "生成 month matrix、event reducer、keyboard handler。"],
-        ["10.4s", "Tests executed", "8 个断言全部通过。"],
-      ],
-    },
-    "deepseek/deepseek-v3.2": {
-      input: 1505,
-      output: 2940,
-      cache: 0,
-      reasoning: 0,
-      latency: 7.4,
-      passed: 5,
-      score: 74,
-      retries: 2,
-      tools: 3,
-      providerName: "DeepSeek",
-      verdict: "成本最低，但日期边界和重复事件失败较多。",
-      trace: [
-        ["00.0s", "Prompt packed", "规格压缩，保留核心日期断言。"],
-        ["01.6s", "Code drafted", "基础月视图可用，复杂状态缺失。"],
-        ["06.8s", "Tests executed", "闰年、重复事件、键盘边界失败。"],
-      ],
-    },
-  },
+  calculator: {},
+  calendar: {},
 };
 
 let state = {
   task: "calculator",
-  selectedModelId: "deepseek/deepseek-v4-pro",
+  selectedModelId: "",
+  selectedTask: "",
   fx: fxDefault,
+  sort: "model",
+  filterArtifact: false,
+  filterComplete: false,
 };
 
 let generatedDataset = null;
+let html2CanvasLoader = null;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -465,23 +133,6 @@ function escapeAttr(value) {
   return escapeHtml(value).replaceAll("`", "&#096;");
 }
 
-function costFor(model, run) {
-  if (Number.isFinite(run.totalCost)) return run.totalCost;
-  const input = (run.input / 1_000_000) * model.pricing.input;
-  const output = (run.output / 1_000_000) * model.pricing.output;
-  const cache = (run.cache / 1_000_000) * (model.pricing.cache || 0);
-  const reasoning = (run.reasoning / 1_000_000) * (model.pricing.reasoning || 0);
-  return input + output + cache + reasoning;
-}
-
-function runFor(model) {
-  return runs[state.task]?.[model.id];
-}
-
-function formatUsdUnit(value) {
-  return `$${Number(value).toLocaleString("en-US", { maximumFractionDigits: 4 })}`;
-}
-
 function formatCny(value) {
   if (value > 0 && value < 0.01) return "< ¥0.01";
   return `¥${Number(value || 0).toLocaleString("zh-CN", {
@@ -491,342 +142,504 @@ function formatCny(value) {
 }
 
 function formatTokens(value) {
-  return new Intl.NumberFormat("en-US").format(value);
+  return new Intl.NumberFormat("en-US").format(value || 0);
 }
 
-function taskName(taskId = state.task) {
-  return taskId === "calendar" ? "日历" : "计算器";
+function formatLatency(value) {
+  return Number.isFinite(value) && value > 0 ? `${value.toFixed(1)}s` : "-";
 }
 
-function taskPageTitle(taskId = state.task) {
-  return `${taskName(taskId)}页面`;
+function formatUsdUnit(value) {
+  return `$${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 4 })}`;
 }
 
-function taskCompareTitle(taskId = state.task) {
-  return `${taskName(taskId)}对比`;
+function safeSlug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-")
+    .slice(0, 70) || "item";
 }
 
-function taskPromptSummary(taskId = state.task) {
-  return taskId === "calendar"
-    ? "要求模型生成一个能直接使用的网页日历。"
-    : "要求模型生成一个能直接使用的网页计算器。";
+function filenameForEntry(entry) {
+  const model = safeSlug(entry?.model?.id || "model");
+  const task = safeSlug(entry?.task?.title || entry?.taskId || "task");
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:.]/g, "-");
+  return `or-bench-${task}-${model}-${ts}.png`;
 }
 
-function taskCheckBadge(taskId = state.task) {
+function formatExportMeta(entry) {
+  if (!entry) return [];
+
+  const taskName = entry.task?.title || entry.taskId || "未知任务";
+  const modelName = entry.model?.name || entry.model?.id || "未知模型";
+  const passed = Number.isFinite(entry.passed) ? entry.passed : 0;
+  const total = Number.isFinite(entry.task?.tests?.length) ? entry.task.tests.length : 0;
+  const tokens = formatTokens(entry.totalTokens || 0);
+  const cost = formatCny((entry.cost || 0) * state.fx);
+  const latency = formatLatency(entry.run?.latency);
+
+  return [
+    `模型：${modelName}`,
+    `任务：${taskName}`,
+    `通过率：${passed}/${total}`,
+    `Token：${tokens}`,
+    `成本：${cost}`,
+    `耗时：${latency}`,
+  ];
+}
+
+function createExportFrameWrapper(entry, cardElement) {
+  const frame = document.createElement("article");
+  frame.className = "export-card-frame";
+  frame.setAttribute("aria-hidden", "true");
+
+  frame.style.background = "linear-gradient(180deg, #151e1d 0%, #0a100f 100%)";
+  frame.style.padding = "16px";
+  frame.style.borderRadius = "18px";
+  frame.style.border = "1px solid rgba(255,255,255,0.17)";
+  frame.style.boxShadow = "0 16px 38px rgba(0, 0, 0, 0.4)";
+  frame.style.width = "min-content";
+  frame.style.maxWidth = "100%";
+  frame.style.boxSizing = "border-box";
+  frame.style.color = "#f1eadb";
+  frame.style.fontFamily = `"Georgia", "Times New Roman", serif`;
+  frame.style.fontSmooth = "antialiased";
+  frame.style.gap = "12px";
+
+  const header = document.createElement("header");
+  header.style.cssText = "display:flex; justify-content:space-between; gap:14px; align-items:flex-start; color:#f1eadb;";
+
+  const title = document.createElement("div");
+  const brand = document.createElement("div");
+  brand.textContent = "OpenRouter Bench Lab";
+  brand.style.cssText = "font-size:11px; letter-spacing:0.08em; color:#d2ed86; text-transform:uppercase; font-weight:700;";
+  title.appendChild(brand);
+
+  const main = document.createElement("h3");
+  main.textContent = entry?.model?.name || entry?.model?.id || "模型评测卡片";
+  main.style.cssText = "margin:2px 0 0; font-size:22px; line-height:1.2; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+  title.appendChild(main);
+
+  const sub = document.createElement("p");
+  sub.textContent = formatExportMeta(entry).join(" · ");
+  sub.style.cssText = "margin:8px 0 0; font-size:11px; line-height:1.45; color:#dcd0b8; max-width:360px; overflow-wrap:anywhere;";
+  title.appendChild(sub);
+
+  const time = document.createElement("div");
+  const ts = new Date().toLocaleString("zh-CN", { hour12: false });
+  time.textContent = ts;
+  time.style.cssText = "font-size:11px; color:#8f9c94; margin-top:4px; white-space:nowrap;";
+  header.appendChild(title);
+  header.appendChild(time);
+
+  const exportCard = cardElement;
+  exportCard.style.borderRadius = "10px";
+  exportCard.style.border = "1px solid rgba(255,255,255,0.1)";
+  exportCard.style.background = "rgba(8,9,6,0.95)";
+  exportCard.style.overflow = "hidden";
+  exportCard.style.width = "100%";
+
+  const footer = document.createElement("footer");
+  footer.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; gap:8px; font-size:11px; color:#8f9c94; margin-top:12px;";
+
+  const source = document.createElement("span");
+  source.textContent = "可在控制台导出与复盘";
+  const sig = document.createElement("span");
+  sig.textContent = "#OpenRouter #AI";
+
+  footer.appendChild(source);
+  footer.appendChild(sig);
+
+  frame.appendChild(header);
+  frame.appendChild(exportCard);
+  frame.appendChild(footer);
+
+  return frame;
+}
+
+function getModelById(modelId) {
+  return models.find((model) => model.id === modelId) || null;
+}
+
+function waitFrameReady(frame, timeoutMs = 5000) {
+  return new Promise((resolve) => {
+    if (!frame || !frame.contentDocument) {
+      resolve(false);
+      return;
+    }
+
+    if (frame.contentDocument.readyState === "complete") {
+      resolve(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      frame.removeEventListener("load", onLoad);
+      resolve(false);
+    }, timeoutMs);
+
+    const onLoad = () => {
+      clearTimeout(timer);
+      resolve(true);
+    };
+
+    frame.addEventListener("load", onLoad, { once: true });
+  });
+}
+
+function ensureHtml2Canvas() {
+  if (window.html2canvas) return Promise.resolve(window.html2canvas);
+  if (html2CanvasLoader) return html2CanvasLoader;
+
+  const sources = [
+    "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+    "https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js",
+  ];
+
+  html2CanvasLoader = new Promise((resolve, reject) => {
+    let cursor = 0;
+
+    const loadSource = () => {
+      if (cursor >= sources.length) {
+        reject(new Error("导出图片库加载失败"));
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = sources[cursor];
+      script.crossOrigin = "anonymous";
+
+      script.onload = () => {
+        if (window.html2canvas) {
+          resolve(window.html2canvas);
+          return;
+        }
+        cursor += 1;
+        loadSource();
+      };
+
+      script.onerror = () => {
+        cursor += 1;
+        loadSource();
+      };
+
+      document.head.appendChild(script);
+    };
+
+    loadSource();
+  });
+
+  return html2CanvasLoader;
+}
+
+async function captureIframeAsImage(frame, html2CanvasLib) {
+  if (!frame || !frame.contentDocument || !frame.contentDocument.body) return null;
+  await waitFrameReady(frame);
+
+  try {
+    const body = frame.contentDocument.body;
+    const canvas = await html2CanvasLib(body, {
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      scale: 2,
+      width: Math.max(1, body.scrollWidth || body.clientWidth || 360),
+      height: Math.max(1, body.scrollHeight || body.clientHeight || 640),
+    });
+    return canvas.toDataURL("image/png");
+  } catch {
+    return null;
+  }
+}
+
+async function buildExportableCardClone(cardElement, html2CanvasLib, entry) {
+  const clone = cardElement.cloneNode(true);
+  const sourceIframes = cardElement.querySelectorAll("iframe");
+  const clonedIframes = clone.querySelectorAll("iframe");
+
+  for (let i = 0; i < clonedIframes.length; i += 1) {
+    const source = sourceIframes[i];
+    const target = clonedIframes[i];
+    if (!source || !target) continue;
+
+    const srcImage = await captureIframeAsImage(source, html2CanvasLib);
+    if (!srcImage) {
+      target.parentElement?.removeChild(target);
+      continue;
+    }
+
+    const img = document.createElement("img");
+    img.src = srcImage;
+    img.alt = "Generated preview";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.display = "block";
+    img.style.objectFit = "cover";
+    img.style.background = "#fff";
+    target.replaceWith(img);
+  }
+
+  clone.querySelectorAll("[data-export-card]").forEach((button) => button.remove());
+
+  const actionRow = clone.querySelector(".result-actions, .task-cell-actions, .detail-actions");
+  if (actionRow) actionRow.style.display = "none";
+
+  const rect = cardElement.getBoundingClientRect();
+  if (rect.width > 0) {
+    clone.style.width = `${Math.ceil(rect.width)}px`;
+    clone.style.maxWidth = `${Math.ceil(rect.width)}px`;
+  }
+
+  const wrapped = createExportFrameWrapper(entry, clone);
+  return wrapped;
+}
+
+function downloadBlob(blob, filename) {
+  const blobUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = filename;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+}
+
+async function exportCardAsImage(button, cardElement, entry) {
+  if (!cardElement || !entry || !hasUsableArtifact(entry.run)) return;
+  const previousLabel = button.textContent || "导出图像";
+  button.disabled = true;
+  button.textContent = "导出中...";
+
+  try {
+    const html2CanvasLib = await ensureHtml2Canvas();
+    const cardClone = await buildExportableCardClone(cardElement, html2CanvasLib, entry);
+
+    const wrap = document.createElement("div");
+    wrap.style.position = "fixed";
+    wrap.style.left = "-10000px";
+    wrap.style.top = "0";
+    wrap.style.opacity = "0";
+    wrap.style.pointerEvents = "none";
+    wrap.dataset.exportTemp = "1";
+    wrap.appendChild(cardClone);
+    document.body.appendChild(wrap);
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const canvas = await html2CanvasLib(cardClone, {
+      backgroundColor: "#050706",
+      useCORS: true,
+      scale: 2,
+    });
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob((result) => {
+        if (result) resolve(result);
+        else reject(new Error("导出图片失败"));
+      }, "image/png");
+    });
+
+    wrap.remove();
+    downloadBlob(blob, filenameForEntry(entry));
+  } catch (error) {
+    window.alert(`导出失败：${error?.message || "请重试"}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = previousLabel;
+    const pendingWrap = document.querySelector('[data-export-temp="1"]');
+    if (pendingWrap?.parentElement) pendingWrap.parentElement.removeChild(pendingWrap);
+  }
+}
+
+function formatDataTime(value) {
+  if (!value) return "读取本地静态数据";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "读取本地静态数据";
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function costFor(model, run) {
+  if (Number.isFinite(run?.totalCost)) return run.totalCost;
+  const input = ((run?.input || 0) / 1_000_000) * (model.pricing.input || 0);
+  const output = ((run?.output || 0) / 1_000_000) * (model.pricing.output || 0);
+  const cache = ((run?.cache || 0) / 1_000_000) * (model.pricing.cache || 0);
+  const reasoning = ((run?.reasoning || 0) / 1_000_000) * (model.pricing.reasoning || 0);
+  return input + output + cache + reasoning;
+}
+
+function runForTask(model, taskId) {
+  if (!model || !taskId) return null;
+  return runs[taskId]?.[model.id] || null;
+}
+
+function resultEntry(model, taskId) {
   const task = tasks[taskId];
-  return `${task.tests.length} 项检查`;
+  const run = runForTask(model, taskId);
+  if (!model || !task || !run) return null;
+  const totalTokens = (run.input || 0) + (run.output || 0) + (run.cache || 0) + (run.reasoning || 0);
+  const cost = costFor(model, run);
+  const passed = Math.min(run.passed || 0, task.tests.length);
+  return {
+    model,
+    run,
+    task,
+    taskId,
+    totalTokens,
+    cost,
+    passed,
+    passRate: task.tests.length ? passed / task.tests.length : 0,
+  };
 }
 
-function usageLabel(value) {
-  return `${formatTokens(value)} 用量`;
+function taskIdsWithResults() {
+  return Object.keys(tasks).filter((taskId) => Object.keys(runs[taskId] || {}).length);
+}
+
+function taskIdsForView() {
+  const ids = taskIdsWithResults();
+  return ids.includes(state.task) ? [state.task] : [];
+}
+
+function hasUsableArtifact(run) {
+  return Boolean(run?.artifactPath && (run.responseKind || "content") === "content");
 }
 
 function responseKindText(value) {
   return {
-    content: "正常返回",
-    reasoning_only: "未返回页面",
+    content: "页面已生成",
+    reasoning_only: "仅返回推理",
+    error: "调用失败",
     empty: "无内容",
     fixture: "示例数据",
   }[value] || "已记录";
 }
 
-function runVerdict(entry) {
-  if (!entry) return "这个组合还没有结果。";
-  if (entry.passed === entry.task.tests.length) {
-    return "已通过本页的全部功能检查，可以直接试用。";
-  }
-  return `通过 ${entry.passed}/${entry.task.tests.length} 项功能检查，下面可以看到具体未通过项。`;
+function friendlyFailureText(run) {
+  const verdict = String(run?.verdict || "");
+  if (/not available in your region/i.test(verdict)) return "当前账号或地区暂时无法调用该模型。";
+  if (/Unexpected end of JSON input/i.test(verdict)) return "本次调用没有拿到完整结果。";
+  if (/调用失败/.test(verdict)) return "本次调用失败。";
+  return "这次没有可直接体验的页面。";
 }
 
 function testDescription(taskId, name, fallback = "") {
   const descriptions = {
     calculator: {
-      可发现控件: "页面上能看到数字、运算符和结果区域。",
-      清除和退格: "清除和退格操作能正常恢复输入。",
-      基础四则运算: "加、减、乘、除都能得到正确结果。",
-      运算优先级: "混合运算会按常规优先级计算。",
-      小数精度: "小数相加不会出现明显精度问题。",
-      错误状态: "除以 0 等异常会给出明确反馈。",
-      键盘输入: "使用键盘也能完成计算。",
+      可发现控件: "数字、运算符和结果区域清楚可见。",
+      清除和退格: "清除与退格操作符合预期。",
+      基础四则运算: "加、减、乘、除结果正确。",
+      运算优先级: "混合运算遵循常规优先级。",
+      小数精度: "小数计算没有明显精度异常。",
+      错误状态: "除以 0 等异常有明确反馈。",
+      键盘输入: "键盘输入能够完成核心计算。",
     },
     calendar: {
-      可发现控件: "页面上能看到月份切换和日期网格。",
-      月份标题: "当前月份和年份清楚可见。",
-      星期表头: "星期信息完整显示。",
-      日期网格: "一个月的日期排列完整。",
-      月份切换: "上个月、下个月可以正常切换。",
-      日期选择: "点击日期后能看到选中状态。",
-      键盘或焦点: "键盘或焦点状态可用，方便连续操作。",
+      可发现控件: "月份切换和日期网格清楚可见。",
+      月份标题: "当前月份与年份表达明确。",
+      星期表头: "星期表头完整展示。",
+      日期网格: "日期排列覆盖完整月份。",
+      月份切换: "上月、下月导航能够改变视图。",
+      日期选择: "点击日期后有清晰选中状态。",
+      键盘或焦点: "焦点或键盘操作具备基本可用性。",
     },
   };
-  return descriptions[taskId]?.[name] || fallback || "已完成这一项功能检查。";
+  return descriptions[taskId]?.[name] || fallback || "该项功能检查已完成。";
 }
 
 function traceTitleText(title) {
   return {
-    "OpenRouter request": "提交任务",
-    "Artifact generated": "页面返回",
-    "Repair attempt": "修复后返回",
+    "OpenRouter request": "提交请求",
+    "Artifact generated": "页面生成",
+    "Repair attempt": "修复尝试",
     "Final tests": "检查完成",
     "Run failed": "运行失败",
     "Repair failed": "修复失败",
     "Generation failed": "生成失败",
-    "Prompt packed": "提交任务",
-    "Code drafted": "页面返回",
+    "Prompt packed": "整理请求",
+    "Code drafted": "页面生成",
     "Tests executed": "检查完成",
-    "Date engine": "日历能力",
-    "State modeled": "交互状态",
-    "Implementation split": "页面实现",
+    "Date engine": "日历逻辑",
+    "State modeled": "状态建模",
+    "Implementation split": "实现拆分",
   }[title] || title;
 }
 
-function traceBodyText(title, body, run, task) {
-  const passed = Math.min(run?.passed || 0, task?.tests?.length || 0);
-  const total = task?.tests?.length || 0;
+function traceBodyText(title, body, entry) {
+  const passed = entry?.passed || 0;
+  const total = entry?.task?.tests?.length || 0;
   return {
-    "OpenRouter request": "已把当前任务发给所选模型。",
-    "Artifact generated": "模型返回了页面，随后进入功能检查。",
-    "Repair attempt": "根据未通过项重新生成后，再次检查页面。",
+    "OpenRouter request": "任务已提交，等待模型返回页面。",
+    "Artifact generated": "模型返回页面，开始进入功能检查。",
+    "Repair attempt": "根据未通过项发起修复，并再次检查页面。",
     "Final tests": `最终通过 ${passed}/${total} 项功能检查。`,
-    "Run failed": "这次没有拿到可展示的页面结果。",
-    "Repair failed": "修复轮没有拿到更好的页面结果。",
+    "Run failed": "本次没有拿到可展示页面。",
+    "Repair failed": "修复轮没有获得更好的页面结果。",
     "Generation failed": "模型没有返回可用页面。",
-    "Prompt packed": "已把当前任务发给所选模型。",
-    "Code drafted": "模型返回了页面，随后进入功能检查。",
+    "Prompt packed": "请求已整理并提交给模型。",
+    "Code drafted": "模型返回页面，开始进入功能检查。",
     "Tests executed": `最终通过 ${passed}/${total} 项功能检查。`,
-    "Date engine": "日历相关能力已进入检查。",
-    "State modeled": "页面交互状态已进入检查。",
-    "Implementation split": "页面结构和交互已进入检查。",
   }[title] || body;
 }
 
-function taskModels() {
-  return models
-    .map((model) => {
-    const run = runFor(model);
-    if (!run) return null;
-    const task = tasks[state.task];
-    const cost = costFor(model, run);
-    const totalTokens = (run.input || 0) + (run.output || 0) + (run.cache || 0) + (run.reasoning || 0);
-    const passed = Math.min(run.passed || 0, task.tests.length);
-    const passRate = passed / task.tests.length;
-    const value = Math.round((run.score * passRate) / Math.max(cost * 1000, 0.1));
-    return { model, run, task, cost, totalTokens, passed, passRate, value };
-    })
-    .filter(Boolean);
+function aggregateModel(model, taskIds) {
+  const entries = taskIds.map((taskId) => resultEntry(model, taskId));
+  const available = entries.filter(Boolean);
+  const totalChecks = available.reduce((sum, entry) => sum + entry.task.tests.length, 0);
+  const passed = available.reduce((sum, entry) => sum + entry.passed, 0);
+  const totalCost = available.reduce((sum, entry) => sum + entry.cost, 0);
+  const totalTokens = available.reduce((sum, entry) => sum + entry.totalTokens, 0);
+  const latencies = available.map((entry) => entry.run.latency).filter((latency) => Number.isFinite(latency) && latency > 0);
+  const totalLatency = latencies.reduce((sum, latency) => sum + latency, 0);
+  const hasArtifact = available.some((entry) => hasUsableArtifact(entry.run));
+  const isComplete = available.length === taskIds.length && available.every((entry) => entry.passed === entry.task.tests.length);
+
+  return {
+    model,
+    entries,
+    available,
+    totalChecks,
+    passed,
+    totalCost,
+    totalTokens,
+    totalLatency,
+    hasArtifact,
+    isComplete,
+  };
 }
 
-function preferredTaskEntry() {
-  const entries = taskModels();
-  return entries.find((entry) => entry.run?.artifactPath) || entries[0] || null;
-}
+function filteredGroups(taskIds) {
+  const groups = models
+    .map((model) => aggregateModel(model, taskIds))
+    .filter((group) => group.available.length);
 
-function selectedEntry() {
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const run = model ? runFor(model) : null;
-  if (!model || !run) return null;
-  const task = tasks[state.task];
-  const cost = costFor(model, run);
-  const totalTokens = (run.input || 0) + (run.output || 0) + (run.cache || 0) + (run.reasoning || 0);
-  const passed = Math.min(run.passed || 0, task.tests.length);
-  const passRate = passed / task.tests.length;
-  return { model, run, task, cost, totalTokens, passed, passRate };
-}
-
-function ensureSelectedModel() {
-  if (selectedEntry()) return;
-  const fallback = preferredTaskEntry();
-  if (fallback) state.selectedModelId = fallback.model.id;
-}
-
-function updateModelSelector() {
-  const entries = taskModels();
-  if (!entries.length) {
-    $("#model-selector").innerHTML = '<p class="selector-empty">当前任务还没有模型结果。</p>';
-    return;
-  }
-
-  $("#model-selector").innerHTML = entries
-    .map(({ model, run, task, cost, totalTokens, passed }) => {
-      const selected = model.id === state.selectedModelId ? " is-selected" : "";
-      const complete = passed === task.tests.length;
-      const demoState = run.artifactPath ? "可试用" : "仅有记录";
-      return `
-        <button class="model-choice${selected}" data-model="${escapeAttr(model.id)}" type="button" style="--accent:${model.accent}">
-          <span class="choice-provider">${escapeHtml(model.provider)}</span>
-          <strong>${escapeHtml(model.name)}</strong>
-          <span class="choice-id">${escapeHtml(model.id)}</span>
-          <span class="choice-meta">
-            <span class="${complete ? "is-complete" : ""}">${passed}/${task.tests.length} 通过</span>
-            <span>${formatCny(cost * state.fx)}</span>
-            <span>${run.latency.toFixed(1)}s</span>
-            <span>${usageLabel(totalTokens)}</span>
-          </span>
-          <span class="choice-demo">${demoState}</span>
-        </button>
-      `;
-    })
-    .join("");
-
-  $$(".model-choice").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.selectedModelId = button.dataset.model;
-      render();
-    });
+  const filtered = groups.filter((group) => {
+    if (state.filterArtifact && !group.hasArtifact) return false;
+    if (state.filterComplete && !group.isComplete) return false;
+    return true;
   });
+
+  const sorter = {
+    model: (a, b) => models.indexOf(a.model) - models.indexOf(b.model),
+    cost: (a, b) => a.totalCost - b.totalCost,
+    tokens: (a, b) => a.totalTokens - b.totalTokens,
+    latency: (a, b) => a.totalLatency - b.totalLatency,
+    passed: (a, b) => b.passed - a.passed || b.totalChecks - a.totalChecks,
+  }[state.sort] || ((a, b) => models.indexOf(a.model) - models.indexOf(b.model));
+
+  return filtered.sort(sorter);
 }
 
-function updateFlowReadout() {
-  const entry = selectedEntry();
-  if (!entry) {
-    $("#flow-current").textContent = "暂无结果";
-    $("#flow-current-detail").textContent = "请选择有结果的模型版本";
-    return;
-  }
-  $("#flow-current").textContent = `${entry.model.name} × ${taskName()}`;
-  $("#flow-current-detail").textContent = `${entry.passed}/${entry.task.tests.length} 通过 · ${formatCny(entry.cost * state.fx)} · ${entry.run.latency.toFixed(1)}s`;
-}
-
-function updateSummary() {
-  const entries = taskModels();
-  if (!entries.length) {
-    $("#metric-cheapest").textContent = "-";
-    $("#metric-cheapest-detail").textContent = "还没有可比较结果";
-    $("#metric-best").textContent = "-";
-    $("#metric-best-detail").textContent = "有结果后显示";
-    $("#metric-fastest").textContent = "-";
-    $("#metric-fastest-detail").textContent = "暂无通过全部检查的模型";
-    $("#metric-spread").textContent = "-";
-    $("#metric-spread-detail").textContent = "暂无成本记录";
-    return;
-  }
-  const green = entries.filter((entry) => entry.passRate === 1);
-  const cheapest = green.reduce((best, entry) => (!best || entry.cost < best.cost ? entry : best), null);
-  const best = entries.reduce((top, entry) => (entry.run.score > top.run.score ? entry : top), entries[0]);
-  const fastest = green.reduce((top, entry) => (!top || entry.run.latency < top.run.latency ? entry : top), null);
-  const costs = entries.map((entry) => entry.cost).filter((cost) => cost > 0);
-  const min = costs.length ? Math.min(...costs) : 0;
-  const max = costs.length ? Math.max(...costs) : 0;
-
-  $("#metric-cheapest").textContent = cheapest ? formatCny(cheapest.cost * state.fx) : "暂无全通过";
-  $("#metric-cheapest-detail").textContent = cheapest
-    ? `${cheapest.model.name} · ${usageLabel(cheapest.totalTokens)}`
-    : "还没有模型通过全部检查";
-  $("#metric-best").textContent = `${best.run.score}/100`;
-  $("#metric-best-detail").textContent = `${best.model.name} · ${best.passed}/${best.task.tests.length} 项测试`;
-  $("#metric-fastest").textContent = fastest ? `${fastest.run.latency.toFixed(1)}s` : "-";
-  $("#metric-fastest-detail").textContent = fastest ? `${fastest.model.name} · 全部通过` : "暂无通过全部检查的模型";
-  $("#metric-spread").textContent = min ? `${(max / min).toFixed(1)}×` : "-";
-  $("#metric-spread-detail").textContent = min
-    ? `${formatCny(min * state.fx)} → ${formatCny(max * state.fx)}`
-    : "暂无成本记录";
-}
-
-function updateRows() {
-  const maxValue = Math.max(1, ...taskModels().map((entry) => entry.value));
-  $("#model-rows").innerHTML = taskModels()
-    .map(({ model, run, task, cost, totalTokens, passed, passRate, value }) => {
-      const selected = model.id === state.selectedModelId ? " is-selected" : "";
-      const dots = task.tests
-        .map((_, index) => `<span class="test-dot ${index < passed ? "pass" : "fail"}"></span>`)
-        .join("");
-      const valueWidth = Math.max(4, Math.round((value / maxValue) * 100));
-
-      return `
-        <tr class="model-row${selected}" data-model="${model.id}" style="--accent: ${model.accent}">
-          <td>
-            <div class="model-cell">
-              <span class="model-dot"></span>
-              <span>
-                <span class="model-name">${model.name}</span>
-                <span class="model-id">${model.id}</span>
-              </span>
-            </div>
-          </td>
-          <td>
-            <span class="test-dots">${dots}</span>
-            <span class="latency-sub">${passed}/${task.tests.length}</span>
-          </td>
-          <td>
-            <span class="token-pair">
-              <strong>${usageLabel(totalTokens)}</strong>
-              <small>输入 ${formatTokens(run.input)} · 输出 ${formatTokens(run.output)}</small>
-            </span>
-          </td>
-          <td>
-            <span class="money-pair">
-              <strong>${formatCny(cost * state.fx)}</strong>
-              <small>按当前汇率折算</small>
-            </span>
-          </td>
-          <td>
-            <span class="money-pair">
-              <strong>${formatUsdUnit(model.pricing.input)} / ${formatUsdUnit(model.pricing.output)}</strong>
-              <small>输入 / 输出 · 每百万用量</small>
-            </span>
-          </td>
-          <td>
-            <strong>${run.latency.toFixed(1)}s</strong>
-            <div class="latency-sub">${run.retries} 次修复</div>
-          </td>
-          <td>
-            <div class="value-bar" style="--value: ${valueWidth}%"><span></span></div>
-            <span class="latency-sub">${Math.round(passRate * 100)}% 通过</span>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
-
-  $$(".model-row").forEach((row) => {
-    row.addEventListener("click", () => {
-      state.selectedModelId = row.dataset.model;
-      render();
-    });
-  });
-}
-
-function updateDetail() {
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const run = runFor(model);
-  if (!model || !run) {
-    $("#selected-provider").textContent = "暂无数据";
-    $("#selected-name").textContent = "还没跑这个组合";
-    $("#selected-verdict").textContent = "这个模型在当前任务下还没有结果。";
-    $("#detail-tokens").textContent = "-";
-    $("#detail-cost-pass").textContent = "-";
-    $("#detail-retries").textContent = "-";
-    $("#detail-tools").textContent = "-";
-    $("#usage-json").innerHTML = `
-      <div class="usage-empty">
-        <strong>暂无结果</strong>
-        <span>请选择已有结果的模型，或重新运行这一组合。</span>
-      </div>
-    `;
-    return;
-  }
-  const task = tasks[state.task];
-  const cost = costFor(model, run);
-  const totalTokens = (run.input || 0) + (run.output || 0) + (run.cache || 0) + (run.reasoning || 0);
-  const passed = Math.min(run.passed || 0, task.tests.length);
-  const inputPct = totalTokens ? ((run.input || 0) / totalTokens) * 100 : 0;
-  const outputPct = totalTokens ? ((run.output || 0) / totalTokens) * 100 : 0;
-  const cachePct = totalTokens ? ((run.cache || 0) / totalTokens) * 100 : 0;
-
-  $("#selected-provider").textContent = `${model.provider} · 当前选择`;
-  $("#selected-name").textContent = model.name;
-  $("#selected-verdict").textContent = runVerdict({ model, run, task, cost, totalTokens, passed, passRate: passed / task.tests.length });
-  $("#stack-input").style.setProperty("--input", `${inputPct}%`);
-  $("#stack-output").style.setProperty("--output", `${outputPct}%`);
-  $("#stack-cache").style.setProperty("--cache", `${cachePct}%`);
-  $("#detail-tokens").textContent = usageLabel(totalTokens);
-  $("#detail-cost-pass").textContent = passed ? formatCny((cost * state.fx) / passed) : "-";
-  $("#detail-retries").textContent = run.retries;
-  $("#detail-tools").textContent = run.tools;
-  $("#pass-rate-chip").textContent = `${passed}/${task.tests.length} 通过`;
-
-  const usage = {
+function usagePayload(entry) {
+  const { model, run, task, cost } = entry;
+  return {
     model: model.id,
+    task: task.title,
     provider_name: run.providerName,
     generation_id: run.generationId || null,
     input_tokens: run.input || 0,
@@ -841,7 +654,7 @@ function updateDetail() {
       cache_read: model.pricing.cache || 0,
       reasoning: model.pricing.reasoning || 0,
     },
-    latency_ms: Math.round(run.latency * 1000),
+    latency_ms: Math.round((run.latency || 0) * 1000),
     page_path: run.artifactPath || null,
     record_path: run.rawRunPath || null,
     attempts: Array.isArray(run.attempts) ? run.attempts.length : (run.retries || 0) + 1,
@@ -851,269 +664,488 @@ function updateDetail() {
     reasoning_length: run.reasoningLength || 0,
     request_config: run.requestConfig || null,
   };
-  $("#usage-json").innerHTML = `
-    <div class="usage-lines">
-      <div><span>模型</span><strong>${escapeHtml(model.name)}</strong></div>
-      <div><span>任务</span><strong>${escapeHtml(task.title.replace("任务", ""))}</strong></div>
-      <div><span>测试</span><strong>${passed}/${task.tests.length} 通过</strong></div>
-      <div><span>成本</span><strong>${formatCny(cost * state.fx)}</strong></div>
-      <div><span>耗时</span><strong>${run.latency.toFixed(1)}s</strong></div>
-      <div><span>返回状态</span><strong>${escapeHtml(responseKindText(run.responseKind || "fixture"))}</strong></div>
-    </div>
-    <details class="usage-raw">
-      <summary>查看技术字段</summary>
-      <pre>${escapeHtml(JSON.stringify(usage, null, 2))}</pre>
-    </details>
-  `;
 }
 
-function updatePromptPanel() {
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const task = tasks[state.task];
-  $("#prompt-title").textContent = "发给模型的要求";
-  $("#prompt-chip").textContent = `${model ? `${model.name} · ` : ""}${taskName()}`;
-  $("#prompt-summary").textContent = taskPromptSummary();
-  $("#task-prompt").textContent = (task.prompt || "这个任务暂无要求记录。").trim();
+function caseDescription(taskId) {
+  return {
+    calculator: "网页计算器",
+    calendar: "网页日历",
+  }[taskId] || "网页案例";
 }
 
-function updateTests() {
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const run = runFor(model);
-  if (!model || !run) {
-    $("#test-list").innerHTML = "";
-    $("#pass-rate-chip").textContent = "暂无数据";
-    return;
-  }
-  const task = tasks[state.task];
-  const testRows = Array.isArray(run.testResults) && run.testResults.length
-    ? run.testResults.slice(0, task.tests.length).map((test) => [test.name, testDescription(state.task, test.name, test.assertion || test.message || ""), Boolean(test.passed)])
-    : task.tests.map(([name, assertion], index) => [name, testDescription(state.task, name, assertion), index < Math.min(run.passed || 0, task.tests.length)]);
-
-  $("#test-list").innerHTML = testRows
-    .map(([name, assertion, passed]) => {
+function renderCaseList() {
+  const ids = Object.keys(tasks);
+  $("#case-count").textContent = `${ids.length} 个案例`;
+  $("#case-list").innerHTML = ids
+    .map((taskId) => {
+      const task = tasks[taskId];
+      const active = state.task === taskId ? " is-active" : "";
+      const resultCount = Object.keys(runs[taskId] || {}).length;
       return `
-        <div class="test-item">
-          <span class="test-state ${passed ? "" : "fail"}"></span>
-          <span>
-            <strong>${escapeHtml(name)}</strong>
-            <small>${escapeHtml(assertion)}</small>
-          </span>
-          <code>${passed ? "通过" : "未过"}</code>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-function updateScatter() {
-  const entries = taskModels();
-  if (!entries.length) {
-    $("#scatter").innerHTML = "";
-    return;
-  }
-  const maxCost = Math.max(...entries.map((entry) => entry.cost));
-  const minCost = Math.min(...entries.map((entry) => entry.cost));
-  $("#scatter").innerHTML = entries
-    .map(({ model, run, cost }) => {
-      const x = ((cost - minCost) / Math.max(maxCost - minCost, 0.000001)) * 86 + 7;
-      const y = (run.score / 100) * 82 + 8;
-      const selected = model.id === state.selectedModelId ? " is-selected" : "";
-      return `
-        <button
-          class="scatter-point${selected}"
-          data-model="${model.id}"
-          type="button"
-          aria-label="${model.name}"
-          style="--x:${x}%; --y:${y}%; --accent:${model.accent}"
-        >
-          <span class="scatter-label">${model.name}</span>
+        <button class="case-card${active}" type="button" data-case="${escapeAttr(taskId)}">
+          <span>${escapeHtml(caseDescription(taskId))}</span>
+          <strong>${escapeHtml(task.title)}</strong>
+          <small>${resultCount} 个模型结果 · ${task.tests.length} 项检查</small>
         </button>
       `;
     })
     .join("");
-
-  $$(".scatter-point").forEach((point) => {
-    point.addEventListener("click", () => {
-      state.selectedModelId = point.dataset.model;
-      render();
-    });
-  });
 }
 
-function renderCalculator() {
-  return `
-    <div class="calculator-demo">
-      <div class="calc-display">
-        <span class="calc-expression" id="calc-expression">18 ÷ 3 + 4 × 2</span>
-        <strong class="calc-result" id="calc-result">14</strong>
-      </div>
-      <div class="calc-grid">
-        ${["C", "±", "%", "÷", "7", "8", "9", "×", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "⌫", "="]
-          .map((key) => `<button type="button" data-calc="${key}">${key}</button>`)
-          .join("")}
-      </div>
-    </div>
-  `;
+function renderCaseContext() {
+  const task = tasks[state.task] || Object.values(tasks)[0];
+  $("#active-case-title").textContent = task?.title || "案例";
+  $("#active-case-prompt").textContent = task?.prompt ? `这次给所有模型的需求：${task.prompt}` : "这个案例还没有需求记录。";
+  $("#active-case-checks").textContent = task ? `${task.tests.length} 项检查` : "-";
+  $("#active-case-summary").textContent = task ? `${task.title} · ${Object.keys(runs[state.task] || {}).length} 个模型结果` : "等待结果";
 }
 
-function renderCalendar() {
-  const days = [
-    ["29", "muted"], ["30", "muted"], ["31", "muted"], ["1", ""], ["2", ""], ["3", ""], ["4", ""],
-    ["5", ""], ["6", ""], ["7", ""], ["8", ""], ["9", ""], ["10", ""], ["11", ""],
-    ["12", ""], ["13", ""], ["14", ""], ["15", "today"], ["16", ""], ["17", ""], ["18", ""],
-    ["19", ""], ["20", ""], ["21", ""], ["22", ""], ["23", ""], ["24", ""], ["25", ""],
-    ["26", ""], ["27", ""], ["28", ""], ["29", ""], ["30", ""], ["1", "muted"], ["2", "muted"],
-  ];
-  return `
-    <div class="calendar-demo">
-      <div class="calendar-head">
-        <h3>2026 年 4 月</h3>
-        <span>北京时间</span>
-      </div>
-      <div class="week-grid">
-        ${["日", "一", "二", "三", "四", "五", "六"].map((day) => `<span>${day}</span>`).join("")}
-      </div>
-      <div class="day-grid">
-        ${days
-          .map(([day, stateName]) => {
-            const event = day === "15" ? '<span class="event">评测</span>' : day === "23" ? '<span class="event">上线</span>' : "";
-            return `<div class="day ${stateName === "muted" ? "is-muted" : ""} ${stateName === "today" ? "is-today" : ""}">${day}${event}</div>`;
-          })
-          .join("")}
-      </div>
-    </div>
-  `;
+function renderPromptList() {
+  renderCaseList();
+  renderCaseContext();
 }
 
-function attachCalculator() {
-  let expression = "18 ÷ 3 + 4 × 2";
-  const expressionEl = $("#calc-expression");
-  const resultEl = $("#calc-result");
-  const safeEval = () => {
+function selectedCaseTitle() {
+  return tasks[state.task]?.title || "当前案例";
+}
+
+function refreshSocialShareLinks() {
+  const shareButton = $("#copy-share-link");
+  const tweetLink = $("#x-share-link");
+  const caseTitle = $("#active-case-title")?.textContent?.trim() || selectedCaseTitle();
+  const summary = $("#active-case-summary")?.textContent?.trim() || "";
+  const shareBaseText = `OpenRouter Bench Lab · 模型网页生成对比：${caseTitle}${summary ? `（${summary}）` : ""}`;
+  const pageUrl = window.location.href;
+  const shareText = `${shareBaseText} ${pageUrl}`;
+
+  if (tweetLink) {
+    const encoded = encodeURIComponent(shareText);
+    tweetLink.href = `https://x.com/intent/tweet?text=${encoded}&hashtags=OpenRouter,BenchLab,AIModel`;
+  }
+
+  if (shareButton) {
+    shareButton.dataset.shareUrl = pageUrl;
+  }
+}
+
+function bindShareActions() {
+  const copyButton = $("#copy-share-link");
+  if (!copyButton) return;
+
+  copyButton.addEventListener("click", async () => {
+    const url = copyButton.dataset.shareUrl || window.location.href;
+    const original = copyButton.textContent;
     try {
-      const normalized = expression.replaceAll("×", "*").replaceAll("÷", "/").replace(/[^0-9+\-*/.()% ]/g, "");
-      const value = Function(`"use strict"; return (${normalized})`)();
-      resultEl.textContent = Number.isFinite(value) ? Number(value.toFixed(8)).toString() : "Error";
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        copyButton.textContent = "已复制";
+      } else {
+        throw new Error("clipboard-unavailable");
+      }
     } catch {
-      resultEl.textContent = "Error";
+      window.prompt("复制失败，可手动复制链接：", url);
+      copyButton.textContent = "请手动复制";
     }
-  };
 
-  $$(".calc-grid button").forEach((button) => {
-    button.addEventListener("click", () => {
-      const key = button.dataset.calc;
-      if (key === "C") expression = "";
-      else if (key === "⌫") expression = expression.slice(0, -1);
-      else if (key === "=") safeEval();
-      else if (key === "±") expression = expression.startsWith("-") ? expression.slice(1) : `-${expression}`;
-      else expression += key;
-      expressionEl.textContent = expression || "0";
-      if (key !== "=") safeEval();
-    });
+    window.setTimeout(() => {
+      copyButton.textContent = original;
+    }, 1600);
   });
 }
 
-function updatePreview() {
-  const task = tasks[state.task];
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const run = model ? runFor(model) : null;
-  $("#preview-title").textContent = model ? `${model.name} · ${taskPageTitle()}` : taskPageTitle();
-  $("#artifact-chip").textContent = run?.artifactPath ? "可试用" : "示例预览";
-
-  if (run?.artifactPath) {
-    const filename = `${state.task}-${model.id.replace(/[^a-z0-9]+/gi, "-")}.html`;
-    $("#artifact-preview").innerHTML = `
-      <div class="artifact-frame-shell">
-        <iframe
-          class="artifact-frame"
-          sandbox="allow-scripts allow-forms allow-same-origin"
-          src="${escapeAttr(run.artifactPath)}"
-          title="${escapeAttr(`${model.name} ${taskPageTitle()}`)}"
-        ></iframe>
-        <div class="artifact-actions">
-          <a class="artifact-link" href="${escapeAttr(run.artifactPath)}" target="_blank" rel="noreferrer">
-            新窗口打开
-          </a>
-          <a class="artifact-link secondary" href="${escapeAttr(run.artifactPath)}" download="${escapeAttr(filename)}">
-            保存页面文件
-          </a>
+function renderTaskCell(entry, model, taskId) {
+  const task = tasks[taskId];
+  if (!entry) {
+    return `
+      <div class="task-cell is-empty">
+        <div class="task-preview empty">
+          <strong>${escapeHtml(task?.title || taskId)}</strong>
+          <span>暂无记录</span>
         </div>
+      </div>
+    `;
+  }
+
+  const ready = hasUsableArtifact(entry.run);
+  const selected = state.selectedModelId === model.id && state.selectedTask === taskId ? " is-selected" : "";
+  const status = ready ? "可体验" : responseKindText(entry.run.responseKind || "empty");
+  const preview = ready
+    ? `
+      <iframe
+        sandbox="allow-scripts allow-forms"
+        loading="eager"
+        src="${escapeAttr(entry.run.artifactPath)}"
+        title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
+      ></iframe>
+    `
+    : `
+      <div class="task-preview empty">
+        <strong>${escapeHtml(status)}</strong>
+        <span>${escapeHtml(friendlyFailureText(entry.run))}</span>
+      </div>
+    `;
+
+  return `
+    <article
+      class="task-cell${ready ? "" : " is-empty"}${selected}"
+      data-select-model="${escapeAttr(model.id)}"
+      data-select-task="${escapeAttr(taskId)}"
+      role="button"
+      tabindex="0"
+      aria-label="${escapeAttr(`${model.name} ${entry.task.title} ${entry.passed}/${entry.task.tests.length} 通过`)}"
+    >
+      <div class="task-preview">${preview}</div>
+      <div class="task-cell-meta">
+        <div>
+          <strong>${escapeHtml(entry.task.title)}</strong>
+          <span>${entry.passed}/${entry.task.tests.length} 通过</span>
+        </div>
+        <small>${escapeHtml(status)}</small>
+      </div>
+      <div class="task-cell-actions">
+        <button type="button" data-select-model="${escapeAttr(model.id)}" data-select-task="${escapeAttr(taskId)}">查看详情</button>
+        ${ready ? `<button
+          type="button"
+          class="artifact-link"
+          data-export-card
+          data-export-model="${escapeAttr(model.id)}"
+          data-export-task="${escapeAttr(taskId)}"
+        >导出图像</button>` : ""}
+        ${ready ? `<a href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer">打开页面</a>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function renderResultCard(group, taskId) {
+  const entry = group.entries[0];
+  const model = group.model;
+  const selected = model.id === state.selectedModelId && taskId === state.selectedTask ? " is-selected" : "";
+
+  if (!entry) {
+    return `
+      <article class="result-card is-empty" style="--accent:${model.accent}">
+        <div class="result-head">
+          <div>
+            <span>${escapeHtml(model.provider)}</span>
+            <strong>${escapeHtml(model.name)}</strong>
+            <small>${escapeHtml(model.id)}</small>
+          </div>
+        </div>
+        <div class="result-preview empty">
+          <strong>还没有结果</strong>
+          <span>这个模型还没有跑当前案例。</span>
+        </div>
+      </article>
+    `;
+  }
+
+  const ready = hasUsableArtifact(entry.run);
+  const status = ready ? "可预览" : responseKindText(entry.run.responseKind || "empty");
+  const preview = ready
+    ? `
+      <iframe
+        sandbox="allow-scripts allow-forms"
+        loading="eager"
+        src="${escapeAttr(entry.run.artifactPath)}"
+        title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
+      ></iframe>
+    `
+    : `
+      <div class="result-preview empty">
+        <strong>${escapeHtml(status)}</strong>
+        <span>${escapeHtml(friendlyFailureText(entry.run))}</span>
+      </div>
+    `;
+
+  return `
+    <article class="result-card${ready ? "" : " is-empty"}${selected}" style="--accent:${model.accent}">
+      <div class="result-head">
+        <div>
+          <span>${escapeHtml(model.provider)}</span>
+          <strong>${escapeHtml(model.name)}</strong>
+          <small>${escapeHtml(model.id)}</small>
+        </div>
+        <em>${entry.passed}/${entry.task.tests.length}</em>
+      </div>
+
+      <div class="result-preview">${preview}</div>
+
+      <dl class="result-metrics">
+        <div>
+          <dt>Token</dt>
+          <dd>${formatTokens(entry.totalTokens)}</dd>
+        </div>
+        <div>
+          <dt>成本</dt>
+          <dd>${formatCny(entry.cost * state.fx)}</dd>
+        </div>
+        <div>
+          <dt>耗时</dt>
+          <dd>${formatLatency(entry.run.latency)}</dd>
+        </div>
+        <div>
+          <dt>状态</dt>
+          <dd>${escapeHtml(status)}</dd>
+        </div>
+      </dl>
+
+      <div class="result-actions">
+        <button type="button" data-select-model="${escapeAttr(model.id)}" data-select-task="${escapeAttr(taskId)}">查看测试细节</button>
+        ${ready ? `
+          <button
+            type="button"
+            class="artifact-link"
+            data-export-card
+            data-export-model="${escapeAttr(model.id)}"
+            data-export-task="${escapeAttr(taskId)}"
+          >导出图像</button>
+        ` : ""}
+        ${ready ? `<a href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer">新窗口查看</a>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function renderDetail(entry) {
+  const ready = hasUsableArtifact(entry.run);
+  const filename = `${entry.taskId}-${entry.model.id.replace(/[^a-z0-9]+/gi, "-")}.html`;
+  const testRows = Array.isArray(entry.run.testResults) && entry.run.testResults.length
+    ? entry.run.testResults.slice(0, entry.task.tests.length).map((test) => [
+      test.name,
+      testDescription(entry.taskId, test.name, test.assertion || test.message || ""),
+      Boolean(test.passed),
+    ])
+    : entry.task.tests.map(([name, assertion], index) => [
+      name,
+      testDescription(entry.taskId, name, assertion),
+      index < entry.passed,
+    ]);
+
+  const preview = ready
+    ? `
+      <iframe
+        class="detail-frame"
+        sandbox="allow-scripts allow-forms"
+        src="${escapeAttr(entry.run.artifactPath)}"
+        title="${escapeAttr(`${entry.model.name} ${entry.task.title}完整页面`)}"
+      ></iframe>
+    `
+    : `
+      <div class="detail-empty">
+        <strong>暂无可体验页面</strong>
+        <p>${escapeHtml(friendlyFailureText(entry.run))}</p>
+      </div>
+    `;
+
+  return `
+    <section class="row-detail" aria-label="${escapeAttr(`${entry.model.name} ${entry.task.title}详情`)}">
+      <div class="detail-heading">
+        <div>
+          <p class="eyebrow">结果详情</p>
+          <h3>${escapeHtml(entry.model.name)} · ${escapeHtml(entry.task.title)}</h3>
+        </div>
+        <button class="detail-close" type="button" data-close-detail>收起</button>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-preview">${preview}</div>
+
+        <aside class="detail-side">
+          <div class="detail-metrics">
+            <div><span>功能检查</span><strong>${entry.passed}/${entry.task.tests.length}</strong></div>
+            <div><span>Token</span><strong>${formatTokens(entry.totalTokens)}</strong></div>
+            <div><span>成本</span><strong>${formatCny(entry.cost * state.fx)}</strong></div>
+            <div><span>耗时</span><strong>${formatLatency(entry.run.latency)}</strong></div>
+          </div>
+
+          <div class="test-list">
+            ${testRows.map(([name, description, passed]) => `
+              <div class="test-item">
+                <span class="test-state ${passed ? "" : "fail"}"></span>
+                <span>
+                  <strong>${escapeHtml(name)}</strong>
+                  <small>${escapeHtml(description)}</small>
+                </span>
+                <code>${passed ? "通过" : "未通过"}</code>
+              </div>
+            `).join("")}
+          </div>
+        </aside>
+      </div>
+
+      <div class="detail-actions">
+        ${ready ? `
+          <button
+            type="button"
+            class="artifact-link"
+            data-export-card
+            data-export-model="${escapeAttr(entry.model.id)}"
+            data-export-task="${escapeAttr(entry.taskId)}"
+          >下载卡片图像</button>
+          <a class="artifact-link" href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer">新窗口打开</a>
+          <a class="artifact-link secondary" href="${escapeAttr(entry.run.artifactPath)}" download="${escapeAttr(filename)}">下载 HTML</a>
+        ` : ""}
+      </div>
+
+      <details class="raw-record">
+        <summary>原始记录</summary>
+        <pre>${escapeHtml(JSON.stringify(usagePayload(entry), null, 2))}</pre>
+      </details>
+
+      <details class="raw-record">
+        <summary>调用与检查轨迹</summary>
+        <ol class="trace-list">
+          ${(entry.run.trace || []).map(([time, title, body]) => `
+            <li>
+              <time>${escapeHtml(time)}</time>
+              <span>
+                <strong>${escapeHtml(traceTitleText(title))}</strong>
+                <span>${escapeHtml(traceBodyText(title, body, entry))}</span>
+              </span>
+            </li>
+          `).join("") || "<li><span>没有运行记录。</span></li>"}
+        </ol>
+      </details>
+    </section>
+  `;
+}
+
+function renderMatrix() {
+  const taskIds = taskIdsForView();
+  const matrix = $("#comparison-matrix");
+  if (!taskIds.length) {
+    matrix.innerHTML = `
+      <div class="matrix-empty">
+        <strong>还没有结果</strong>
+        <span>跑完这个案例后，这里会显示每个模型生成的页面。</span>
+      </div>
+    `;
+    $("#matrix-summary").textContent = "暂无结果";
+    $("#active-case-summary").textContent = "等待结果";
+    return;
+  }
+
+  const groups = filteredGroups(taskIds);
+  const totalEntries = groups.reduce((sum, group) => sum + group.available.length, 0);
+  $("#active-case-summary").textContent = `${selectedCaseTitle()} · ${groups.length} 个模型结果`;
+  $("#matrix-summary").textContent = `正在看 ${selectedCaseTitle()}：${groups.length} 个模型。每张卡片里就是模型生成出来的页面，可以直接在这里看和操作。`;
+
+  if (!groups.length) {
+    matrix.innerHTML = `
+      <div class="matrix-empty">
+        <strong>没有符合条件的结果</strong>
+        <span>可以取消筛选，再看完整列表。</span>
       </div>
     `;
     return;
   }
 
-  $("#artifact-preview").innerHTML = state.task === "calculator" ? renderCalculator() : renderCalendar();
-  if (state.task === "calculator") attachCalculator();
+  const activeTaskId = taskIds[0];
+  const cards = groups.map((group) => renderResultCard(group, activeTaskId)).join("");
+  const selectedEntry = state.selectedModelId && state.selectedTask === activeTaskId
+    ? resultEntry(models.find((model) => model.id === state.selectedModelId), activeTaskId)
+    : null;
+
+  matrix.innerHTML = `
+    <div class="result-gallery">
+      ${cards}
+    </div>
+    ${selectedEntry ? `<div class="detail-dock">${renderDetail(selectedEntry)}</div>` : ""}
+  `;
 }
 
-function updateTrace() {
-  const model = models.find((item) => item.id === state.selectedModelId);
-  const run = runFor(model);
-  if (!model || !run) {
-    $("#trace-list").innerHTML = "";
-    return;
-  }
-  const task = tasks[state.task];
-  $("#trace-list").innerHTML = (run.trace || [])
-    .map(
-      ([time, title, body]) => `
-      <li>
-        <time>${time}</time>
-        <span>
-          <strong>${traceTitleText(title)}</strong>
-          <span>${traceBodyText(title, body, run, task)}</span>
-        </span>
-      </li>
-    `,
-    )
-    .join("");
+function renderDetailTable() {
+  const rows = models.flatMap((model) => Object.keys(tasks).map((taskId) => resultEntry(model, taskId)).filter(Boolean));
+  $("#detail-table").innerHTML = `
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>模型</th>
+          <th>任务</th>
+          <th>状态</th>
+          <th>检查</th>
+          <th>Token</th>
+          <th>成本</th>
+          <th>耗时</th>
+          <th>输入 / 输出</th>
+          <th>单价</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((entry) => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(entry.model.name)}</strong>
+              <small>${escapeHtml(entry.model.id)}</small>
+            </td>
+            <td>${escapeHtml(entry.task.title)}</td>
+            <td>${escapeHtml(hasUsableArtifact(entry.run) ? "可体验" : responseKindText(entry.run.responseKind || "empty"))}</td>
+            <td>${entry.passed}/${entry.task.tests.length}</td>
+            <td>${formatTokens(entry.totalTokens)}</td>
+            <td>${formatCny(entry.cost * state.fx)}</td>
+            <td>${formatLatency(entry.run.latency)}</td>
+            <td>${formatTokens(entry.run.input || 0)} / ${formatTokens(entry.run.output || 0)}</td>
+            <td>${formatUsdUnit(entry.model.pricing.input)} / ${formatUsdUnit(entry.model.pricing.output)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
 }
 
-function updateTaskLabels() {
-  const task = tasks[state.task];
-  $("#task-title").textContent = taskCompareTitle();
-  $("#task-badge").textContent = taskCheckBadge();
-  $$(".task-tab").forEach((tab) => {
-    const active = tab.dataset.task === state.task;
-    tab.classList.toggle("is-active", active);
-    tab.setAttribute("aria-selected", String(active));
-  });
+function syncControls() {
+  $("#fx-pill").textContent = state.fx.toFixed(4);
+  $("#fx-rate").value = state.fx.toFixed(4);
+  $("#sort-mode").value = state.sort;
+  $("#filter-artifact").checked = state.filterArtifact;
+  $("#filter-complete").checked = state.filterComplete;
 }
 
 function render() {
-  ensureSelectedModel();
-  $("#fx-pill").textContent = state.fx.toFixed(4);
-  updateTaskLabels();
-  updateModelSelector();
-  updateFlowReadout();
-  updatePromptPanel();
-  updateSummary();
-  updateRows();
-  updateDetail();
-  updateTests();
-  updateScatter();
-  updatePreview();
-  updateTrace();
+  syncControls();
+  renderPromptList();
+  renderMatrix();
+  renderDetailTable();
+  refreshSocialShareLinks();
+  $("#data-timestamp").textContent = generatedDataset?.generatedAt
+    ? `数据时间 ${formatDataTime(generatedDataset.generatedAt)}`
+    : "读取本地静态数据";
 }
 
 function applyRouteHints() {
   const params = new URLSearchParams(window.location.search);
-  const checkTask = params.get("check");
+  const checkTask = params.get("check") || params.get("task") || params.get("case");
   if (checkTask && tasks[checkTask]) state.task = checkTask;
-  if (params.has("minimax")) state.selectedModelId = "minimax/minimax-m2.7";
+  if (params.has("minimax")) {
+    state.selectedModelId = "minimax/minimax-m2.7";
+    state.selectedTask = state.task;
+  }
 }
 
 function bindControls() {
-  $$(".task-tab").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.task = button.dataset.task;
-      const selectedRun = runs[state.task]?.[state.selectedModelId];
-      if (!selectedRun || !selectedRun.artifactPath) {
-        state.selectedModelId = preferredTaskEntry()?.model.id || state.selectedModelId;
-      }
-      render();
-    });
+  $("#case-list").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-case]");
+    if (!button) return;
+    state.task = button.dataset.case;
+    state.selectedTask = "";
+    state.selectedModelId = "";
+    render();
+  });
+
+  $("#sort-mode").addEventListener("change", (event) => {
+    state.sort = event.target.value;
+    render();
+  });
+
+  $("#filter-artifact").addEventListener("change", (event) => {
+    state.filterArtifact = event.target.checked;
+    render();
+  });
+
+  $("#filter-complete").addEventListener("change", (event) => {
+    state.filterComplete = event.target.checked;
+    render();
   });
 
   $("#fx-rate").addEventListener("input", (event) => {
@@ -1122,20 +1154,61 @@ function bindControls() {
     render();
   });
 
-  $("#replay-run").addEventListener("click", () => {
-    document.body.classList.remove("is-replaying");
+  bindShareActions();
+
+  $("#comparison-matrix").addEventListener("click", (event) => {
+    const exportButton = event.target.closest("[data-export-card]");
+    if (exportButton) {
+      event.preventDefault();
+      const modelId = exportButton.dataset.exportModel;
+      const taskId = exportButton.dataset.exportTask;
+      const model = getModelById(modelId);
+      const entry = model ? resultEntry(model, taskId) : null;
+      const card = exportButton.closest(".result-card, .task-cell, .row-detail");
+
+      if (entry && card) {
+        void exportCardAsImage(exportButton, card, entry);
+      } else {
+        window.alert("当前卡片还没有可下载的生成结果。");
+      }
+      return;
+    }
+
+    if (event.target.closest("a")) return;
+    const close = event.target.closest("[data-close-detail]");
+    if (close) {
+      state.selectedModelId = "";
+      state.selectedTask = "";
+      render();
+      return;
+    }
+    const target = event.target.closest("[data-select-model][data-select-task]");
+    if (!target) return;
+    state.selectedModelId = target.dataset.selectModel;
+    state.selectedTask = target.dataset.selectTask;
+    render();
     window.requestAnimationFrame(() => {
-      document.body.classList.add("is-replaying");
-      window.setTimeout(() => document.body.classList.remove("is-replaying"), 1400);
+      document.querySelector(".detail-dock")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  });
+
+  $("#comparison-matrix").addEventListener("keydown", (event) => {
+    if (!["Enter", " "].includes(event.key)) return;
+    const target = event.target.closest("[data-select-model][data-select-task]");
+    if (!target) return;
+    event.preventDefault();
+    state.selectedModelId = target.dataset.selectModel;
+    state.selectedTask = target.dataset.selectTask;
+    render();
   });
 }
 
 function applyGeneratedDataset(dataset) {
   if (!dataset || !dataset.runs || !Array.isArray(dataset.models)) return;
+  const filteredModels = dataset.models.filter((model) => !hiddenModelIds.has(model.id));
   generatedDataset = dataset;
 
-  models.splice(0, models.length, ...dataset.models.map((model, index) => ({
+  models.splice(0, models.length, ...filteredModels.map((model, index) => ({
     accent: ["#c6ff3d", "#ff6547", "#f4b942", "#3d78ff", "#32d6c0", "#f6e27a", "#ff8ec3", "#7cffb2", "#9ea7ff"][index % 9],
     provider: "服务商",
     pricing: { input: 0, output: 0, cache: 0 },
@@ -1149,18 +1222,19 @@ function applyGeneratedDataset(dataset) {
   }
 
   Object.keys(runs).forEach((key) => delete runs[key]);
-  Object.assign(runs, dataset.runs);
+  Object.entries(dataset.runs).forEach(([taskId, taskRuns]) => {
+    runs[taskId] = Object.fromEntries(
+      Object.entries(taskRuns || {}).filter(([modelId]) => !hiddenModelIds.has(modelId))
+    );
+  });
 
   if (Number.isFinite(dataset.fxRate) && dataset.fxRate > 0) {
     state.fx = dataset.fxRate;
-    $("#fx-rate").value = dataset.fxRate;
   }
 
-  const firstEntry = preferredTaskEntry();
-  const selectedModel = models.find((model) => model.id === state.selectedModelId);
-  const selectedRun = selectedModel ? runFor(selectedModel) : null;
-  if ((!selectedModel || !selectedRun || !selectedRun.artifactPath) && firstEntry) {
-    state.selectedModelId = firstEntry.model.id;
+  if (state.selectedModelId && !models.some((model) => model.id === state.selectedModelId)) {
+    state.selectedModelId = "";
+    state.selectedTask = "";
   }
 }
 
@@ -1184,7 +1258,6 @@ async function loadLatestFxRate() {
     const latest = Number(data.rate);
     if (!Number.isFinite(latest) || latest <= 0) return;
     state.fx = latest;
-    $("#fx-rate").value = latest;
     render();
   } catch (error) {
     console.info("Using fallback USD/CNY rate:", error.message);
