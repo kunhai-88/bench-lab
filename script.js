@@ -109,6 +109,7 @@ let state = {
   selectedModelId: "",
   selectedTask: "",
   fx: fxDefault,
+  fxSource: "default",
   sort: "model",
   filterArtifact: false,
   filterComplete: false,
@@ -743,8 +744,14 @@ function bindShareActions() {
         throw new Error("clipboard-unavailable");
       }
     } catch {
-      window.prompt("复制失败，可手动复制链接：", url);
-      copyButton.textContent = "请手动复制";
+      const input = document.createElement("input");
+      input.value = url;
+      input.style.cssText = "position:fixed;opacity:0;left:-9999px";
+      document.body.appendChild(input);
+      input.select();
+      try { document.execCommand("copy"); copyButton.textContent = "已复制"; }
+      catch { copyButton.textContent = "复制失败"; }
+      input.remove();
     }
 
     window.setTimeout(() => {
@@ -773,7 +780,7 @@ function renderTaskCell(entry, model, taskId) {
     ? `
       <iframe
         sandbox="allow-scripts allow-forms"
-        loading="eager"
+        loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
       ></iframe>
@@ -846,7 +853,7 @@ function renderResultCard(group, taskId) {
     ? `
       <iframe
         sandbox="allow-scripts allow-forms"
-        loading="eager"
+        loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
       ></iframe>
@@ -859,14 +866,18 @@ function renderResultCard(group, taskId) {
     `;
 
   return `
-    <article class="result-card${ready ? "" : " is-empty"}${selected}" style="--accent:${model.accent}">
+    <article class="result-card${ready ? "" : " is-empty"}${selected}${entry.passed === entry.task.tests.length ? " is-perfect" : ""}" style="--accent:${model.accent}">
       <div class="result-head">
         <div>
           <span>${escapeHtml(model.provider)}</span>
           <strong>${escapeHtml(model.name)}</strong>
           <small>${escapeHtml(model.id)}</small>
         </div>
-        <em>${entry.passed}/${entry.task.tests.length}</em>
+        <em class="${entry.passed === entry.task.tests.length ? "pass-perfect" : entry.passed > 0 ? "pass-partial" : "pass-zero"}">${entry.passed}/${entry.task.tests.length}</em>
+      </div>
+
+      <div class="pass-bar-wrap">
+        <div class="pass-bar" style="--rate:${(entry.passRate * 100).toFixed(1)}%"></div>
       </div>
 
       <div class="result-preview">${preview}</div>
@@ -927,6 +938,7 @@ function renderDetail(entry) {
       <iframe
         class="detail-frame"
         sandbox="allow-scripts allow-forms"
+        loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${entry.model.name} ${entry.task.title}完整页面`)}"
       ></iframe>
@@ -1019,6 +1031,7 @@ function renderMatrix() {
       <div class="matrix-empty">
         <strong>还没有结果</strong>
         <span>跑完这个案例后，这里会显示每个模型生成的页面。</span>
+        <code class="onboarding-hint">npm run bench:openrouter -- --models=deepseek/deepseek-v3.2 --tasks=calculator --retries=1</code>
       </div>
     `;
     $("#matrix-summary").textContent = "暂无结果";
@@ -1029,7 +1042,23 @@ function renderMatrix() {
   const groups = filteredGroups(taskIds);
   const totalEntries = groups.reduce((sum, group) => sum + group.available.length, 0);
   $("#active-case-summary").textContent = `${selectedCaseTitle()} · ${groups.length} 个模型结果`;
-  $("#matrix-summary").textContent = `正在看 ${selectedCaseTitle()}：${groups.length} 个模型。每张卡片里就是模型生成出来的页面，可以直接在这里看和操作。`;
+
+  if (groups.length) {
+    const avgPass = groups.reduce((s, g) => s + (g.totalChecks ? g.passed / g.totalChecks : 0), 0) / groups.length;
+    const costs = groups.map((g) => g.totalCost * state.fx).filter((c) => c > 0);
+    const perfectCount = groups.filter((g) => g.isComplete).length;
+    const costRange = costs.length
+      ? `${formatCny(Math.min(...costs))} – ${formatCny(Math.max(...costs))}`
+      : "-";
+    $("#matrix-summary").innerHTML = `
+      <span class="summary-chip">${groups.length} 个模型</span>
+      <span class="summary-chip">${perfectCount} 个全部通过</span>
+      <span class="summary-chip">平均通过率 ${(avgPass * 100).toFixed(0)}%</span>
+      <span class="summary-chip">成本 ${escapeHtml(costRange)}</span>
+    `;
+  } else {
+    $("#matrix-summary").textContent = `正在看 ${selectedCaseTitle()}：${groups.length} 个模型。`;
+  }
 
   if (!groups.length) {
     matrix.innerHTML = `
@@ -1081,7 +1110,7 @@ function renderDetailTable() {
             </td>
             <td>${escapeHtml(entry.task.title)}</td>
             <td>${escapeHtml(hasUsableArtifact(entry.run) ? "可体验" : responseKindText(entry.run.responseKind || "empty"))}</td>
-            <td>${entry.passed}/${entry.task.tests.length}</td>
+            <td><span class="table-pass ${entry.passed === entry.task.tests.length ? "perfect" : entry.passed > 0 ? "partial" : ""}">${entry.passed}/${entry.task.tests.length}</span></td>
             <td>${formatTokens(entry.totalTokens)}</td>
             <td>${formatCny(entry.cost * state.fx)}</td>
             <td>${formatLatency(entry.run.latency)}</td>
@@ -1095,11 +1124,26 @@ function renderDetailTable() {
 }
 
 function syncControls() {
-  $("#fx-pill").textContent = state.fx.toFixed(4);
+  const fxLabel = { live: "实时", data: "数据", default: "默认" }[state.fxSource] || "默认";
+  $("#fx-pill").textContent = `${state.fx.toFixed(4)}`;
+  $("#fx-pill").title = `汇率来源：${fxLabel}`;
   $("#fx-rate").value = state.fx.toFixed(4);
-  $("#sort-mode").value = state.sort;
+  const sortSelect = $("#sort-mode");
+  sortSelect.value = state.sort;
+  sortSelect.closest(".select-control")?.setAttribute("data-active", state.sort !== "model" ? "1" : "");
   $("#filter-artifact").checked = state.filterArtifact;
   $("#filter-complete").checked = state.filterComplete;
+}
+
+function syncUrlState() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("case", state.task);
+  if (state.selectedModelId && state.selectedTask) {
+    url.searchParams.set("model", state.selectedModelId);
+  } else {
+    url.searchParams.delete("model");
+  }
+  window.history.replaceState(null, "", url.toString());
 }
 
 function render() {
@@ -1108,6 +1152,7 @@ function render() {
   renderMatrix();
   renderDetailTable();
   refreshSocialShareLinks();
+  syncUrlState();
   $("#data-timestamp").textContent = generatedDataset?.generatedAt
     ? `数据时间 ${formatDataTime(generatedDataset.generatedAt)}`
     : "读取本地静态数据";
@@ -1117,6 +1162,11 @@ function applyRouteHints() {
   const params = new URLSearchParams(window.location.search);
   const checkTask = params.get("check") || params.get("task") || params.get("case");
   if (checkTask && tasks[checkTask]) state.task = checkTask;
+  const modelParam = params.get("model");
+  if (modelParam) {
+    state.selectedModelId = modelParam;
+    state.selectedTask = state.task;
+  }
   if (params.has("minimax")) {
     state.selectedModelId = "minimax/minimax-m2.7";
     state.selectedTask = state.task;
@@ -1155,6 +1205,22 @@ function bindControls() {
   });
 
   bindShareActions();
+
+  const drawer = $("#data-drawer");
+  if (drawer) {
+    drawer.addEventListener("toggle", () => {
+      const label = drawer.querySelector(".drawer-toggle-label");
+      if (label) label.textContent = drawer.open ? "收起" : "展开";
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.selectedModelId) {
+      state.selectedModelId = "";
+      state.selectedTask = "";
+      render();
+    }
+  });
 
   $("#comparison-matrix").addEventListener("click", (event) => {
     const exportButton = event.target.closest("[data-export-card]");
@@ -1230,6 +1296,7 @@ function applyGeneratedDataset(dataset) {
 
   if (Number.isFinite(dataset.fxRate) && dataset.fxRate > 0) {
     state.fx = dataset.fxRate;
+    state.fxSource = "data";
   }
 
   if (state.selectedModelId && !models.some((model) => model.id === state.selectedModelId)) {
@@ -1258,6 +1325,7 @@ async function loadLatestFxRate() {
     const latest = Number(data.rate);
     if (!Number.isFinite(latest) || latest <= 0) return;
     state.fx = latest;
+    state.fxSource = "live";
     render();
   } catch (error) {
     console.info("Using fallback USD/CNY rate:", error.message);
@@ -1266,10 +1334,17 @@ async function loadLatestFxRate() {
 
 function drawSignalCanvas() {
   const canvas = $("#signal-canvas");
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (prefersReduced.matches) {
+    canvas.style.display = "none";
+    return;
+  }
+
   const context = canvas.getContext("2d");
   let width = 0;
   let height = 0;
   let tick = 0;
+  let rafId = 0;
 
   function resize() {
     const ratio = window.devicePixelRatio || 1;
@@ -1296,16 +1371,62 @@ function drawSignalCanvas() {
         context.fillRect(px, py, 2, 2);
       }
     }
-    window.requestAnimationFrame(frame);
+    rafId = window.requestAnimationFrame(frame);
   }
+
+  let paused = false;
+
+  prefersReduced.addEventListener("change", (event) => {
+    if (event.matches) {
+      window.cancelAnimationFrame(rafId);
+      context.clearRect(0, 0, width, height);
+      canvas.style.display = "none";
+    } else {
+      canvas.style.display = "";
+      paused = false;
+      resize();
+      frame();
+    }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (prefersReduced.matches) return;
+    if (document.hidden) {
+      paused = true;
+      window.cancelAnimationFrame(rafId);
+    } else {
+      paused = false;
+      frame();
+    }
+  });
 
   resize();
   window.addEventListener("resize", resize);
   frame();
 }
 
+function bindBackToTop() {
+  const btn = $("#back-to-top");
+  if (!btn) return;
+  let visible = false;
+  const threshold = 600;
+
+  const toggle = () => {
+    const shouldShow = window.scrollY > threshold;
+    if (shouldShow === visible) return;
+    visible = shouldShow;
+    btn.hidden = !visible;
+  };
+
+  window.addEventListener("scroll", toggle, { passive: true });
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 applyRouteHints();
 bindControls();
+bindBackToTop();
 render();
 loadGeneratedResults();
 loadLatestFxRate();

@@ -12,12 +12,28 @@
 
 ```bash
 npm install
+npx playwright install chromium
 cp .env.example .env.local
 npm run check
 npm run serve
 ```
 
+> `npx playwright install chromium` 会下载 Chromium 浏览器二进制，隐藏浏览器测试依赖它。
+
 运行真实模型前，请在 `.env.local` 填入 OpenRouter Key。
+
+## 验证你的改动
+
+添加新任务或修改测试后，建议跑一次小范围 benchmark 确认结果：
+
+```bash
+npm run bench:openrouter -- \
+  --models=deepseek/deepseek-v3.2 \
+  --tasks=calculator \
+  --retries=1
+npm run serve
+# 打开 http://127.0.0.1:4173 检查页面是否正常
+```
 
 ## 提交前检查
 

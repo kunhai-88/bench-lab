@@ -42,13 +42,23 @@
 
       gtag('config', 'G-MG09X1BDRM');
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23080906'/%3E%3Cpath d='M9 9h46v46H9z' fill='%23c6ff3d'/%3E%3Cpath d='M18 22h28v6H18zm0 14h18v6H18z' fill='%23080906'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles.css?v=case-4" />
+    <link rel="stylesheet" href="./styles.css?v=case-5" />
   </head>
   <body>
+    <noscript>
+      <div style="padding:40px 20px;text-align:center;color:#f1eadb;font-family:monospace;background:#080906;min-height:100vh;display:grid;place-items:center;">
+        <div>
+          <h1 style="color:#c6ff3d;margin:0 0 16px;">OpenRouter Bench Lab</h1>
+          <p>本页需要 JavaScript 才能展示模型对比数据。请开启浏览器 JavaScript 后刷新。</p>
+        </div>
+      </div>
+    </noscript>
     <canvas id="signal-canvas" aria-hidden="true"></canvas>
     <main class="shell">
       <header class="page-header">
@@ -79,7 +89,7 @@
           </div>
         </section>
         <section class="share-toolbar" aria-label="分享">
-          <a id="x-share-link" class="share-btn" href="https://x.com/intent/tweet?text=%E8%AE%A9%E5%90%84%E4%B8%AAOpenRouter%E6%A8%A1%E5%9E%8B%E5%8D%B4%E7%94%A8%E6%9D%A5%E6%AF%95%E9%AA%8C%E7%9A%84%E7%BD%91%E9%A1%B5%E7%94%9F%E6%88%90%E7%BB%93%E6%9E%9C">去 X 分享</a>
+          <a id="x-share-link" class="share-btn" href="https://x.com/intent/tweet?text=OpenRouter+Bench+Lab" target="_blank" rel="noreferrer">去 X 分享</a>
           <button id="copy-share-link" class="share-btn secondary">复制页面链接</button>
         </section>
       </header>
@@ -133,30 +143,32 @@
           </label>
         </div>
 
-        <div class="matrix-summary" id="matrix-summary">等待结果</div>
+        <div class="matrix-summary" id="matrix-summary">
+          <span class="loading-pulse">正在加载数据…</span>
+        </div>
         <div id="comparison-matrix" class="comparison-matrix" aria-live="polite"></div>
       </section>
 
-      <details class="data-drawer" aria-label="完整数据表">
+      <details class="data-drawer" id="data-drawer" aria-label="完整数据表">
         <summary>
           <div class="drawer-heading">
             <div>
               <p class="eyebrow">完整数据</p>
               <h2>查看所有指标</h2>
             </div>
-            <span>展开</span>
+            <span class="drawer-toggle-label">展开</span>
           </div>
         </summary>
         <div id="detail-table" class="detail-table-wrap"></div>
       </details>
 
       <footer class="footer-band">
-        <span>同一个需求</span>
-        <span>真实生成页面</span>
-        <span>点击查看测试细节</span>
+        <span>同一个需求 · 真实生成页面</span>
+        <span><a href="https://github.com/defto-ai/openrouter-bench-lab" target="_blank" rel="noreferrer" class="footer-link">GitHub 源码</a></span>
       </footer>
+      <button id="back-to-top" class="back-to-top" type="button" aria-label="回到顶部" hidden>↑</button>
     </main>
 
-    <script src="./script.js?v=case-3"></script>
+    <script src="./script.js?v=case-5"></script>
   </body>
 </html>

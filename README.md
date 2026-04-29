@@ -6,6 +6,27 @@
 
 > English: A static dashboard and local runner for comparing OpenRouter model cost, token usage, generated web app quality, and hidden browser-test results.
 
+**[在线体验 →](https://openrouter-bench-lab.pages.dev/)**
+
+---
+
+## 目录
+
+- [项目特点](#项目特点)
+- [当前任务](#当前任务)
+- [先决条件](#先决条件)
+- [快速开始](#快速开始)
+- [环境变量](#环境变量)
+- [常用命令](#常用命令)
+- [结果文件](#结果文件)
+- [部署](#部署)
+- [开源安全检查](#开源安全检查)
+- [贡献](#贡献)
+- [English Summary](#english-summary)
+- [License](#license)
+
+---
+
 ## 项目特点
 
 - 静态网页：可直接部署到 Cloudflare Pages、GitHub Pages 或任意静态托管服务。
@@ -27,12 +48,24 @@
 
 隐藏测试不会提前暴露给模型。测试会尽量通过用户可见行为发现控件，而不是要求模型写固定 `data-testid`。
 
+## 先决条件
+
+| 依赖 | 最低版本 | 说明 |
+| --- | --- | --- |
+| [Node.js](https://nodejs.org/) | 18+ | 项目使用 ES Modules（`"type": "module"`） |
+| npm | 随 Node.js | 安装依赖 |
+| [Playwright Chromium](https://playwright.dev/) | — | `npx playwright install chromium`，用于隐藏浏览器测试 |
+| Python 3 | 3.x | `npm run serve` 使用 `python3 -m http.server`（可选：仅本地预览需要） |
+
+> Windows 用户如果没有 Python，也可以用 `npx serve .` 或任意静态服务器替代 `npm run serve`。
+
 ## 快速开始
 
 安装依赖：
 
 ```bash
 npm install
+npx playwright install chromium
 ```
 
 创建本地环境文件：
@@ -75,10 +108,15 @@ http://127.0.0.1:4173
 | `OPENROUTER_API_KEY` | 无 | 必填。只放在 `.env.local`。 |
 | `MAX_TOKENS` | `16000` | 单次生成最大 token。 |
 | `MAX_RETRIES` | `1` | 浏览器测试失败后的修复尝试次数。 |
-| `OPENROUTER_TIMEOUT_MS` | `480000` | 单次 OpenRouter 请求超时。 |
-| `OPENROUTER_REASONING_EFFORT` | `none` | 默认降低 reasoning 消耗；如 provider 不支持，脚本会自动降级重试。 |
+| `OPENROUTER_TIMEOUT_MS` | `480000` | 单次 OpenRouter 请求超时（毫秒）。 |
+| `OPENROUTER_REASONING_EFFORT` | `none` | 降低 reasoning 消耗；设为 `default` 则不传该参数。 |
+| `OPENROUTER_REASONING_EXCLUDE` | `1` | 设为 `0` 可在响应中保留 reasoning 文本。 |
 | `ARTIFACT_OUTPUT_MODE` | `html` | 生成页面的输出模式。 |
 | `USD_CNY` | 自动获取 | 可手动指定美元兑人民币汇率。 |
+| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | 自定义 OpenRouter 兼容端点（优先级最高）。 |
+| `OPENROUTER_PROXY_URL` | — | `OPENROUTER_BASE_URL` 的别名，用于自建代理。 |
+| `OPENROUTER_PROXY_API_KEY` | — | 为私有代理请求设置 `X-Proxy-API-Key` header。 |
+| `OPENROUTER_JSON_MODE` | `1` | 设为 `0` 可在 provider 拒绝时禁用 `response_format` json_object。 |
 
 脚本会自动：
 
@@ -174,7 +212,26 @@ rg --pcre2 "sk-or-v1-[A-Za-z0-9]+|OPENROUTER_API_KEY=.*sk-or" . \
 
 OpenRouter Bench Lab is a static dashboard plus a local runner. It calls OpenRouter models with natural user prompts, generates standalone HTML pages, runs hidden browser tests, and records token usage, latency, repair attempts, and CNY cost.
 
-API keys stay local in `.env.local`. Generated artifacts and raw responses are ignored by default.
+**[Live Demo →](https://openrouter-bench-lab.pages.dev/)**
+
+### Quick Start (English)
+
+```bash
+npm install
+npx playwright install chromium
+cp .env.example .env.local
+# Edit .env.local — set OPENROUTER_API_KEY=sk-or-your-key
+
+npm run bench:openrouter -- \
+  --models=deepseek/deepseek-v3.2 \
+  --tasks=calculator \
+  --retries=1
+
+npm run serve
+# Open http://127.0.0.1:4173
+```
+
+API keys stay local in `.env.local`. Generated artifacts and raw responses are ignored by default. See the environment variable table above for all configuration options.
 
 ## License
 
