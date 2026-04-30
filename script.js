@@ -776,7 +776,7 @@ function renderTaskCell(entry, model, taskId) {
   const preview = ready
     ? `
       <iframe
-        sandbox="allow-scripts allow-forms"
+        sandbox="allow-scripts allow-forms allow-same-origin"
         loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
@@ -849,7 +849,7 @@ function renderResultCard(group, taskId) {
   const preview = ready
     ? `
       <iframe
-        sandbox="allow-scripts allow-forms"
+        sandbox="allow-scripts allow-forms allow-same-origin"
         loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${model.name} ${entry.task.title}`)}"
@@ -916,7 +916,7 @@ function renderDetail(entry) {
     ? `
       <iframe
         class="detail-frame"
-        sandbox="allow-scripts allow-forms"
+        sandbox="allow-scripts allow-forms allow-same-origin"
         loading="lazy"
         src="${escapeAttr(entry.run.artifactPath)}"
         title="${escapeAttr(`${entry.model.name} ${entry.task.title}完整页面`)}"
