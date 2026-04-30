@@ -66,9 +66,7 @@ const models = [
   },
 ];
 
-const hiddenModelIds = new Set([
-  "alibaba/tongyi-deepresearch-30b-a3b",
-]);
+const hiddenModelIds = new Set([]);
 
 const tasks = {
   calculator: {
@@ -683,10 +681,9 @@ function renderCaseList() {
       const active = state.task === taskId ? " is-active" : "";
       const resultCount = Object.keys(runs[taskId] || {}).length;
       return `
-        <button class="case-card${active}" type="button" data-case="${escapeAttr(taskId)}">
-          <span>${escapeHtml(caseDescription(taskId))}</span>
+        <button class="case-chip${active}" type="button" data-case="${escapeAttr(taskId)}">
           <strong>${escapeHtml(task.title)}</strong>
-          <small>${resultCount} 个模型结果 · ${task.tests.length} 项检查</small>
+          <small>${resultCount} 个模型</small>
         </button>
       `;
     })
@@ -696,9 +693,9 @@ function renderCaseList() {
 function renderCaseContext() {
   const task = tasks[state.task] || Object.values(tasks)[0];
   $("#active-case-title").textContent = task?.title || "案例";
-  $("#active-case-prompt").textContent = task?.prompt ? `这次给所有模型的需求：${task.prompt}` : "这个案例还没有需求记录。";
+  $("#active-case-prompt").textContent = task?.prompt || "";
   $("#active-case-checks").textContent = task ? `${task.tests.length} 项检查` : "-";
-  $("#active-case-summary").textContent = task ? `${task.title} · ${Object.keys(runs[state.task] || {}).length} 个模型结果` : "等待结果";
+  $("#active-case-summary").textContent = task ? `${task.title} · ${Object.keys(runs[state.task] || {}).length} 个模型` : "等待结果";
 }
 
 function renderPromptList() {
@@ -865,15 +862,16 @@ function renderResultCard(group, taskId) {
       </div>
     `;
 
+  const passClass = entry.passed === entry.task.tests.length ? "pass-perfect" : entry.passed > 0 ? "pass-partial" : "pass-zero";
+
   return `
     <article class="result-card${ready ? "" : " is-empty"}${selected}${entry.passed === entry.task.tests.length ? " is-perfect" : ""}" style="--accent:${model.accent}">
       <div class="result-head">
         <div>
           <span>${escapeHtml(model.provider)}</span>
           <strong>${escapeHtml(model.name)}</strong>
-          <small>${escapeHtml(model.id)}</small>
         </div>
-        <em class="${entry.passed === entry.task.tests.length ? "pass-perfect" : entry.passed > 0 ? "pass-partial" : "pass-zero"}">${entry.passed}/${entry.task.tests.length}</em>
+        <em class="${passClass}">${entry.passed}/${entry.task.tests.length}</em>
       </div>
 
       <div class="pass-bar-wrap">
@@ -882,37 +880,18 @@ function renderResultCard(group, taskId) {
 
       <div class="result-preview">${preview}</div>
 
-      <dl class="result-metrics">
-        <div>
-          <dt>Token</dt>
-          <dd>${formatTokens(entry.totalTokens)}</dd>
-        </div>
-        <div>
-          <dt>成本</dt>
-          <dd>${formatCny(entry.cost * state.fx)}</dd>
-        </div>
-        <div>
-          <dt>耗时</dt>
-          <dd>${formatLatency(entry.run.latency)}</dd>
-        </div>
-        <div>
-          <dt>状态</dt>
-          <dd>${escapeHtml(status)}</dd>
-        </div>
-      </dl>
+      <div class="result-stats">
+        <span class="stat">${formatCny(entry.cost * state.fx)}</span>
+        <span class="stat-sep">·</span>
+        <span class="stat">${formatTokens(entry.totalTokens)} tok</span>
+        <span class="stat-sep">·</span>
+        <span class="stat">${formatLatency(entry.run.latency)}</span>
+      </div>
 
       <div class="result-actions">
-        <button type="button" data-select-model="${escapeAttr(model.id)}" data-select-task="${escapeAttr(taskId)}">查看测试细节</button>
-        ${ready ? `
-          <button
-            type="button"
-            class="artifact-link"
-            data-export-card
-            data-export-model="${escapeAttr(model.id)}"
-            data-export-task="${escapeAttr(taskId)}"
-          >导出图像</button>
-        ` : ""}
-        ${ready ? `<a href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer">新窗口查看</a>` : ""}
+        <button type="button" data-select-model="${escapeAttr(model.id)}" data-select-task="${escapeAttr(taskId)}">查看详情</button>
+        ${ready ? `<a href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer" class="action-link">打开</a>` : ""}
+        ${ready ? `<button type="button" data-export-card data-export-model="${escapeAttr(model.id)}" data-export-task="${escapeAttr(taskId)}" class="action-link">导出</button>` : ""}
       </div>
     </article>
   `;
