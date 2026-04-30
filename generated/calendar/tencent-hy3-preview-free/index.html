@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>网页日历</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  body { background: #f5f7fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  .calendar {
+    width: 360px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+  }
+  .calendar-header {
+    background: #4a90e2;
+    color: #fff;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .calendar-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .calendar-header button:hover { background: rgba(255,255,255,0.2); }
+  .calendar-header .title { font-size: 18px; font-weight: 600; }
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f0f4f8;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    border-bottom: 1px solid #e8ecf1;
+  }
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 10px;
+    gap: 6px;
+  }
+  .calendar-days .day {
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .calendar-days .day:hover { background: #e8f0fe; }
+  .calendar-days .day.today { background: #4a90e2; color: #fff; font-weight: 600; }
+  .calendar-days .day.other-month { color: #bbb; }
+  .calendar-days .day.selected { outline: 2px solid #4a90e2; outline-offset: -2px; }
+</style>
+</head>
+<body>
+<div class="calendar">
+  <div class="calendar-header">
+    <button id="prev">&#8249;</button>
+    <div class="title" id="title"></div>
+    <button id="next">&#8250;</button>
+  </div>
+  <div class="calendar-weekdays">
+    <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+  </div>
+  <div class="calendar-days" id="days"></div>
+</div>
+
+<script>
+  (function () {
+    const titleEl = document.getElementById('title');
+    const daysEl = document.getElementById('days');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+    let selectedDate = new Date(today);
+
+    function render() {
+      const monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      titleEl.textContent = currentYear + '年 ' + monthNames[currentMonth];
+
+      daysEl.innerHTML = '';
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+      // 上月补齐
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const d = document.createElement('div');
+        d.className = 'day other-month';
+        d.textContent = daysInPrevMonth - i;
+        daysEl.appendChild(d);
+      }
+
+      // 本月
+      const isToday = (y, m, d) =>
+        y === today.getFullYear() && m === today.getMonth() && d === today.getDate();
+      const isSelected = (y, m, d) =>
+        y === selectedDate.getFullYear() && m === selectedDate.getMonth() && d === selectedDate.getDate();
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const el = document.createElement('div');
+        el.className = 'day';
+        el.textContent = d;
+        if (isToday(currentYear, currentMonth, d)) el.classList.add('today');
+        if (isSelected(currentYear, currentMonth, d)) el.classList.add('selected');
+
+        el.addEventListener('click', function () {
+          selectedDate = new Date(currentYear, currentMonth, d);
+          render();
+        });
+
+        daysEl.appendChild(el);
+      }
+
+      // 下月补齐
+      const totalCells = firstDay + daysInMonth;
+      const remain = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+      for (let i = 1; i <= remain; i++) {
+        const d = document.createElement('div');
+        d.className = 'day other-month';
+        d.textContent = i;
+        daysEl.appendChild(d);
+      }
+    }
+
+    prevBtn.addEventListener('click', function () {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      render();
+    });
+
+    nextBtn.addEventListener('click', function () {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      render();
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>

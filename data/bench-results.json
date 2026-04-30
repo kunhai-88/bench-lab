@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "promptStyle": "natural-user-request-v1",
-  "generatedAt": "2026-04-29T07:46:55.372Z",
-  "fxRate": 6.8314,
+  "generatedAt": "2026-04-30T06:06:54.297Z",
+  "fxRate": 6.8352,
   "models": [
     {
       "id": "minimax/minimax-m2.7",
@@ -168,17 +168,6 @@
       }
     },
     {
-      "id": "alibaba/tongyi-deepresearch-30b-a3b",
-      "name": "Tongyi DeepResearch 30B A3B",
-      "provider": "Alibaba",
-      "accent": "#ffb347",
-      "pricing": {
-        "input": 0.09,
-        "output": 0.45,
-        "cache": 0.09
-      }
-    },
-    {
       "id": "xiaomi/mimo-v2-pro-20260318",
       "name": "MiMo V2 Pro (2026-03-18)",
       "provider": "Xiaomi",
@@ -199,6 +188,31 @@
         "output": 0.00624,
         "cache": 0.0013
       }
+    },
+    {
+      "id": "tencent/hy3-preview:free",
+      "name": "Hy3 Preview",
+      "provider": "Tencent",
+      "accent": "#00a4ff",
+      "pricing": {
+        "input": 0,
+        "output": 0,
+        "cache": 0
+      },
+      "openRouterName": "Tencent: Hy3 preview (free)",
+      "supportedParameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "stop",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_p"
+      ]
     }
   ],
   "tasks": {
@@ -1588,176 +1602,6 @@
           "maxRetries": 1
         }
       },
-      "alibaba/tongyi-deepresearch-30b-a3b": {
-        "input": 378,
-        "output": 4352,
-        "cache": 57,
-        "reasoning": 1612,
-        "latency": 122.33,
-        "passed": 2,
-        "score": 29,
-        "retries": 1,
-        "tools": 2,
-        "providerName": "AtlasCloud",
-        "verdict": "真实生成页面通过 2/7 个自动测试。",
-        "trace": [
-          [
-            "00.0s",
-            "OpenRouter request",
-            "model=alibaba/tongyi-deepresearch-30b-a3b, attempts=2"
-          ],
-          [
-            "44.8s",
-            "Artifact generated",
-            "Generated HTML page · 2/7 passed"
-          ],
-          [
-            "54.5s",
-            "Repair attempt",
-            "Generated HTML page · 2/7 passed"
-          ],
-          [
-            "122.3s",
-            "Final tests",
-            "2/7 passed via browser checks"
-          ]
-        ],
-        "totalCost": 0.00199242,
-        "totalCostCny": 0.01360265,
-        "generationId": "gen-1777371962-2ZJBCFA1pY0hmJfErlpM",
-        "generationIds": [
-          "gen-1777371904-uYWiEyGaxZxR48aIzwSv",
-          "gen-1777371962-2ZJBCFA1pY0hmJfErlpM"
-        ],
-        "artifactPath": "generated/calculator/alibaba-tongyi-deepresearch-30b-a3b/index.html",
-        "rawRunPath": ".bench-runs/calculator/alibaba-tongyi-deepresearch-30b-a3b.json",
-        "testResults": [
-          {
-            "name": "可发现控件",
-            "assertion": "calculator controls and display can be discovered by behavior",
-            "passed": true,
-            "message": "calculator controls and display can be discovered by behavior"
-          },
-          {
-            "name": "清除和退格",
-            "assertion": "clear resets display and backspace removes one digit",
-            "passed": true,
-            "message": "clear resets display and backspace removes one digit"
-          },
-          {
-            "name": "基础四则运算",
-            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
-            "passed": false,
-            "message": "display=13"
-          },
-          {
-            "name": "运算优先级",
-            "assertion": "18 ÷ 3 + 4 × 2 = 14",
-            "passed": false,
-            "message": "display=3.869927e-2"
-          },
-          {
-            "name": "小数精度",
-            "assertion": "0.1 + 0.2 ≈ 0.3",
-            "passed": false,
-            "message": "display=0.202"
-          },
-          {
-            "name": "错误状态",
-            "assertion": "8 ÷ 0 shows error",
-            "passed": false,
-            "message": "display=0.1"
-          },
-          {
-            "name": "键盘输入",
-            "assertion": "Escape / Enter / Backspace work without mouse clicks",
-            "passed": false,
-            "message": "display=13337"
-          }
-        ],
-        "summary": "The model returned a complete HTML document instead of JSON.",
-        "responseKind": "content",
-        "finishReason": "stop",
-        "contentLength": 8119,
-        "reasoningLength": 0,
-        "attempts": [
-          {
-            "index": 0,
-            "repair": false,
-            "input": 122,
-            "output": 2114,
-            "cache": 3,
-            "reasoning": 800,
-            "totalCost": 0.00096228,
-            "totalCostCny": 0.00656968,
-            "generationId": "gen-1777371904-uYWiEyGaxZxR48aIzwSv",
-            "providerName": "Alibaba",
-            "elapsedMs": 44836,
-            "passed": 2,
-            "score": 29,
-            "responseKind": "content",
-            "finishReason": "stop",
-            "contentLength": 6344,
-            "reasoningLength": 0,
-            "parsedTitle": "Generated HTML page",
-            "request": {
-              "model": "alibaba/tongyi-deepresearch-30b-a3b",
-              "max_tokens": 16000,
-              "response_format": null,
-              "reasoning": {
-                "effort": "none",
-                "exclude": true
-              },
-              "modalities": [
-                "text"
-              ]
-            }
-          },
-          {
-            "index": 1,
-            "repair": true,
-            "input": 256,
-            "output": 2238,
-            "cache": 54,
-            "reasoning": 812,
-            "totalCost": 0.00103014,
-            "totalCostCny": 0.00703297,
-            "generationId": "gen-1777371962-2ZJBCFA1pY0hmJfErlpM",
-            "providerName": "AtlasCloud",
-            "elapsedMs": 54535,
-            "passed": 2,
-            "score": 29,
-            "responseKind": "content",
-            "finishReason": "stop",
-            "contentLength": 8119,
-            "reasoningLength": 0,
-            "parsedTitle": "Generated HTML page",
-            "request": {
-              "model": "alibaba/tongyi-deepresearch-30b-a3b",
-              "max_tokens": 16000,
-              "response_format": null,
-              "reasoning": {
-                "effort": "none",
-                "exclude": true
-              },
-              "modalities": [
-                "text"
-              ]
-            }
-          }
-        ],
-        "requestConfig": {
-          "maxTokens": 16000,
-          "jsonMode": false,
-          "artifactOutputMode": "html",
-          "requestTimeoutMs": 480000,
-          "reasoning": {
-            "effort": "none",
-            "exclude": true
-          },
-          "maxRetries": 1
-        }
-      },
       "xiaomi/mimo-v2-pro-20260318": {
         "input": 357,
         "output": 3946,
@@ -2074,6 +1918,176 @@
             "parsedTitle": "Generated HTML page",
             "request": {
               "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "tencent/hy3-preview:free": {
+        "input": 394,
+        "output": 3584,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 64.75,
+        "passed": 5,
+        "score": 71,
+        "retries": 1,
+        "tools": 2,
+        "providerName": "Tencent",
+        "verdict": "真实生成页面通过 5/7 个自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=tencent/hy3-preview:free, attempts=2"
+          ],
+          [
+            "14.4s",
+            "Artifact generated",
+            "Generated HTML page · 2/7 passed"
+          ],
+          [
+            "27.8s",
+            "Repair attempt",
+            "Generated HTML page · 5/7 passed"
+          ],
+          [
+            "64.8s",
+            "Final tests",
+            "5/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0,
+        "totalCostCny": 0,
+        "generationId": "gen-1777529148-lEQWC2XNUt5rhhP5TfHR",
+        "generationIds": [
+          "gen-1777529123-VSBZdi2xLJtkrPbW6UY2",
+          "gen-1777529148-lEQWC2XNUt5rhhP5TfHR"
+        ],
+        "artifactPath": "generated/calculator/tencent-hy3-preview-free/index.html",
+        "rawRunPath": ".bench-runs/calculator/tencent-hy3-preview-free.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calculator controls and display can be discovered by behavior",
+            "passed": true,
+            "message": "calculator controls and display can be discovered by behavior"
+          },
+          {
+            "name": "清除和退格",
+            "assertion": "clear resets display and backspace removes one digit",
+            "passed": true,
+            "message": "clear resets display and backspace removes one digit"
+          },
+          {
+            "name": "基础四则运算",
+            "assertion": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4",
+            "passed": true,
+            "message": "1 + 2 = 3, 9 - 4 = 5, 6 × 7 = 42, 8 ÷ 2 = 4"
+          },
+          {
+            "name": "运算优先级",
+            "assertion": "18 ÷ 3 + 4 × 2 = 14",
+            "passed": false,
+            "message": "display=20"
+          },
+          {
+            "name": "小数精度",
+            "assertion": "0.1 + 0.2 ≈ 0.3",
+            "passed": true,
+            "message": "0.1 + 0.2 ≈ 0.3"
+          },
+          {
+            "name": "错误状态",
+            "assertion": "8 ÷ 0 shows error",
+            "passed": false,
+            "message": "display=错误"
+          },
+          {
+            "name": "键盘输入",
+            "assertion": "Escape / Enter / Backspace work without mouse clicks",
+            "passed": true,
+            "message": "Escape / Enter / Backspace work without mouse clicks"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 7626,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 125,
+            "output": 1498,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0,
+            "totalCostCny": 0,
+            "generationId": "gen-1777529123-VSBZdi2xLJtkrPbW6UY2",
+            "providerName": "SiliconFlow",
+            "elapsedMs": 14437,
+            "passed": 2,
+            "score": 29,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 5496,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "tencent/hy3-preview:free",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "repair": true,
+            "input": 269,
+            "output": 2086,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0,
+            "totalCostCny": 0,
+            "generationId": "gen-1777529148-lEQWC2XNUt5rhhP5TfHR",
+            "providerName": "Tencent",
+            "elapsedMs": 27818,
+            "passed": 5,
+            "score": 71,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 7626,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "tencent/hy3-preview:free",
               "max_tokens": 16000,
               "response_format": null,
               "reasoning": {
@@ -3296,138 +3310,6 @@
           "maxRetries": 1
         }
       },
-      "alibaba/tongyi-deepresearch-30b-a3b": {
-        "input": 123,
-        "output": 3880,
-        "cache": 3,
-        "reasoning": 888,
-        "latency": 98.45,
-        "passed": 7,
-        "score": 100,
-        "retries": 0,
-        "tools": 1,
-        "providerName": "Alibaba",
-        "verdict": "真实生成页面通过了全部自动测试。",
-        "trace": [
-          [
-            "00.0s",
-            "OpenRouter request",
-            "model=alibaba/tongyi-deepresearch-30b-a3b, attempts=1"
-          ],
-          [
-            "87.7s",
-            "Artifact generated",
-            "Generated HTML page · 7/7 passed"
-          ],
-          [
-            "98.5s",
-            "Final tests",
-            "7/7 passed via browser checks"
-          ]
-        ],
-        "totalCost": 0.00175707,
-        "totalCostCny": 0.01199587,
-        "generationId": "gen-1777372081-PYWtR7NGKse6BIOnH2T7",
-        "generationIds": [
-          "gen-1777372081-PYWtR7NGKse6BIOnH2T7"
-        ],
-        "artifactPath": "generated/calendar/alibaba-tongyi-deepresearch-30b-a3b/index.html",
-        "rawRunPath": ".bench-runs/calendar/alibaba-tongyi-deepresearch-30b-a3b.json",
-        "testResults": [
-          {
-            "name": "可发现控件",
-            "assertion": "calendar controls and day grid can be discovered by behavior",
-            "passed": true,
-            "message": "calendar controls and day grid can be discovered by behavior"
-          },
-          {
-            "name": "月份标题",
-            "assertion": "a current month or year title is rendered",
-            "passed": true,
-            "message": "a current month or year title is rendered"
-          },
-          {
-            "name": "星期表头",
-            "assertion": "weekday labels are rendered",
-            "passed": true,
-            "message": "weekday labels are rendered"
-          },
-          {
-            "name": "日期网格",
-            "assertion": "at least 28 day cells are rendered",
-            "passed": true,
-            "message": "at least 28 day cells are rendered"
-          },
-          {
-            "name": "月份切换",
-            "assertion": "next/previous month navigation changes the title or grid",
-            "passed": true,
-            "message": "next/previous month navigation changes the title or grid"
-          },
-          {
-            "name": "日期选择",
-            "assertion": "a day can be selected",
-            "passed": true,
-            "message": "a day can be selected"
-          },
-          {
-            "name": "键盘或焦点",
-            "assertion": "day cells or navigation controls are keyboard reachable",
-            "passed": true,
-            "message": "day cells or navigation controls are keyboard reachable"
-          }
-        ],
-        "summary": "The model returned a complete HTML document instead of JSON.",
-        "responseKind": "content",
-        "finishReason": "stop",
-        "contentLength": 14111,
-        "reasoningLength": 0,
-        "attempts": [
-          {
-            "index": 0,
-            "repair": false,
-            "input": 123,
-            "output": 3880,
-            "cache": 3,
-            "reasoning": 888,
-            "totalCost": 0.00175707,
-            "totalCostCny": 0.01199587,
-            "generationId": "gen-1777372081-PYWtR7NGKse6BIOnH2T7",
-            "providerName": "Alibaba",
-            "elapsedMs": 87677,
-            "passed": 7,
-            "score": 100,
-            "responseKind": "content",
-            "finishReason": "stop",
-            "contentLength": 14111,
-            "reasoningLength": 0,
-            "parsedTitle": "Generated HTML page",
-            "request": {
-              "model": "alibaba/tongyi-deepresearch-30b-a3b",
-              "max_tokens": 16000,
-              "response_format": null,
-              "reasoning": {
-                "effort": "none",
-                "exclude": true
-              },
-              "modalities": [
-                "text"
-              ]
-            }
-          }
-        ],
-        "requestConfig": {
-          "maxTokens": 16000,
-          "jsonMode": false,
-          "artifactOutputMode": "html",
-          "requestTimeoutMs": 480000,
-          "reasoning": {
-            "effort": "none",
-            "exclude": true
-          },
-          "maxRetries": 1
-        }
-      },
       "xiaomi/mimo-v2-pro-20260318": {
         "input": 413,
         "output": 6503,
@@ -3744,6 +3626,138 @@
             "parsedTitle": "Generated HTML page",
             "request": {
               "model": "qwen/qwen3.6-max-preview-20260420",
+              "max_tokens": 16000,
+              "response_format": null,
+              "reasoning": {
+                "effort": "none",
+                "exclude": true
+              },
+              "modalities": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "requestConfig": {
+          "maxTokens": 16000,
+          "jsonMode": false,
+          "artifactOutputMode": "html",
+          "requestTimeoutMs": 480000,
+          "reasoning": {
+            "effort": "none",
+            "exclude": true
+          },
+          "maxRetries": 1
+        }
+      },
+      "tencent/hy3-preview:free": {
+        "input": 125,
+        "output": 1470,
+        "cache": 0,
+        "reasoning": 0,
+        "latency": 26.58,
+        "passed": 7,
+        "score": 100,
+        "retries": 0,
+        "tools": 1,
+        "providerName": "Tencent",
+        "verdict": "真实生成页面通过了全部自动测试。",
+        "trace": [
+          [
+            "00.0s",
+            "OpenRouter request",
+            "model=tencent/hy3-preview:free, attempts=1"
+          ],
+          [
+            "16.6s",
+            "Artifact generated",
+            "Generated HTML page · 7/7 passed"
+          ],
+          [
+            "26.6s",
+            "Final tests",
+            "7/7 passed via browser checks"
+          ]
+        ],
+        "totalCost": 0,
+        "totalCostCny": 0,
+        "generationId": "gen-1777529188-i7G7FnG3un8eVnuWfBiQ",
+        "generationIds": [
+          "gen-1777529188-i7G7FnG3un8eVnuWfBiQ"
+        ],
+        "artifactPath": "generated/calendar/tencent-hy3-preview-free/index.html",
+        "rawRunPath": ".bench-runs/calendar/tencent-hy3-preview-free.json",
+        "testResults": [
+          {
+            "name": "可发现控件",
+            "assertion": "calendar controls and day grid can be discovered by behavior",
+            "passed": true,
+            "message": "calendar controls and day grid can be discovered by behavior"
+          },
+          {
+            "name": "月份标题",
+            "assertion": "a current month or year title is rendered",
+            "passed": true,
+            "message": "a current month or year title is rendered"
+          },
+          {
+            "name": "星期表头",
+            "assertion": "weekday labels are rendered",
+            "passed": true,
+            "message": "weekday labels are rendered"
+          },
+          {
+            "name": "日期网格",
+            "assertion": "at least 28 day cells are rendered",
+            "passed": true,
+            "message": "at least 28 day cells are rendered"
+          },
+          {
+            "name": "月份切换",
+            "assertion": "next/previous month navigation changes the title or grid",
+            "passed": true,
+            "message": "next/previous month navigation changes the title or grid"
+          },
+          {
+            "name": "日期选择",
+            "assertion": "a day can be selected",
+            "passed": true,
+            "message": "a day can be selected"
+          },
+          {
+            "name": "键盘或焦点",
+            "assertion": "day cells or navigation controls are keyboard reachable",
+            "passed": true,
+            "message": "day cells or navigation controls are keyboard reachable"
+          }
+        ],
+        "summary": "The model returned a complete HTML document instead of JSON.",
+        "responseKind": "content",
+        "finishReason": "stop",
+        "contentLength": 4933,
+        "reasoningLength": 0,
+        "attempts": [
+          {
+            "index": 0,
+            "repair": false,
+            "input": 125,
+            "output": 1470,
+            "cache": 0,
+            "reasoning": 0,
+            "totalCost": 0,
+            "totalCostCny": 0,
+            "generationId": "gen-1777529188-i7G7FnG3un8eVnuWfBiQ",
+            "providerName": "Tencent",
+            "elapsedMs": 16558,
+            "passed": 7,
+            "score": 100,
+            "responseKind": "content",
+            "finishReason": "stop",
+            "contentLength": 4933,
+            "reasoningLength": 0,
+            "parsedTitle": "Generated HTML page",
+            "request": {
+              "model": "tencent/hy3-preview:free",
               "max_tokens": 16000,
               "response_format": null,
               "reasoning": {

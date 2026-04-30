@@ -93,6 +93,13 @@ const modelCatalog = [
     accent: "#7cffb2",
     pricing: { input: 0.435, output: 0.87, cache: 0.003625 },
   },
+  {
+    id: "tencent/hy3-preview:free",
+    name: "Hy3 Preview",
+    provider: "Tencent",
+    accent: "#00a4ff",
+    pricing: { input: 0, output: 0, cache: 0 },
+  },
 ];
 
 const tasks = {
