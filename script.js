@@ -168,94 +168,140 @@ function filenameForEntry(entry) {
   return `or-bench-${task}-${model}-${ts}.png`;
 }
 
-function formatExportMeta(entry) {
-  if (!entry) return [];
-
-  const taskName = entry.task?.title || entry.taskId || "未知任务";
-  const modelName = entry.model?.name || entry.model?.id || "未知模型";
+function buildExportCard(entry, previewDataUrl) {
+  const modelName = entry?.model?.name || entry?.model?.id || "Model";
+  const provider = entry?.model?.provider || "";
+  const taskName = entry?.task?.title || "";
   const passed = Number.isFinite(entry.passed) ? entry.passed : 0;
-  const total = Number.isFinite(entry.task?.tests?.length) ? entry.task.tests.length : 0;
+  const total = entry?.task?.tests?.length || 0;
   const tokens = formatTokens(entry.totalTokens || 0);
   const cost = formatCny((entry.cost || 0) * state.fx);
   const latency = formatLatency(entry.run?.latency);
+  const accent = entry?.model?.accent || "#b8f230";
+  const isPerfect = passed === total;
+  const ts = new Date().toLocaleString("zh-CN", { hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
-  return [
-    `模型：${modelName}`,
-    `任务：${taskName}`,
-    `通过率：${passed}/${total}`,
-    `Token：${tokens}`,
-    `成本：${cost}`,
-    `耗时：${latency}`,
+  const card = document.createElement("div");
+  card.style.cssText = `
+    width: 440px;
+    padding: 28px 24px 20px;
+    background: linear-gradient(168deg, #12150f 0%, #0d0f0b 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #f0ebe0;
+    -webkit-font-smoothing: antialiased;
+  `;
+
+  const topRow = document.createElement("div");
+  topRow.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;";
+
+  const brandWrap = document.createElement("div");
+  brandWrap.style.cssText = "display:flex; align-items:center; gap:8px;";
+  const mark = document.createElement("div");
+  mark.textContent = "OR";
+  mark.style.cssText = "width:24px; height:24px; display:flex; align-items:center; justify-content:center; background:#b8f230; border-radius:5px; font-size:9px; font-weight:800; color:#0a0c08;";
+  const brandText = document.createElement("span");
+  brandText.textContent = "BENCH LAB";
+  brandText.style.cssText = "font-size:11px; font-weight:600; letter-spacing:0.06em; color:rgba(240,235,224,0.6);";
+  brandWrap.appendChild(mark);
+  brandWrap.appendChild(brandText);
+
+  const scoreEl = document.createElement("div");
+  scoreEl.textContent = `${passed}/${total}`;
+  scoreEl.style.cssText = `font-size:22px; font-weight:700; font-family:"JetBrains Mono",ui-monospace,monospace; color:${isPerfect ? "#b8f230" : passed > 0 ? "#f4b942" : "#ff6547"};`;
+
+  topRow.appendChild(brandWrap);
+  topRow.appendChild(scoreEl);
+
+  const modelRow = document.createElement("div");
+  modelRow.style.cssText = "margin-bottom:16px;";
+  const providerEl = document.createElement("div");
+  providerEl.textContent = provider;
+  providerEl.style.cssText = "font-size:12px; color:rgba(240,235,224,0.5); margin-bottom:2px;";
+  const nameEl = document.createElement("div");
+  nameEl.textContent = modelName;
+  nameEl.style.cssText = "font-size:24px; font-weight:700; color:#ffffff; line-height:1.25;";
+  const taskEl = document.createElement("div");
+  taskEl.textContent = taskName;
+  taskEl.style.cssText = "font-size:13px; color:rgba(240,235,224,0.5); margin-top:4px;";
+  modelRow.appendChild(providerEl);
+  modelRow.appendChild(nameEl);
+  modelRow.appendChild(taskEl);
+
+  const previewWrap = document.createElement("div");
+  previewWrap.style.cssText = `
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #ffffff;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  `;
+
+  if (previewDataUrl) {
+    const img = document.createElement("img");
+    img.src = previewDataUrl;
+    img.style.cssText = "width:100%; height:100%; display:block; object-fit:cover; object-position:top left;";
+    previewWrap.appendChild(img);
+  } else {
+    previewWrap.style.background = "#1a1d17";
+    previewWrap.style.display = "flex";
+    previewWrap.style.alignItems = "center";
+    previewWrap.style.justifyContent = "center";
+    const placeholder = document.createElement("span");
+    placeholder.textContent = "预览不可用";
+    placeholder.style.cssText = "font-size:13px; color:rgba(240,235,224,0.3);";
+    previewWrap.appendChild(placeholder);
+  }
+
+  const accentBar = document.createElement("div");
+  accentBar.style.cssText = `width:100%; height:3px; border-radius:2px; background:${accent}; margin-bottom:14px; opacity:0.7;`;
+
+  const metricsRow = document.createElement("div");
+  metricsRow.style.cssText = "display:flex; justify-content:space-between; gap:8px; margin-bottom:16px;";
+
+  const metrics = [
+    ["成本", cost],
+    ["Token", tokens],
+    ["耗时", latency],
   ];
-}
+  for (const [label, value] of metrics) {
+    const cell = document.createElement("div");
+    cell.style.cssText = "flex:1; text-align:center;";
+    const labelEl = document.createElement("div");
+    labelEl.textContent = label;
+    labelEl.style.cssText = "font-size:10px; color:rgba(240,235,224,0.4); letter-spacing:0.04em; margin-bottom:4px;";
+    const valueEl = document.createElement("div");
+    valueEl.textContent = value;
+    valueEl.style.cssText = "font-size:15px; font-weight:600; font-family:'JetBrains Mono',ui-monospace,monospace; color:#f0ebe0;";
+    cell.appendChild(labelEl);
+    cell.appendChild(valueEl);
+    metricsRow.appendChild(cell);
+  }
 
-function createExportFrameWrapper(entry, cardElement) {
-  const frame = document.createElement("article");
-  frame.className = "export-card-frame";
-  frame.setAttribute("aria-hidden", "true");
+  const footerRow = document.createElement("div");
+  footerRow.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);";
+  const urlEl = document.createElement("span");
+  urlEl.textContent = "openrouter-bench-lab.pages.dev";
+  urlEl.style.cssText = "font-size:10px; color:rgba(240,235,224,0.3); letter-spacing:0.02em;";
+  const timeEl = document.createElement("span");
+  timeEl.textContent = ts;
+  timeEl.style.cssText = "font-size:10px; color:rgba(240,235,224,0.3);";
+  footerRow.appendChild(urlEl);
+  footerRow.appendChild(timeEl);
 
-  frame.style.background = "linear-gradient(180deg, #151e1d 0%, #0a100f 100%)";
-  frame.style.padding = "16px";
-  frame.style.borderRadius = "18px";
-  frame.style.border = "1px solid rgba(255,255,255,0.17)";
-  frame.style.boxShadow = "0 16px 38px rgba(0, 0, 0, 0.4)";
-  frame.style.width = "min-content";
-  frame.style.maxWidth = "100%";
-  frame.style.boxSizing = "border-box";
-  frame.style.color = "#f1eadb";
-  frame.style.fontFamily = `"Georgia", "Times New Roman", serif`;
-  frame.style.fontSmooth = "antialiased";
-  frame.style.gap = "12px";
+  card.appendChild(topRow);
+  card.appendChild(modelRow);
+  card.appendChild(previewWrap);
+  card.appendChild(accentBar);
+  card.appendChild(metricsRow);
+  card.appendChild(footerRow);
 
-  const header = document.createElement("header");
-  header.style.cssText = "display:flex; justify-content:space-between; gap:14px; align-items:flex-start; color:#f1eadb;";
-
-  const title = document.createElement("div");
-  const brand = document.createElement("div");
-  brand.textContent = "OpenRouter Bench Lab";
-  brand.style.cssText = "font-size:11px; letter-spacing:0.08em; color:#d2ed86; text-transform:uppercase; font-weight:700;";
-  title.appendChild(brand);
-
-  const main = document.createElement("h3");
-  main.textContent = entry?.model?.name || entry?.model?.id || "模型评测卡片";
-  main.style.cssText = "margin:2px 0 0; font-size:22px; line-height:1.2; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
-  title.appendChild(main);
-
-  const sub = document.createElement("p");
-  sub.textContent = formatExportMeta(entry).join(" · ");
-  sub.style.cssText = "margin:8px 0 0; font-size:11px; line-height:1.45; color:#dcd0b8; max-width:360px; overflow-wrap:anywhere;";
-  title.appendChild(sub);
-
-  const time = document.createElement("div");
-  const ts = new Date().toLocaleString("zh-CN", { hour12: false });
-  time.textContent = ts;
-  time.style.cssText = "font-size:11px; color:#8f9c94; margin-top:4px; white-space:nowrap;";
-  header.appendChild(title);
-  header.appendChild(time);
-
-  const exportCard = cardElement;
-  exportCard.style.borderRadius = "10px";
-  exportCard.style.border = "1px solid rgba(255,255,255,0.1)";
-  exportCard.style.background = "rgba(8,9,6,0.95)";
-  exportCard.style.overflow = "hidden";
-  exportCard.style.width = "100%";
-
-  const footer = document.createElement("footer");
-  footer.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; gap:8px; font-size:11px; color:#8f9c94; margin-top:12px;";
-
-  const source = document.createElement("span");
-  source.textContent = "可在控制台导出与复盘";
-  const sig = document.createElement("span");
-  sig.textContent = "#OpenRouter #AI";
-
-  footer.appendChild(source);
-  footer.appendChild(sig);
-
-  frame.appendChild(header);
-  frame.appendChild(exportCard);
-  frame.appendChild(footer);
-
-  return frame;
+  return card;
 }
 
 function getModelById(modelId) {
@@ -353,45 +399,9 @@ async function captureIframeAsImage(frame, html2CanvasLib) {
 }
 
 async function buildExportableCardClone(cardElement, html2CanvasLib, entry) {
-  const clone = cardElement.cloneNode(true);
-  const sourceIframes = cardElement.querySelectorAll("iframe");
-  const clonedIframes = clone.querySelectorAll("iframe");
-
-  for (let i = 0; i < clonedIframes.length; i += 1) {
-    const source = sourceIframes[i];
-    const target = clonedIframes[i];
-    if (!source || !target) continue;
-
-    const srcImage = await captureIframeAsImage(source, html2CanvasLib);
-    if (!srcImage) {
-      target.parentElement?.removeChild(target);
-      continue;
-    }
-
-    const img = document.createElement("img");
-    img.src = srcImage;
-    img.alt = "Generated preview";
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.display = "block";
-    img.style.objectFit = "cover";
-    img.style.background = "#fff";
-    target.replaceWith(img);
-  }
-
-  clone.querySelectorAll("[data-export-card]").forEach((button) => button.remove());
-
-  const actionRow = clone.querySelector(".result-actions, .task-cell-actions, .detail-actions");
-  if (actionRow) actionRow.style.display = "none";
-
-  const rect = cardElement.getBoundingClientRect();
-  if (rect.width > 0) {
-    clone.style.width = `${Math.ceil(rect.width)}px`;
-    clone.style.maxWidth = `${Math.ceil(rect.width)}px`;
-  }
-
-  const wrapped = createExportFrameWrapper(entry, clone);
-  return wrapped;
+  const iframe = cardElement.querySelector("iframe");
+  const previewDataUrl = iframe ? await captureIframeAsImage(iframe, html2CanvasLib) : null;
+  return buildExportCard(entry, previewDataUrl);
 }
 
 function downloadBlob(blob, filename) {
@@ -426,7 +436,7 @@ async function exportCardAsImage(button, cardElement, entry) {
     await new Promise((resolve) => requestAnimationFrame(resolve));
 
     const canvas = await html2CanvasLib(cardClone, {
-      backgroundColor: "#050706",
+      backgroundColor: null,
       useCORS: true,
       scale: 2,
     });
