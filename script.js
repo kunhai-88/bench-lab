@@ -103,7 +103,9 @@ const runs = {
 };
 
 let state = {
+  viewMode: "case",
   task: "calculator",
+  activeModel: "",
   selectedModelId: "",
   selectedTask: "",
   fx: fxDefault,
@@ -683,6 +685,14 @@ function caseDescription(taskId) {
 }
 
 function renderCaseList() {
+  const toggleBtns = $$("#view-toggle .view-btn");
+  toggleBtns.forEach((btn) => btn.classList.toggle("is-active", btn.dataset.view === state.viewMode));
+
+  if (state.viewMode === "model") {
+    renderModelChips();
+    return;
+  }
+
   const ids = Object.keys(tasks);
   $("#case-count").textContent = `${ids.length} 个案例`;
   $("#case-list").innerHTML = ids
@@ -700,12 +710,46 @@ function renderCaseList() {
     .join("");
 }
 
+function renderModelChips() {
+  const taskIds = Object.keys(tasks);
+  const modelsWithRuns = models.filter((model) => taskIds.some((taskId) => runs[taskId]?.[model.id]));
+  $("#case-count").textContent = `${modelsWithRuns.length} 个模型`;
+
+  if (!state.activeModel && modelsWithRuns.length) {
+    state.activeModel = modelsWithRuns[0].id;
+  }
+
+  $("#case-list").innerHTML = modelsWithRuns
+    .map((model) => {
+      const active = state.activeModel === model.id ? " is-active" : "";
+      const taskCount = taskIds.filter((taskId) => runs[taskId]?.[model.id]).length;
+      return `
+        <button class="case-chip${active}" type="button" data-model-chip="${escapeAttr(model.id)}" style="border-color:${active ? model.accent : ""}; ${active ? `background:color-mix(in srgb, ${model.accent}, transparent 88%)` : ""}">
+          <strong>${escapeHtml(model.name)}</strong>
+          <small>${taskCount} 个案例</small>
+        </button>
+      `;
+    })
+    .join("");
+}
+
 function renderCaseContext() {
+  if (state.viewMode === "model") {
+    const model = models.find((m) => m.id === state.activeModel);
+    const taskIds = Object.keys(tasks);
+    const completedTasks = taskIds.filter((taskId) => runs[taskId]?.[state.activeModel]);
+    $("#active-case-title").textContent = model?.name || "模型";
+    $("#active-case-prompt").textContent = model ? `${model.provider} · ${model.id}` : "";
+    $("#active-case-checks").textContent = model ? `${completedTasks.length} 个案例` : "-";
+    $("#active-case-summary").textContent = model ? `${model.name} · ${completedTasks.length} 个案例结果` : "等待结果";
+    return;
+  }
+
   const task = tasks[state.task] || Object.values(tasks)[0];
   $("#active-case-title").textContent = task?.title || "案例";
   $("#active-case-prompt").textContent = task?.prompt || "";
   $("#active-case-checks").textContent = task ? `${task.tests.length} 项检查` : "-";
-  $("#active-case-summary").textContent = task ? `${task.title} · ${Object.keys(runs[state.task] || {}).length} 个模型` : "等待结果";
+  $("#active-case-summary").textContent = task ? `${task.title} · ${Object.keys(runs[state.task] || {}).length} 个模型结果` : "等待结果";
 }
 
 function renderPromptList() {
@@ -1013,6 +1057,11 @@ function renderDetail(entry) {
 }
 
 function renderMatrix() {
+  if (state.viewMode === "model") {
+    renderModelView();
+    return;
+  }
+
   const taskIds = taskIdsForView();
   const matrix = $("#comparison-matrix");
   if (!taskIds.length) {
@@ -1029,7 +1078,6 @@ function renderMatrix() {
   }
 
   const groups = filteredGroups(taskIds);
-  const totalEntries = groups.reduce((sum, group) => sum + group.available.length, 0);
   $("#active-case-summary").textContent = `${selectedCaseTitle()} · ${groups.length} 个模型结果`;
 
   if (groups.length) {
@@ -1069,6 +1117,84 @@ function renderMatrix() {
     <div class="result-gallery">
       ${cards}
     </div>
+    ${selectedEntry ? `<div class="detail-dock">${renderDetail(selectedEntry)}</div>` : ""}
+  `;
+}
+
+function renderModelView() {
+  const matrix = $("#comparison-matrix");
+  const model = models.find((m) => m.id === state.activeModel);
+
+  if (!model) {
+    matrix.innerHTML = `<div class="matrix-empty"><strong>选择一个模型查看结果</strong></div>`;
+    $("#matrix-summary").textContent = "";
+    return;
+  }
+
+  const taskIds = Object.keys(tasks).filter((taskId) => runs[taskId]?.[model.id]);
+
+  if (!taskIds.length) {
+    matrix.innerHTML = `<div class="matrix-empty"><strong>${escapeHtml(model.name)} 还没有测试结果</strong></div>`;
+    $("#matrix-summary").textContent = "";
+    return;
+  }
+
+  const entries = taskIds.map((taskId) => resultEntry(model, taskId)).filter(Boolean);
+  const totalPassed = entries.reduce((s, e) => s + e.passed, 0);
+  const totalChecks = entries.reduce((s, e) => s + e.task.tests.length, 0);
+  const totalCost = entries.reduce((s, e) => s + e.cost, 0);
+  const totalTokens = entries.reduce((s, e) => s + e.totalTokens, 0);
+
+  $("#matrix-summary").innerHTML = `
+    <span class="summary-chip">${taskIds.length} 个案例</span>
+    <span class="summary-chip">通过 ${totalPassed}/${totalChecks}</span>
+    <span class="summary-chip">总成本 ${formatCny(totalCost * state.fx)}</span>
+    <span class="summary-chip">总 Token ${formatTokens(totalTokens)}</span>
+  `;
+
+  const cards = entries.map((entry) => {
+    const ready = hasUsableArtifact(entry.run);
+    const status = ready ? "可预览" : responseKindText(entry.run.responseKind || "empty");
+    const passClass = entry.passed === entry.task.tests.length ? "pass-perfect" : entry.passed > 0 ? "pass-partial" : "pass-zero";
+    const selected = state.selectedModelId === model.id && state.selectedTask === entry.taskId ? " is-selected" : "";
+
+    const preview = ready
+      ? `<iframe sandbox="allow-scripts allow-forms allow-same-origin" loading="lazy" src="${escapeAttr(entry.run.artifactPath)}" title="${escapeAttr(`${model.name} ${entry.task.title}`)}"></iframe>`
+      : `<div class="result-preview empty"><strong>${escapeHtml(status)}</strong><span>${escapeHtml(friendlyFailureText(entry.run))}</span></div>`;
+
+    return `
+      <article class="result-card${selected}${entry.passed === entry.task.tests.length ? " is-perfect" : ""}" style="--accent:${model.accent}">
+        <div class="result-head">
+          <div>
+            <span>${escapeHtml(entry.task.title)}</span>
+            <strong>${escapeHtml(entry.task.title)}</strong>
+          </div>
+          <em class="${passClass}">${entry.passed}/${entry.task.tests.length}</em>
+        </div>
+        <div class="pass-bar-wrap"><div class="pass-bar" style="--rate:${(entry.passRate * 100).toFixed(1)}%"></div></div>
+        <div class="result-preview">${preview}</div>
+        <div class="result-stats">
+          <span class="stat">${formatCny(entry.cost * state.fx)}</span>
+          <span class="stat-sep">·</span>
+          <span class="stat">${formatTokens(entry.totalTokens)} tok</span>
+          <span class="stat-sep">·</span>
+          <span class="stat">${formatLatency(entry.run.latency)}</span>
+        </div>
+        <div class="result-actions">
+          <button type="button" data-select-model="${escapeAttr(model.id)}" data-select-task="${escapeAttr(entry.taskId)}">查看详情</button>
+          ${ready ? `<a href="${escapeAttr(entry.run.artifactPath)}" target="_blank" rel="noreferrer" class="action-link">打开</a>` : ""}
+          ${ready ? `<button type="button" data-export-card data-export-model="${escapeAttr(model.id)}" data-export-task="${escapeAttr(entry.taskId)}" class="action-link">导出</button>` : ""}
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  const selectedEntry = state.selectedModelId === model.id && state.selectedTask
+    ? resultEntry(model, state.selectedTask)
+    : null;
+
+  matrix.innerHTML = `
+    <div class="result-gallery">${cards}</div>
     ${selectedEntry ? `<div class="detail-dock">${renderDetail(selectedEntry)}</div>` : ""}
   `;
 }
@@ -1126,7 +1252,15 @@ function syncControls() {
 
 function syncUrlState() {
   const url = new URL(window.location.href);
-  url.searchParams.set("case", state.task);
+  if (state.viewMode === "model") {
+    url.searchParams.set("view", "model");
+    if (state.activeModel) url.searchParams.set("active", state.activeModel);
+    url.searchParams.delete("case");
+  } else {
+    url.searchParams.delete("view");
+    url.searchParams.delete("active");
+    url.searchParams.set("case", state.task);
+  }
   if (state.selectedModelId && state.selectedTask) {
     url.searchParams.set("model", state.selectedModelId);
   } else {
@@ -1149,12 +1283,17 @@ function render() {
 
 function applyRouteHints() {
   const params = new URLSearchParams(window.location.search);
+  if (params.get("view") === "model") {
+    state.viewMode = "model";
+    const active = params.get("active");
+    if (active) state.activeModel = active;
+  }
   const checkTask = params.get("check") || params.get("task") || params.get("case");
   if (checkTask && tasks[checkTask]) state.task = checkTask;
   const modelParam = params.get("model");
   if (modelParam) {
     state.selectedModelId = modelParam;
-    state.selectedTask = state.task;
+    state.selectedTask = state.viewMode === "model" ? (params.get("task") || Object.keys(tasks)[0]) : state.task;
   }
   if (params.has("minimax")) {
     state.selectedModelId = "minimax/minimax-m2.7";
@@ -1163,7 +1302,25 @@ function applyRouteHints() {
 }
 
 function bindControls() {
+  $("#view-toggle").addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-view]");
+    if (!btn) return;
+    state.viewMode = btn.dataset.view;
+    state.selectedModelId = "";
+    state.selectedTask = "";
+    render();
+  });
+
   $("#case-list").addEventListener("click", (event) => {
+    const modelChip = event.target.closest("[data-model-chip]");
+    if (modelChip) {
+      state.activeModel = modelChip.dataset.modelChip;
+      state.selectedModelId = "";
+      state.selectedTask = "";
+      render();
+      return;
+    }
+
     const button = event.target.closest("[data-case]");
     if (!button) return;
     state.task = button.dataset.case;

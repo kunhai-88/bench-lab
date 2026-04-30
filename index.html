@@ -87,7 +87,11 @@
         </section>
       </header>
 
-      <nav class="case-strip" aria-label="案例选择">
+      <nav class="case-strip" aria-label="视图切换">
+        <div class="view-toggle" id="view-toggle">
+          <button class="view-btn is-active" type="button" data-view="case">按案例</button>
+          <button class="view-btn" type="button" data-view="model">按模型</button>
+        </div>
         <div id="case-list" class="case-chips"></div>
         <span id="case-count" class="case-count-badge">等待结果</span>
       </nav>

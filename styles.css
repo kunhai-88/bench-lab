@@ -293,6 +293,35 @@ small {
   border-right: 1px solid var(--line);
 }
 
+.view-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+}
+
+.view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.view-btn:hover {
+  color: var(--paper);
+}
+
+.view-btn.is-active {
+  background: var(--acid-dim);
+  color: var(--acid);
+  font-weight: 600;
+}
+
 .case-chips {
   display: flex;
   gap: 6px;
